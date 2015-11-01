@@ -5,11 +5,18 @@
 #define MAX_BUFFER 255							//this is the buffer for all popen output streams
 
 //test
+/*
 #define PATH /home/andreas/Dokumente/my_it4s/gtk/configuration/settings	//the path to the file of the configuration
 #define IMAGE_PATH /home/andreas/Dokumente/my_it4s/gtk/startpage	//the path to the image_file
 #define CITRIX_PATH /home/andreas/link_citrix 				//the path to the url of the citrix url
+*/
 
-#define CONFIGURATION /home/andreas/Dokumente/my_it4s/gtk/startpage/configuration_test //the path to the configurationfile
+// rapha test
+#define PATH /home/test/IT4S/ConfigurationPage/settings
+#define IMAGE_PATH /home/test/IT4S/StartPage
+#define CITRIX_PATH /home/test/IT4S/link_citrix
+
+#define CONFIGURATION /home/test/IT4S/ConfigurationPage/configuration //the path to the configurationfile
 //set of Input for the configuration_page
 //#define GET_LOGIN 	"get login"
 //#define GET_IP 		"get ip"
@@ -27,7 +34,7 @@
 #define CTXRDP_RDP_LINK CTXRDP_RDP_LINK
 #define CTXRDP_RDP_DOMAIN CTXRDP_RDP_DOMAIN
 #define CTXRDP_RDP_BIN CTXRDP_RDP_BIN
-//set of possible outputs of the configuration_paeg for the Login-demand 
+//set of possible outputs of the configuration_page for the Login-demand 
 //config answers
 #define RDP_ANSWER RDP
 

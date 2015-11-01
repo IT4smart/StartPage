@@ -75,7 +75,7 @@ static void init_login() {
 	
 	const char *login_type 		= configuration_output(STR(CTXRDP_TYPE));
 
-	printf("%s\n", login_type);
+	printf("login type: %s\n", login_type);
 	//if Remote, then label and function //after alex: only RDP 
 	if (strcmp(login_type, STR(RDP_ANSWER)) == 0) {
 		label_button_login 	= gtk_label_new ("Remotedesktop Login");	

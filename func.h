@@ -23,6 +23,7 @@ gboolean repaint_time();
 
 //rdp
 void rdp_login();
+
 //citrix
 void citrix_login();
 

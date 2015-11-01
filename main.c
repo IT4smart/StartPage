@@ -52,14 +52,144 @@ gboolean repaint_time(){
 
 
 
+// remove linefeed
+void remove_lf(char *str) {
+   size_t p = strlen(str);
+   str[p-1] = '\0';   // '\n' mit '\0' überschreiben
+}
+
+
+// replace a string with another
+char *replace_str(char *str, char *orig, char *rep) {
+  static char buffer[4096];
+  char *p;
+
+  if(!(p = strstr(str, orig)))  // Is 'orig' even in 'str'?
+    return str;
+
+  strncpy(buffer, str, p-str); // Copy characters from 'str' start to 'orig' st$
+  buffer[p-str] = '\0';
+
+  sprintf(buffer+(p-str), "%s%s", rep, p+strlen(orig));
+
+  return buffer;
+}
 
 void rdp_login() {
+	printf("%s", "starting rdp...\n");
+	char rdp_launch[MAX_BUFFER] = "";
 
+	// read data from config-file into buffer
+	char* buffer_ctxrdp_rdp_bin = (char*) configuration_output(STR(CTXRDP_RDP_BIN));
+	char* buffer_ctxrdp_rdp_link = (char*) configuration_output(STR(CTXRDP_RDP_LINK));
+	char* buffer_ctxrdp_rdp_domain = (char*) configuration_output(STR(CTXRDP_RDP_DOMAIN));	
+
+	// run rdp
+	strcat(rdp_launch, buffer_ctxrdp_rdp_bin);
+	strcat(rdp_launch, " -d ");
+	strcat(rdp_launch, buffer_ctxrdp_rdp_domain);
+	strcat(rdp_launch, " -f ");
+	strcat(rdp_launch, buffer_ctxrdp_rdp_link);
+	fp = popen(rdp_launch, "r");
+  	if (fp == NULL) {
+    		printf("Failed to run command\n" );
+    		exit(1);
+  	}
 }
 
 
 void citrix_login() {
+	printf("starting ctx ...\n");	
 
+	printf("killing all running processes of citrix...\n");
+	system("killall storebrowse AuthManagerDaemon ServiceRecord");
+
+	// try to add the store.	
+	FILE *fp;
+
+  	/* Open the command for reading. */
+	char ctx_launch[MAX_BUFFER] = "";
+	char* buffer_ctxrdp_ctx_bin = (char*) configuration_output(STR(CTXRDP_CTX_BIN));
+	char* buffer_ctxrdp_ctx_link = (char*) configuration_output(STR(CTXRDP_CTX_LINK));
+	
+	// debugging
+	printf("ctx bin: %s\n", buffer_ctxrdp_ctx_bin);
+	printf("ctx link: %s\n", buffer_ctxrdp_ctx_link);
+		
+	strcat(ctx_launch, buffer_ctxrdp_ctx_bin);
+	strcat(ctx_launch, " -a ");
+	strcat(ctx_launch, buffer_ctxrdp_ctx_link);
+
+	fp = popen(ctx_launch, "r");
+  	if (fp == NULL) {
+    		printf("Failed to run command\n" );
+    		exit(1);
+  	}
+	
+	/* Read the output a line at a time - output it. */
+  	char path[MAX_BUFFER] = "";
+  	while (fgets(path, sizeof(path)-1, fp) != NULL) {
+    		printf("%s", path);
+  	}
+	remove_lf(path); // entferne linefeed
+
+  	/* close */
+  	pclose(fp);
+
+	// find all the desktops
+	char ctx_find[MAX_BUFFER] = "";
+	strcat(ctx_find, buffer_ctxrdp_ctx_bin);
+	strcat(ctx_find, " -E ");
+	strcat(ctx_find, path);
+	strcat(ctx_find, " -i best > settings_from_store");
+	system(ctx_find);
+
+	// launch the desktop if only one exists
+	char *desktop;
+	FILE *pipe;
+	char buffer[MAX_BUFFER];
+
+	pipe = popen("awk -F\"\\'\" '{print $2}' settings_from_store", "r");
+	if (NULL == pipe) {
+   		perror("pipe");
+    		exit(1);
+	} 
+	fgets(buffer, sizeof(buffer), pipe);
+	desktop = buffer;
+	remove_lf(desktop);
+	printf("%s\n", desktop);	
+	pclose(pipe);  
+
+	char ctx_launch2[MAX_BUFFER] = "";
+	desktop = replace_str(desktop, "$", "\\$"); // replace $ with \$
+	strcat(ctx_launch2, buffer_ctxrdp_ctx_bin);
+	strcat(ctx_launch2, " -L \"");
+	strcat(ctx_launch2, desktop);
+	strcat(ctx_launch2, "\" ");
+	strcat(ctx_launch2, path);
+
+  	/* Open the command for reading. */
+  	fp = popen(ctx_launch2, "r");
+  	if (fp == NULL) {
+    		printf("Failed to run command\n" );
+    		exit(1);
+  	}
+	
+	/* Read the output a line at a time - output it. */
+	char do_output[MAX_BUFFER];
+  	while (fgets(do_output, sizeof(path)-1, fp) != NULL) {
+    		printf("%s", do_output);
+
+		if (strstr(do_output, "Error"))
+		{
+			printf("Error with launching Session");
+		}
+  	}
+
+  	/* close */
+  	pclose(fp);
+
+	//return;
 }
 
 
@@ -101,7 +231,7 @@ char* configuration_output(char *get_info) {
 	strcpy (config_command, config_path);
 	strcat (config_command, " ");
 	strcat (config_command, info_request);
-	
+
 	const char* comment	= config_command;
 	//get back the output of what is wanted to be tested
 				//printf("comment: %s\n\n", comment);
@@ -115,7 +245,7 @@ char* configuration_output(char *get_info) {
 	return configuration_output_return;
 }
 
-
+/*
 //function test for existing wlan0 module 
 bool test_for_wlan_module() {
 	//test for wlan-module
@@ -135,7 +265,7 @@ bool test_for_wlan_module() {
 	}
 	return FALSE;
 }
-
+*/
 
 
 
@@ -155,7 +285,7 @@ void quit_window () {
 void activate (GtkApplication *app) {
 // create a new window, and set its title
 window = gtk_application_window_new (app);
-gtk_window_set_title (GTK_WINDOW (window), "Configuration Page");
+gtk_window_set_title (GTK_WINDOW (window), "Start Page");
 gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 g_signal_connect (G_OBJECT (window), "delete_event", 
 		G_CALLBACK(quit_window), NULL);
@@ -193,7 +323,7 @@ gtk_init(&argc, &argv);
 
 window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
-gtk_window_set_title (GTK_WINDOW (window), "Configuration Page");
+gtk_window_set_title (GTK_WINDOW (window), "Start Page");
 
 gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 g_signal_connect (G_OBJECT (window), "delete_event", 
