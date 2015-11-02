@@ -78,11 +78,28 @@ char *replace_str(char *str, char *orig, char *rep) {
 void rdp_login() {
 	printf("%s", "starting rdp...\n");
 	char rdp_launch[MAX_BUFFER] = "";
+	char buffer[MAX_BUFFER];
 
 	// read data from config-file into buffer
-	char* buffer_ctxrdp_rdp_bin = (char*) configuration_output(STR(CTXRDP_RDP_BIN));
-	char* buffer_ctxrdp_rdp_link = (char*) configuration_output(STR(CTXRDP_RDP_LINK));
-	char* buffer_ctxrdp_rdp_domain = (char*) configuration_output(STR(CTXRDP_RDP_DOMAIN));	
+	char* buffer_ctxrdp_rdp_bin = NULL;
+	char* buffer_ctxrdp_rdp_link = NULL;
+	char* buffer_ctxrdp_rdp_domain = NULL;	
+
+	/* Doing some memory management */
+	// RDP binary
+	strcpy(buffer, configuration_output(STR(CTXRDP_RDP_BIN)));
+	buffer_ctxrdp_rdp_bin = (char *)malloc(strlen(buffer)+1);
+	strcpy(buffer_ctxrdp_rdp_bin, buffer);
+
+	// RDP Link/Address
+	strcpy(buffer, configuration_output(STR(CTXRDP_RDP_LINK)));
+	buffer_ctxrdp_rdp_link = (char *)malloc(strlen(buffer)+1);
+	strcpy(buffer_ctxrdp_rdp_link, buffer);
+
+	// RDP Domain
+	strcpy(buffer, configuration_output(STR(CTXRDP_RDP_DOMAIN)));
+	buffer_ctxrdp_rdp_domain = (char *)malloc(strlen(buffer)+1);
+	strcpy(buffer_ctxrdp_rdp_domain, buffer);
 
 	// run rdp
 	strcat(rdp_launch, buffer_ctxrdp_rdp_bin);
@@ -115,16 +132,19 @@ void citrix_login() {
 	char* buffer_ctxrdp_ctx_bin = NULL;
 	char* buffer_ctxrdp_ctx_link = NULL;
 	
+	/* Doing some memory management */
+	// CTX BIN
 	strcpy(buffer, configuration_output(STR(CTXRDP_CTX_BIN)));
 	buffer_ctxrdp_ctx_bin = (char *)malloc(strlen(buffer)+1);
-	printf("%p\n", buffer_ctxrdp_ctx_bin);
+	//printf("%p\n", buffer_ctxrdp_ctx_bin);
 	strcpy(buffer_ctxrdp_ctx_bin, buffer);
-	printf("%p\n", buffer_ctxrdp_ctx_bin);
+	//printf("%p\n", buffer_ctxrdp_ctx_bin);
 
+	// CTX LINK
 	strcpy(buffer, configuration_output(STR(CTXRDP_CTX_LINK)));
 	buffer_ctxrdp_ctx_link = (char *)malloc(strlen(buffer)+1);
 	strcpy(buffer_ctxrdp_ctx_link, buffer);
-	printf("%p\n", buffer_ctxrdp_ctx_link);
+	//printf("%p\n", buffer_ctxrdp_ctx_link);
 	
 	// debugging
 	printf("ctx bin: %s\n", buffer_ctxrdp_ctx_bin);
