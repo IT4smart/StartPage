@@ -108,14 +108,29 @@ void citrix_login() {
 	FILE *fp;
 
   	/* Open the command for reading. */
+	// declare some variables
 	char ctx_launch[MAX_BUFFER] = "";
-	char* buffer_ctxrdp_ctx_bin = (char*) configuration_output(STR(CTXRDP_CTX_BIN));
-	char* buffer_ctxrdp_ctx_link = (char*) configuration_output(STR(CTXRDP_CTX_LINK));
+	char ctx_launch2[MAX_BUFFER] = "";
+	char buffer[MAX_BUFFER];
+	char* buffer_ctxrdp_ctx_bin = NULL;
+	char* buffer_ctxrdp_ctx_link = NULL;
+	
+	strcpy(buffer, configuration_output(STR(CTXRDP_CTX_BIN)));
+	buffer_ctxrdp_ctx_bin = (char *)malloc(strlen(buffer)+1);
+	printf("%p\n", buffer_ctxrdp_ctx_bin);
+	strcpy(buffer_ctxrdp_ctx_bin, buffer);
+	printf("%p\n", buffer_ctxrdp_ctx_bin);
+
+	strcpy(buffer, configuration_output(STR(CTXRDP_CTX_LINK)));
+	buffer_ctxrdp_ctx_link = (char *)malloc(strlen(buffer)+1);
+	strcpy(buffer_ctxrdp_ctx_link, buffer);
+	printf("%p\n", buffer_ctxrdp_ctx_link);
 	
 	// debugging
 	printf("ctx bin: %s\n", buffer_ctxrdp_ctx_bin);
 	printf("ctx link: %s\n", buffer_ctxrdp_ctx_link);
-		
+
+	
 	strcat(ctx_launch, buffer_ctxrdp_ctx_bin);
 	strcat(ctx_launch, " -a ");
 	strcat(ctx_launch, buffer_ctxrdp_ctx_link);
@@ -147,7 +162,7 @@ void citrix_login() {
 	// launch the desktop if only one exists
 	char *desktop;
 	FILE *pipe;
-	char buffer[MAX_BUFFER];
+	//char buffer[MAX_BUFFER];
 
 	pipe = popen("awk -F\"\\'\" '{print $2}' settings_from_store", "r");
 	if (NULL == pipe) {
@@ -160,7 +175,7 @@ void citrix_login() {
 	printf("%s\n", desktop);	
 	pclose(pipe);  
 
-	char ctx_launch2[MAX_BUFFER] = "";
+	//char ctx_launch2[MAX_BUFFER] = "";
 	desktop = replace_str(desktop, "$", "\\$"); // replace $ with \$
 	strcat(ctx_launch2, buffer_ctxrdp_ctx_bin);
 	strcat(ctx_launch2, " -L \"");
@@ -188,7 +203,10 @@ void citrix_login() {
 
   	/* close */
   	pclose(fp);
-
+	
+	// free the allocated space
+	free(buffer_ctxrdp_ctx_bin);
+	free(buffer_ctxrdp_ctx_link);
 	//return;
 }
 
@@ -220,7 +238,7 @@ void analyse_input(FILE *fp, char file_type[MAX_BUFFER]) {
 //input: parameter for the configuration_page
 //output: return string of the configuration_page
 char* configuration_output(char *get_info) {
-	//the command will be prepared
+	//the command will be prepared	
 	char* info_request	= get_info;
 	int size_request	= strlen(info_request);
 				//g_print("size %d\n", size);
@@ -235,13 +253,15 @@ char* configuration_output(char *get_info) {
 	const char* comment	= config_command;
 	//get back the output of what is wanted to be tested
 				//printf("comment: %s\n\n", comment);
+	
 	fp = popen(comment, "r");
 	//store the output
 	analyse_input(fp, configuration_output_return);
 				//g_print("output %s", configuration_output_return);
 				//gtk_entry_set_text(GTK_ENTRY(entry_network_ip), file_type);
 	pclose(fp);
-				//printf("in config_outout: %s\n", configuration_output_return);
+				printf("in config_output: %s\n", configuration_output_return);
+
 	return configuration_output_return;
 }
 
@@ -291,11 +311,6 @@ g_signal_connect (G_OBJECT (window), "delete_event",
 		G_CALLBACK(quit_window), NULL);
 gtk_window_set_keep_above(GTK_WINDOW(window),TRUE);
 
-
-
-//deactivate xbindkeys
-//system("killall xbindkeys");
-	//execl ("/usr/bin/firefox", "", "firefox",  NULL);
 
 
 
