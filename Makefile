@@ -18,7 +18,7 @@ OBJ 		=	\
 			init.o			\
 
 
-config:  $(OBJ)
+all:  $(OBJ)
 	$(CC) $(WFLAGS) $(OBJ) -o $(TARGET) $(GTK3)
 
 %.o: %.c
