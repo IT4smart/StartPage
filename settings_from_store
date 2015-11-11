@@ -1,0 +1,26 @@
+Usage: /opt/Citrix/ICAClient/util/storebrowse [options] store
+    -?,  --help                                 this message
+    -M,  --details xxx                          details of resources to print
+    -i,  --icons WxB|best                       fetch icons W pixels wide and B bpp OR
+                                                best sized icon
+    -L,  --launch <resource>                    launch an instance of this resource
+    -E,  --enumerate                            enumerate all resources available
+    -S,  --subscribed                           list all subscribed resources
+    -v,  --version                              version number of this command
+    -r,  --icaroot <directory>                  the root of the receiver installation
+    -s,  --subscribe <resource>                 subscribe to this resource
+    -u,  --unsubscribe <resource>               unsubscribe from this resource
+    -Wr, --reconnect r                          reconnect to disconnected sessions
+    -WR, --reconnect R                          reconnect to active and disconnected sessions
+    -WD, --disconnect                           disconnect from all sessions
+    -WT, --terminate                            terminate all sessions
+    -U,  --username <user_name>                 user name (for PNA connections only)
+    -P,  --password <password>                  password (for PNA connections only)
+    -D,  --domain <domain>                      domain (for PNA connections only)
+    -l,  --liststores                           list all stores and their configuration
+    -a,  --addstore <store URL>                 add the store at the given URL
+    -C,  --addcr <cr file>                      add the store for the given CR file
+    -g,  --storegateway <gateway>               changes the default gateway to the given gateway
+    -d,  --deletestore <store URL>              removes this store
+    -c,  --configselfservice <entry[=value]>    gets or sets the configuration entries
+    -K,  --killdaemon                           closes storebrowse daemon (also clears PNA credentials)

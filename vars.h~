@@ -12,11 +12,11 @@
 */
 
 // rapha test
-#define PATH /home/test/workspace/ConfigurationPage/settings
-#define IMAGE_PATH /home/test/workspace/StartPage
+#define PATH /home/test/IT4S/ConfigurationPage/settings
+#define IMAGE_PATH /home/test/IT4S/StartPage
 #define CITRIX_PATH /home/test/IT4S/link_citrix
 
-#define CONFIGURATION /home/test/workspace/ConfigurationPage/configuration //the path to the configurationfile
+#define CONFIGURATION /home/test/IT4S/configuration/configuration //the path to the configurationfile
 //set of Input for the configuration_page
 //#define GET_LOGIN 	"get login"
 //#define GET_IP 		"get ip"
