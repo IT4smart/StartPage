@@ -14,10 +14,10 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    Citrix.cpp
+    ./src/Citrix.cpp
 
 HEADERS  += mainwindow.h \
-    Citrix.h
+    ./inc/Citrix.h
 
 FORMS    += mainwindow.ui
 
