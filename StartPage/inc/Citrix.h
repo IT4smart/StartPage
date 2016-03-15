@@ -30,8 +30,8 @@ enum CTX_Status {OK, FILE_DELETE, FILE_EMPTY, MISSING_CERTIFICATE, EXECUTION_FAI
 
 // element struct of citrix
 typedef struct {
-    std::string name;
-    std::string link;
+    std::string name = "";
+    std::string link = "";
 } CTX_Element;
 
 // result struct of citrix
@@ -68,6 +68,11 @@ class Citrix {
     public:
         // constructors
         Citrix(std::string netscaler_link, CTX_Mode mode);
+
+		// delete the copy contructors, because they are not needed and
+		// otherwise there will be problems with the copying of the ui* pointer
+		Citrix(const Citrix&) = delete;
+		Citrix* operator=(const Citrix&) = delete;
         
     
 };

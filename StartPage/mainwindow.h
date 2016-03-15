@@ -28,37 +28,41 @@ const QString LABEL_GATEWAY = "Gateway:";
 const QString LABEL_TYPE = "IP Vergabe:";
 
 namespace Ui {
-    class MainWindow;
+	class MainWindow;
 }
 
 class MainWindow : public QMainWindow {
-    Q_OBJECT
+	Q_OBJECT
 
-    public:
-        explicit MainWindow(QWidget *parent = 0);
-        ~MainWindow();
+	public:
+		explicit MainWindow(QWidget *parent = 0);
+		~MainWindow();
 
-        void positionWidgets(); // hier werden die Elemente neu positioniert
-        Ui::MainWindow *ui; // user interface
+		void positionWidgets(); // hier werden die Elemente neu positioniert
+		Ui::MainWindow *ui; // user interface
+		// delete the copy contructors, because they are not needed and
+		// otherwise there will be problems with the copying of the ui* pointer
+		MainWindow(const MainWindow&) = delete;
+		MainWindow* operator=(const MainWindow&) = delete;
 
-    private slots:
-        void on_btnExit_clicked();
-        void on_btnCitrix_clicked();
-        void on_btnDesktop_clicked(int);
+		private slots:
+			void on_btnExit_clicked();
+		void on_btnCitrix_clicked();
+		void on_btnDesktop_clicked(int);
 
-    private:
-        QProcess *procCitrix; // process for citrix
-        QProcess *procSystem; // process for system commands
-        void fillWidgetsTexts(); // fill all widgets in correct texts and language
-        bool fillNetworkLabels(); // fill all network labels in correct texts and language, return: true=connected, false=offline
-        QSignalMapper *signalMapper; // signal mapper zur übergabe der signale von signal nach slot
-//tests
-        QStringList names;
-        QStringList links;
+	private:
+		QProcess *procCitrix; // process for citrix
+		QProcess *procSystem; // process for system commands
+		void fillWidgetsTexts(); // fill all widgets in correct texts and language
+		bool fillNetworkLabels(); // fill all network labels in correct texts and language, return: true=connected, false=offline
+		QSignalMapper *signalMapper; // signal mapper zur übergabe der signale von signal nach slot
+		//tests
+		QStringList names;
+		QStringList links;
 
 
-    protected:
-        void timerEvent(QTimerEvent *event); // for clock
+	protected:
+		void timerEvent(QTimerEvent *event); // for clock
 
 
 };

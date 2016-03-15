@@ -8,7 +8,15 @@
 #include <iostream>
 
 // Konstruktor
-Citrix::Citrix(std::string netscaler_link, CTX_Mode ctx_mode) {
+Citrix::Citrix(std::string netscaler_link, CTX_Mode ctx_mode):
+        l_ctx_mode(),
+        l_netscaler_link(),
+        l_stores(),
+        l_store_chosen(),
+        l_desktops(),
+        l_desktop_chosen()
+
+{
     // store local variables
     l_netscaler_link = netscaler_link;
     l_ctx_mode = ctx_mode;
@@ -21,7 +29,7 @@ Citrix::Citrix(std::string netscaler_link, CTX_Mode ctx_mode) {
         if (resultGS.result) {
             // choose store
             // ask which store user wants
-            for (int i=0;i<l_stores.size();i++) {
+            for (unsigned int i=0;i<l_stores.size();i++) {
                 std::cout << "Store No. " << i << " = " << l_stores.at(i)->name << "\n";
             }
             int snr;
@@ -51,7 +59,7 @@ std::cout << "sonstiger Fehler:" << resultGS.status << "\n";
     if (resultGD.result) {
         // choose desktop
         // ask which desktop user wants
-        for (int i=0;i<l_desktops.size();i++) {
+        for (unsigned int i=0;i<l_desktops.size();i++) {
             std::cout << "Desktop No. " << i << " = " << l_desktops.at(i)->name << "\n";
         }
         int snr;
@@ -63,6 +71,8 @@ std::cout << "sonstiger Fehler:" << resultGS.status << "\n";
         // start desktop
 std::cout << "starte desktop ...\n";        
         CTX_Result resultSD = startDesktop();
+	//TODO 
+	(void) resultSD;
     } else {
         // error
 std::cout << "ERROR: getDesktops hat nicht funktioniert\n";
@@ -85,12 +95,14 @@ std::exit(1);
 // get stores from site
 //
 CTX_Result Citrix::getStores(std::vector<CTX_Element>& resultStores) {
+	//TODO 
+	(void) resultStores;
     std::vector<std::string> resultLines; // all the lines will be stored here
     CTX_Result result = Citrix::execCommand(CTX_STOREBROWSER_EXE + " -l '" + l_netscaler_link + "'", resultLines);
 
     if (result.result) {
         // speichere Vector mit stores
-        for (int i=0;i<resultLines.size();i++) { // führe für alle gelisteten stores durch
+        for (unsigned int i=0;i<resultLines.size();i++) { // führe für alle gelisteten stores durch
             std::vector<std::string> parts;
             parts = Citrix::splitString(resultLines.at(i),"\t"); // teile zeile in spalten auf
             std::string link = parts.at(0); // store link
@@ -108,12 +120,14 @@ CTX_Result Citrix::getStores(std::vector<CTX_Element>& resultStores) {
     }  
         
     return result;  
-};
+}
 
 //
 // add new store to citrix
 //
 CTX_Result Citrix::addStore(std::vector<CTX_Element>& resultStore) {
+	//TODO 
+	(void) resultStore;
     std::vector<std::string> resultLines; // all the return lines will be stored here
     CTX_Result result = Citrix::execCommand(CTX_STOREBROWSER_EXE + " -a '" + l_netscaler_link + "'", resultLines);
     
@@ -145,13 +159,15 @@ CTX_Result Citrix::addStore(std::vector<CTX_Element>& resultStore) {
 // get desktops
 //
 CTX_Result Citrix::getDesktops(std::vector<CTX_Element>& resultDesktops) {
+	//TODO 
+	(void) resultDesktops;
     // get all the desktops for this store
     std::vector<std::string> resultLines;
     CTX_Result result = Citrix::execCommand(CTX_STOREBROWSER_EXE + " -E '" + l_store_chosen->link + "'", resultLines);    
 
     if (result.result) {
         // speichere Vector mit desktops
-        for (int i=0;i<resultLines.size();i++) { // führe für alle gelisteten desktops durch
+        for (unsigned int i=0;i<resultLines.size();i++) { // führe für alle gelisteten desktops durch
             std::vector<std::string> parts;
             parts = Citrix::splitString(resultLines.at(i),"\t"); // teile zeile in spalten auf
             std::string link = parts.at(0); // desktop link
@@ -220,7 +236,7 @@ std::vector<std::string> Citrix::splitString(std::string line, std::string delim
     std::string temp;
     int start = 0;
     int end = line.find(delim);
-    while (end != std::string::npos)
+    while (end != (int)std::string::npos)
     {
         temp = line.substr(start, end - start);
         parts.push_back(temp); 
@@ -238,7 +254,7 @@ std::vector<std::string> Citrix::splitString(std::string line, std::string delim
 // print vector of strings
 //
 void Citrix::printStrVector(std::vector<std::string> v) {
-    for (int i=0;i<v.size();i++) {
+    for (unsigned int i=0;i<v.size();i++) {
         std::cout << v.at(i) << std::endl;
     }
 }
