@@ -8,9 +8,12 @@
 #include <QPushButton>
 #include <vector>
 
-const QString SHELL_IP = "/home/test/Programs/qt-alex/HelloWorldGui/printIp.sh";
-const QString SHELL_NETMASK = "/home/test/Programs/qt-alex/HelloWorldGui/printNetmask.sh";
-const QString SHELL_GATEWAY = "/home/test/Programs/qt-alex/HelloWorldGui/printGateway.sh";
+const QString SHELL_IP = "./scripts/printIp.sh";
+const QString SHELL_NETMASK = "./scripts/printNetmask.sh";
+const QString SHELL_GATEWAY = "./scripts/printGateway.sh";
+//const QString SHELL_IP = "/home/test/Programs/qt-alex/HelloWorldGui/printIp.sh";
+//const QString SHELL_NETMASK = "/home/test/Programs/qt-alex/HelloWorldGui/printNetmask.sh";
+//const QString SHELL_GATEWAY = "/home/test/Programs/qt-alex/HelloWorldGui/printGateway.sh";
 const QString BTN_CITRIX = "anmelden";
 const QString BTN_CITRIX_TOOLTIP = "klicken zum Anmelden";
 const QString STATUS_LINE_EMPTY = "";

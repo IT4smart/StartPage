@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QApplication>
 #include <QDesktopWidget>
-#include "Citrix.h"
+#include "./inc/Citrix.h"
 #include <iostream>
 
 int main(int argc, char *argv[]) {

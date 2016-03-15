@@ -1,0 +1,12 @@
+*.a
+StartPage
+UnitTest
+*_automoc.cpp
+moc_*.cpp
+*.cmake
+CMakeFiles
+Makefile
+CMakeCache.txt
+ui_mainwindow.h
+session.vim
+

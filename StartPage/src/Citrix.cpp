@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-#include "Citrix.h"
+#include "../inc/Citrix.h"
 #include <iostream>
 
 // Konstruktor
