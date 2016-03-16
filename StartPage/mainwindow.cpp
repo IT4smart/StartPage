@@ -37,6 +37,22 @@ MainWindow::~MainWindow() {
 	delete ui;
 }
 
+
+/* 
+void init(){
+app_mode = ;
+
+if (app_mode = citrix) {
+
+}
+}
+}
+
+ *
+ *
+ * */
+
+
 //
 // button Desktop
 //
@@ -194,10 +210,10 @@ void MainWindow::timerEvent(QTimerEvent *event) {
 
 }
 
-//
-// fill widgets with correct texts
-// use bash scripts --> easy applicable to different systems (just modify the scripts)
-//
+/**
+ * fill widgets with correct texts
+ * use bash scripts --> easy applicable to different systems (just modify the scripts)
+ */
 void MainWindow::fillWidgetsTexts() {
 	// login button
 	ui->btnCitrix->setText(BTN_CITRIX);
@@ -220,9 +236,10 @@ void MainWindow::fillWidgetsTexts() {
 }
 
 
-//
-// fill network labels
-// return: true=network connected, false=offline
+/**
+ * fill network labels
+ * @return: true=network connected, false=offline
+ */
 bool MainWindow::fillNetworkLabels() {
 	bool returnval = true; // if connected, return true
 
