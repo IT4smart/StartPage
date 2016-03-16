@@ -15,10 +15,12 @@
 // Konstruktor
 //
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) 
-	, procCitrix(nullptr), procSystem(nullptr), signalMapper(nullptr), names(), links()
+					  , init{}
+	//, procCitrix(nullptr), procSystem(nullptr), signalMapper(nullptr), names(), links()
 {
 	ui->setupUi(this);
 
+	/*
 	// start clock
 	QTime qtime = QTime::currentTime(); //Timer auslesen
 	QString stime = qtime.toString(Qt::LocalDate);//Timerwert als String wandeln
@@ -27,15 +29,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 	// fill widgets with texts
 	MainWindow::fillWidgetsTexts();
-
+  */
+	//std::cout << exec_script(SHELL_IP).toStdString() << std::endl;
 }
 
-//
-// destructor
-//
+/**
+ * destructor
+ */
 MainWindow::~MainWindow() {
 	delete ui;
 }
+
 
 
 /* 
@@ -53,6 +57,7 @@ if (app_mode = citrix) {
  * */
 
 
+/* 
 //
 // button Desktop
 //
@@ -210,10 +215,8 @@ void MainWindow::timerEvent(QTimerEvent *event) {
 
 }
 
-/**
  * fill widgets with correct texts
  * use bash scripts --> easy applicable to different systems (just modify the scripts)
- */
 void MainWindow::fillWidgetsTexts() {
 	// login button
 	ui->btnCitrix->setText(BTN_CITRIX);
@@ -236,10 +239,8 @@ void MainWindow::fillWidgetsTexts() {
 }
 
 
-/**
  * fill network labels
  * @return: true=network connected, false=offline
- */
 bool MainWindow::fillNetworkLabels() {
 	bool returnval = true; // if connected, return true
 
@@ -275,3 +276,4 @@ bool MainWindow::fillNetworkLabels() {
 
 	return returnval;
 }
+ * */

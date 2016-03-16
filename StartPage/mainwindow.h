@@ -7,13 +7,8 @@
 #include <QVector>
 #include <QPushButton>
 #include <vector>
+#include "./inc/init.h"
 
-const QString SHELL_IP = "./scripts/printIp.sh";
-const QString SHELL_NETMASK = "./scripts/printNetmask.sh";
-const QString SHELL_GATEWAY = "./scripts/printGateway.sh";
-//const QString SHELL_IP = "/home/test/Programs/qt-alex/HelloWorldGui/printIp.sh";
-//const QString SHELL_NETMASK = "/home/test/Programs/qt-alex/HelloWorldGui/printNetmask.sh";
-//const QString SHELL_GATEWAY = "/home/test/Programs/qt-alex/HelloWorldGui/printGateway.sh";
 const QString BTN_CITRIX = "anmelden";
 const QString BTN_CITRIX_TOOLTIP = "klicken zum Anmelden";
 const QString STATUS_LINE_EMPTY = "";
@@ -38,31 +33,37 @@ class MainWindow : public QMainWindow {
 		explicit MainWindow(QWidget *parent = 0);
 		~MainWindow();
 
-		void positionWidgets(); // hier werden die Elemente neu positioniert
 		Ui::MainWindow *ui; // user interface
 		// delete the copy contructors, because they are not needed and
 		// otherwise there will be problems with the copying of the ui* pointer
 		MainWindow(const MainWindow&) = delete;
 		MainWindow* operator=(const MainWindow&) = delete;
 
+
+
+
+		QString exec_script(QString script_full_path);
+
+		//void positionWidgets(); // hier werden die Elemente neu positioniert
 		private slots:
-			void on_btnExit_clicked();
-		void on_btnCitrix_clicked();
-		void on_btnDesktop_clicked(int);
+		//	void on_btnExit_clicked();
+	//	void on_btnCitrix_clicked();
+	//	void on_btnDesktop_clicked(int);
 
 	private:
-		QProcess *procCitrix; // process for citrix
-		QProcess *procSystem; // process for system commands
-		void fillWidgetsTexts(); // fill all widgets in correct texts and language
-		bool fillNetworkLabels(); // fill all network labels in correct texts and language, return: true=connected, false=offline
-		QSignalMapper *signalMapper; // signal mapper zur übergabe der signale von signal nach slot
+			Init init;
+	//	QProcess *procCitrix; // process for citrix
+	//	QProcess *procSystem; // process for system commands
+	//	void fillWidgetsTexts(); // fill all widgets in correct texts and language
+	//	bool fillNetworkLabels(); // fill all network labels in correct texts and language, return: true=connected, false=offline
+	//	QSignalMapper *signalMapper; // signal mapper zur übergabe der signale von signal nach slot
 		//tests
-		QStringList names;
-		QStringList links;
+	//	QStringList names;
+	//	QStringList links;
 
 
 	protected:
-		void timerEvent(QTimerEvent *event); // for clock
+	//	void timerEvent(QTimerEvent *event); // for clock
 
 
 };
