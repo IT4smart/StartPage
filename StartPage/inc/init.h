@@ -12,12 +12,37 @@ class Init {
 		Init(const Init&) = delete;
 		Init* operator=(const Init&) = delete;
 
-	private:
+		//getter script
+		QString get_script_ip();
+		QString get_script_netmask();
+		QString get_script_gateway();
 
-	QString exec_script(QString script_full_path);
-	QString exec_script(QString script_full_path, QStringList arguments);
-	QString exec_script(QString script_full_path, QString argument);
+		//getter ConfigPage
+		QString get_client_logo();
+		QString get_network_type();
+		QString get_citrix_rdp_type();
+		QString get_citrix_store();
+		QString get_citrix_url();
+		QString get_rdp_server();
+		QString get_rdp_domain();
+	private:
+		//Var script
+		QString script_ip;
+		QString script_netmask;
+		QString script_gateway;
+
+
+		//Var ConfigPage
+		QString client_logo;
+		QString network_type;
+		QString citrix_rdp_type;
+		QString citrix_store;
+		QString citrix_url;
+		QString rdp_server;
+		QString rdp_domain;
 };
 
+QStringList exec_cmd_process(QString cmd);
+QString exec_cmd_process_reStr(QString cmd);
 
 #endif // INIT_H
