@@ -59,24 +59,6 @@ Init::Init() :
 
 		print_MapMap_to_stdout(setting.get()->get_Map());
 
-		//test print_mapmap and add 2 maps
-		std::unique_ptr<IniFile> test(new IniFile(SETTING_PATH, "test", SETTING_ENDING));
-		MapMap temp1 = test.get()->get_Map();
-
-		//MapMap oneplustwo = temp + temp1;
-		//MapMap twoplusone = temp1 + temp;
-
-		std::cout << "\n####################################\n\n";
-		print_MapMap_to_stdout(temp1);
-		std::cout << "\n####################################\n\n";
-		//print_MapMap_to_stdout(oneplustwo);
-		std::cout << "\n####################################\n\n";
-		//print_MapMap_to_stdout(twoplusone);
-
-
-			//TODO map1 == map2 so return map1
-
-
 
 		//test:
 		//std::cout << script_ip.toStdString() << std::endl;

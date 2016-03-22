@@ -12,12 +12,12 @@ class Init {
 		Init(const Init&) = delete;
 		Init* operator=(const Init&) = delete;
 
-		//getter script
-		QString get_script_ip();
+        //getter script --> returns path to script
+        QString get_script_ip();
 		QString get_script_netmask();
 		QString get_script_gateway();
 
-		//getter ConfigPage
+        //getter ConfigPage --> reads variables from configpage file
 		QString get_client_logo();
 		QString get_network_type();
 		QString get_citrix_rdp_type();
@@ -26,13 +26,12 @@ class Init {
 		QString get_rdp_server();
 		QString get_rdp_domain();
 	private:
-		//Var script
+        //Var script paths
 		QString script_ip;
 		QString script_netmask;
 		QString script_gateway;
 
-
-		//Var ConfigPage
+        //Vars from ConfigPage
 		QString client_logo;
 		QString network_type;
 		QString citrix_rdp_type;

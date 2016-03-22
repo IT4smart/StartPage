@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 					  , init{}
 	//, procCitrix(nullptr), procSystem(nullptr), signalMapper(nullptr), names(), links()
 {
-	ui->setupUi(this);
+    ui->setupUi(this);
 
 	/*
 	// start clock
