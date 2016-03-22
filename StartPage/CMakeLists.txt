@@ -65,12 +65,14 @@ add_executable(
 	${UI_HEADERS}
 	${UI_RESOURCES}
 	)
+
 #find the library
 find_library(
 	LIB_I_NEED  
 	NAMES lib_Tools.a
-	PATHS ../../libs/lib/ 
+	PATHS ../../libs/tools/ 
 )
+#include_directories(${LibXML++_INCLUDE_DIRS})
 
 if(${LIB_I_NEED} STREQUAL "LIB_I_NEED-NOTFOUND")
     message(FATAL_ERROR "Couldn't find the 'external_lib' library")

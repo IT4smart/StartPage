@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "./inc/Citrix.h"
+#include "./inc/citrix.h"
 #include <iostream>
 #include <qprocess.h>
 #include <QTime>
