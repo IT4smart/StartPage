@@ -7,7 +7,6 @@
 #include <QString>
 
 const QString PRG_STOREBROWSE = "/opt/Citrix/ICAClient/util/storebrowse";
-const QString PRG_SHELL = "/bin/sh";
 const QString PRG_KILLALL = "/usr/bin/killall";
 const QString PROC_AUTHMANAGERDAEMON = "AuthManagerDaemon";
 const QString PROC_SERVICERECORD = "ServiceRecord";
@@ -35,9 +34,6 @@ class Citrix {
         QString link_netscaler; // external link of Netscaler
         QString link_store; // internal link of chosen store
 
-        // run system command,
-        // return: QPair with <QByteArray,QByteArray> (= <buffer_result,buffer_error>)
-        QPair<QByteArray,QByteArray> runSystemCommand(QString command);
 //        QStringList getStores(); // get list of stores
 //        void addStore(); // add store --> login window will appear
 
