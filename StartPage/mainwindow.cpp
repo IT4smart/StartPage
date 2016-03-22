@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "./inc/citrix.h"
+#include "../../libs/tools/inc/custom_exceptions.h"
 #include <iostream>
 #include <qprocess.h>
 #include <QTime>
@@ -14,23 +15,35 @@
 //
 // Konstruktor
 //
+/** 
+ * Constructor
+ * very important: initialiaze init with a string. Otherwise the contructor without argument would be chosen, 
+ * and in there, an developer_error exception can be thrown. 
+ *
+ */
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) 
-					  , init{}
-	//, procCitrix(nullptr), procSystem(nullptr), signalMapper(nullptr), names(), links()
+					  , init("empty")
+					  //, procCitrix(nullptr), procSystem(nullptr), signalMapper(nullptr), names(), links()
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
+	try {
+		init = Init();
+	} catch(const developer_error& e) {
+		//TODO
+		//handle the error
+		std::cout << -1 << "Load Setting in Init-Konstruktor failed" << std::endl;
+	}
+/*
+// start clock
+QTime qtime = QTime::currentTime(); //Timer auslesen
+QString stime = qtime.toString(Qt::LocalDate);//Timerwert als String wandeln
+ui->lblClock->setText(stime);//Text von Label setzen
+startTimer(5000);
 
-	/*
-	// start clock
-	QTime qtime = QTime::currentTime(); //Timer auslesen
-	QString stime = qtime.toString(Qt::LocalDate);//Timerwert als String wandeln
-	ui->lblClock->setText(stime);//Text von Label setzen
-	startTimer(5000);
-
-	// fill widgets with texts
-	MainWindow::fillWidgetsTexts();
-  */
-	//std::cout << exec_script(SHELL_IP).toStdString() << std::endl;
+// fill widgets with texts
+MainWindow::fillWidgetsTexts();
+*/
+//std::cout << exec_script(SHELL_IP).toStdString() << std::endl;
 }
 
 /**
@@ -43,14 +56,14 @@ MainWindow::~MainWindow() {
 
 
 /* 
-void init(){
-app_mode = ;
+   void init(){
+   app_mode = ;
 
-if (app_mode = citrix) {
+   if (app_mode = citrix) {
 
-}
-}
-}
+   }
+   }
+   }
 
  *
  *
@@ -62,92 +75,92 @@ if (app_mode = citrix) {
 // button Desktop
 //
 void on_btnDesktop_clicked() {
-	qDebug("*** WORKED ***");
+qDebug("*** WORKED ***");
 }
 
 //
 // position widgets
 //
 void MainWindow::positionWidgets() {
-	ui->lblClock->move(this->geometry().center()); // funktioniert !!!
-	ui->lblClock->updateGeometry();
+ui->lblClock->move(this->geometry().center()); // funktioniert !!!
+ui->lblClock->updateGeometry();
 }
 
 //
 // button Exit
 void MainWindow::on_btnExit_clicked() {
-	QApplication::exit();
+QApplication::exit();
 }
 
 //
 // button Citrix
 //
 void MainWindow::on_btnCitrix_clicked() {
-	// change ui
-	ui->lblStatusLine->setText(STATUS_LINE_WAIT); // set status line
-	//    ui->lblStatusLine->repaint();
-	ui->btnCitrix->hide(); //->deleteLater(); // hide button oder delete button ...
-	ui->centralWidget->repaint();
+// change ui
+ui->lblStatusLine->setText(STATUS_LINE_WAIT); // set status line
+//    ui->lblStatusLine->repaint();
+ui->btnCitrix->hide(); //->deleteLater(); // hide button oder delete button ...
+ui->centralWidget->repaint();
 
-	// show stores
+// show stores
 
-	// select store
+// select store
 
-	// show desktops
+// show desktops
 
-	// select desktop
+// select desktop
 
-	// start desktop
+// start desktop
 
 
-	procCitrix = new QProcess(this); // start process for citrix
+procCitrix = new QProcess(this); // start process for citrix
 
-	procCitrix->start("sh");
-	//    procCitrix->write("/opt/Citrix/ICAClient/util/storebrowse -l extern.ass-hn.de");
-	//    procCitrix->write("/opt/Citrix/ICAClient/util/storebrowse -a extern.ass-hn.de");
-	procCitrix->write("/opt/Citrix/ICAClient/util/storebrowse -E 'https://ddcxd1.ass-hn.de/citrix/xdstore/discovery'");
-	//    procCitrix->write("/opt/Citrix/ICAClient/util/storebrowse -L 'ddcxd1.W7 Lehrer Test $S5-3' 'https://ddcxd1.ass-hn.de/citrix/xdstore/discovery'");
-	procCitrix->closeWriteChannel();
+procCitrix->start("sh");
+//    procCitrix->write("/opt/Citrix/ICAClient/util/storebrowse -l extern.ass-hn.de");
+//    procCitrix->write("/opt/Citrix/ICAClient/util/storebrowse -a extern.ass-hn.de");
+procCitrix->write("/opt/Citrix/ICAClient/util/storebrowse -E 'https://ddcxd1.ass-hn.de/citrix/xdstore/discovery'");
+//    procCitrix->write("/opt/Citrix/ICAClient/util/storebrowse -L 'ddcxd1.W7 Lehrer Test $S5-3' 'https://ddcxd1.ass-hn.de/citrix/xdstore/discovery'");
+procCitrix->closeWriteChannel();
 
-	QByteArray buffer;
-	QByteArray buffer_error;
-	while(procCitrix->waitForFinished()) {
-		buffer.append(procCitrix->readAllStandardOutput());
-		buffer_error.append(procCitrix->readAllStandardError());
-	}
-	procCitrix->close();
+QByteArray buffer;
+QByteArray buffer_error;
+while(procCitrix->waitForFinished()) {
+buffer.append(procCitrix->readAllStandardOutput());
+buffer_error.append(procCitrix->readAllStandardError());
+}
+procCitrix->close();
 
-	//qDebug(buffer.data());
-	ui->lblDebugLine->setText(QString(buffer_error).toLatin1());
+//qDebug(buffer.data());
+ui->lblDebugLine->setText(QString(buffer_error).toLatin1());
 
-	// split str
-	QString sbuf = buffer.data();
-	sbuf.remove("'"); // remove '-zeichen
-	QStringList zeilen = sbuf.split("\n", QString::SkipEmptyParts);
+// split str
+QString sbuf = buffer.data();
+sbuf.remove("'"); // remove '-zeichen
+QStringList zeilen = sbuf.split("\n", QString::SkipEmptyParts);
 
-	// trenne in Zeilen
-	for (int i=0;i<zeilen.size();i++) {
-		// trenne in Spalten
-		QStringList spalten = zeilen.at(i).split("\t", QString::SkipEmptyParts);
-		names.push_back(spalten.at(1).toLocal8Bit());
-		links.push_back(spalten.at(0).toLocal8Bit());
-	}
+// trenne in Zeilen
+for (int i=0;i<zeilen.size();i++) {
+// trenne in Spalten
+QStringList spalten = zeilen.at(i).split("\t", QString::SkipEmptyParts);
+names.push_back(spalten.at(1).toLocal8Bit());
+links.push_back(spalten.at(0).toLocal8Bit());
+}
 
-	ui->lblStatusLine->setText(STATUS_LINE_SELECT_DESKTOP); // set status line
+ui->lblStatusLine->setText(STATUS_LINE_SELECT_DESKTOP); // set status line
 
-	// baue neue Buttons auf
-	signalMapper = new QSignalMapper(this); // signal mapper zur übergabe von daten von signals to slots
-	for (int i=0;i<names.size();i++) {
-		QPushButton *btn = new QPushButton(names.at(i)); // create button
-		btn->setFont(QFont("Calibri", 26)); // set font
-		ui->hLayoutElements->addWidget(btn); // add button to layout
-		signalMapper->setMapping(btn, i); // setze mapper
-		connect(btn, SIGNAL(clicked()), signalMapper, SLOT(map())); // connect btn to slot map
-	}
-	connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(on_btnDesktop_clicked(int)));
+// baue neue Buttons auf
+signalMapper = new QSignalMapper(this); // signal mapper zur übergabe von daten von signals to slots
+for (int i=0;i<names.size();i++) {
+	QPushButton *btn = new QPushButton(names.at(i)); // create button
+	btn->setFont(QFont("Calibri", 26)); // set font
+	ui->hLayoutElements->addWidget(btn); // add button to layout
+	signalMapper->setMapping(btn, i); // setze mapper
+	connect(btn, SIGNAL(clicked()), signalMapper, SLOT(map())); // connect btn to slot map
+}
+connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(on_btnDesktop_clicked(int)));
 
-	//    QObjectList chlist = ui->hLayoutElements->children();
-	//    qDebug("childn0="+chlist.size());
+//    QObjectList chlist = ui->hLayoutElements->children();
+//    qDebug("childn0="+chlist.size());
 }
 
 //
@@ -215,32 +228,32 @@ void MainWindow::timerEvent(QTimerEvent *event) {
 
 }
 
- * fill widgets with correct texts
- * use bash scripts --> easy applicable to different systems (just modify the scripts)
-void MainWindow::fillWidgetsTexts() {
-	// login button
-	ui->btnCitrix->setText(BTN_CITRIX);
-	ui->btnCitrix->setToolTip(BTN_CITRIX_TOOLTIP);
+	* fill widgets with correct texts
+* use bash scripts --> easy applicable to different systems (just modify the scripts)
+	void MainWindow::fillWidgetsTexts() {
+		// login button
+		ui->btnCitrix->setText(BTN_CITRIX);
+		ui->btnCitrix->setToolTip(BTN_CITRIX_TOOLTIP);
 
-	// Network labels
-	ui->grpBoxNetwork->setTitle(GRP_BOX_NETWORK); // grpBoxNetwork
-	ui->lblNetworkStatus->setText(LABEL_NETWORK_ONLINE); // label network status
-	ui->lblIpText->setText(LABEL_IP); // label IP
-	ui->lblNetmaskText->setText(LABEL_NETMASK); // label NETMASK
-	ui->lblGatewayText->setText(LABEL_GATEWAY); // label GATEWAY
-	ui->lblTypeText->setText(LABEL_TYPE); // label TYPE
+		// Network labels
+		ui->grpBoxNetwork->setTitle(GRP_BOX_NETWORK); // grpBoxNetwork
+		ui->lblNetworkStatus->setText(LABEL_NETWORK_ONLINE); // label network status
+		ui->lblIpText->setText(LABEL_IP); // label IP
+		ui->lblNetmaskText->setText(LABEL_NETMASK); // label NETMASK
+		ui->lblGatewayText->setText(LABEL_GATEWAY); // label GATEWAY
+		ui->lblTypeText->setText(LABEL_TYPE); // label TYPE
 
-	// status and debug label
-	ui->lblStatusLine->setText(""); // empty label STATUSLINE
-	ui->lblDebugLine->setText(""); // empty label DEBUGLINE
+		// status and debug label
+		ui->lblStatusLine->setText(""); // empty label STATUSLINE
+		ui->lblDebugLine->setText(""); // empty label DEBUGLINE
 
-	// fill network labels
-	this->fillNetworkLabels();
-}
+		// fill network labels
+		this->fillNetworkLabels();
+	}
 
 
- * fill network labels
- * @return: true=network connected, false=offline
+* fill network labels
+* @return: true=network connected, false=offline
 bool MainWindow::fillNetworkLabels() {
 	bool returnval = true; // if connected, return true
 
@@ -276,4 +289,4 @@ bool MainWindow::fillNetworkLabels() {
 
 	return returnval;
 }
- * */
+* */

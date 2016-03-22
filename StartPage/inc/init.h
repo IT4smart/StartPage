@@ -6,11 +6,13 @@ class Init {
 	
 	public:
 		Init();
+		Init(QString empty);
 
 		// delete the copy contructors, because they are not needed and
 		// otherwise there will be problems with the copying of the ui* pointer
-		Init(const Init&) = delete;
-		Init* operator=(const Init&) = delete;
+		//Init(const Init&) = delete;
+		//Init* operator=(const Init&) = delete;
+		Init(const Init& x); //copy-constructor
 
         //getter script --> returns path to script
         QString get_script_ip();
@@ -41,7 +43,5 @@ class Init {
 		QString rdp_domain;
 };
 
-QStringList exec_cmd_process(QString cmd);
-QString exec_cmd_process_reStr(QString cmd);
 
 #endif // INIT_H

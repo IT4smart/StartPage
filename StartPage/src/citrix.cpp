@@ -1,5 +1,6 @@
-#include "../inc/citrix.h"
 #include <QProcess>
+#include "../inc/citrix.h"
+#include "../../../libs/tools/inc/exec_cmd.h"
 
 /*
  * constructor
@@ -22,7 +23,7 @@ QMap<QString,QString> Citrix::getDesktops() {
 
     // run system command
     QString command = PRG_STOREBROWSE+" -E '"+link_store+"'";
-    QPair<QByteArray,QByteArray> pair = Citrix::runSystemCommand(command);
+    QPair<QByteArray,QByteArray> pair = exec_cmd_process(command);
 
     // split str
     QString sbuf = pair.first.data(); // get buffer result
@@ -49,8 +50,8 @@ QMap<QString,QString> Citrix::getDesktops() {
  */
 QPair<QByteArray,QByteArray> Citrix::startDesktop(QString desktop_link) {
     // run system command
-    QString command = PRG_STOREBROWSE+" -L '"+desktop_link+"' '"+link_store+"'";
-    QPair<QByteArray,QByteArray> ret_pair = Citrix::runSystemCommand(command);
+    QString command = PRG_STOREBROWSE + " -L '" + desktop_link + "' '" + link_store + "'";
+    QPair<QByteArray,QByteArray> ret_pair = exec_cmd_process(command);
 
     // return QPair
     return ret_pair;
@@ -62,7 +63,7 @@ QPair<QByteArray,QByteArray> Citrix::startDesktop(QString desktop_link) {
 QPair<QByteArray,QByteArray> Citrix::deleteCitrixAuthentication() {
     // run system command
     QString command = PRG_KILLALL+" "+PROC_AUTHMANAGERDAEMON+" "+PROC_SERVICERECORD;
-    QPair<QByteArray,QByteArray> ret_pair = Citrix::runSystemCommand(command);
+    QPair<QByteArray,QByteArray> ret_pair = exec_cmd_process(command);
 
     // return QPair
     return ret_pair;
@@ -80,36 +81,4 @@ QPair<QByteArray,QByteArray> Citrix::deleteCitrixAuthentication() {
 /*void Citrix::addStore() {
 }*/
 
-/*
- * run system command
- *
- * parameter:
- * system command
- *
- * return:
- * QPair of <QByteArray,QByteArray> (= <buffer_result,buffer_error>)
- */
-QPair<QByteArray,QByteArray> Citrix::runSystemCommand(QString command) {
-    QPair<QByteArray,QByteArray> ret_pair; // initiate return pair of <QByteArray,QByteArray>
 
-    // start process for citrix
-    QProcess *proc_ctx = new QProcess();
-    proc_ctx->start(PRG_SHELL);
-    proc_ctx->write(command.toLatin1());
-    proc_ctx->closeWriteChannel();
-
-    // get buffer and buffer_error
-    QByteArray buffer;
-    QByteArray buffer_error;
-    while(proc_ctx->waitForFinished()) {
-        buffer.append(proc_ctx->readAllStandardOutput());
-        buffer_error.append(proc_ctx->readAllStandardError());
-    }
-
-    proc_ctx->close(); // close citrix process
-
-    // return the QPair
-    ret_pair.first = buffer;
-    ret_pair.second = buffer_error;
-    return ret_pair;
-}
