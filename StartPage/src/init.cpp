@@ -1,11 +1,15 @@
 //init.cpp
 
 #include "../inc/init.h"
-#include "../../../libs/tools/inc/setting.h"
-#include "../../../libs/tools/inc/custom_exceptions.h"
 #include <QProcess>
 #include <iostream>
 #include <memory>
+#include "../../../libs/tools/inc/paths.h"
+#include "../../../libs/tools/inc/IniFile.h"
+#include "../../../libs/tools/inc/custom_exceptions.h"
+
+#include "../../../libs/tools/inc/maps.h" //for printing mapmaps
+
 
 /**
  * Constructor
@@ -23,53 +27,53 @@ Init::Init() :
 	rdp_domain() 
 {
 	
-	//std::cout << "Init Constructor\n";
-    std::unique_ptr<Setting> setting (new Setting);
 	try {
-        setting.get()->loadSettings();
+		//this line may throw developer_error
+		std::unique_ptr<IniFile> setting(new IniFile(SETTING_PATH, SETTING_FILE, SETTING_ENDING));
+		//read 
+		this->script_ip			= "./" + setting.get()->get_Map_Value("script", "get_ip");
+		this->script_netmask		= "./" + setting.get()->get_Map_Value("script", "get_netmask");
+		this->script_gateway		= "./" + setting.get()->get_Map_Value("script", "get_gateway");
+
+		//read out the part from ConfigPage setting.ini
+		QString configPath		= setting.get()->get_Map_Value("ConfigPage", "path") + "/";
+		QString configExec		= setting.get()->get_Map_Value("ConfigPage", "exec");
+		QString configPage 		= "cd " + configPath + " && " + "./" + configExec + " "; 
+		QString config_client_logo	= setting.get()->get_Map_Value("ConfigPage", "client_logo");
+		QString config_network_type	= setting.get()->get_Map_Value("ConfigPage", "network_type");
+		QString config_citrix_rdp_type	= setting.get()->get_Map_Value("ConfigPage", "citrix_rdp_type");
+		QString config_citrix_store	= setting.get()->get_Map_Value("ConfigPage", "citrix_store");
+		QString config_citrix_url	= setting.get()->get_Map_Value("ConfigPage", "citrix_url");
+		QString config_rdp_server	= setting.get()->get_Map_Value("ConfigPage", "rdp_server");
+		QString config_rdp_domain	= setting.get()->get_Map_Value("ConfigPage", "rdp_domain");
+
+
+		//set the internal variables
+		this->client_logo 	= 	configPath + exec_cmd_process_reStr(configPage + config_client_logo);
+		this->network_type 	= 	exec_cmd_process_reStr(configPage + config_network_type);
+		this->citrix_rdp_type	= 	exec_cmd_process_reStr(configPage + config_citrix_rdp_type);
+		this->citrix_store	= 	exec_cmd_process_reStr(configPage + config_citrix_store);
+		this->citrix_url	= 	exec_cmd_process_reStr(configPage + config_citrix_url);
+		this->rdp_server	= 	exec_cmd_process_reStr(configPage + config_rdp_server);
+		this->rdp_domain	= 	exec_cmd_process_reStr(configPage + config_rdp_domain);
+
+		print_MapMap_to_stdout(setting.get()->get_Map());
+
+
+		//test:
+		//std::cout << script_ip.toStdString() << std::endl;
+		//std::cout << "network_type command: '" << config_network_type << "'" << std::endl;
+		//std::cout << "network_type: '" << network_type.toStdString() << "'" << std::endl;
+		//std::cout << "citrix_rdp_type: '" << citrix_rdp_type.toStdString() << "'" << std::endl;
+		//std::cout << configPage + config_citrix_rdp_type << std::endl;
+		//std::cout << "client_logo: '" << client_logo.toStdString() << "'" << std::endl;
+		//std::cout << "citrix_store: '" << citrix_store.toStdString() << "'" << std::endl;
+		//std::cout << "citrix_url: '" << citrix_url.toStdString() << "'" << std::endl;
+
 	} catch(const developer_error& e) {
 		//TODO
-		std::cout << -1 << "Load Setting in Init-Konstruktor nicht geklappt" << std::endl;
+		std::cout << -1 << "Load Setting in Init-Konstruktor failed" << std::endl;
 	}
-	auto& setting_map 		= setting.get()->getSetting();
-	//script
-	this->script_ip			= "./" + setting_map.value("script")	.value("get_ip");
-	this->script_netmask		= "./" + setting_map.value("script")	.value("get_netmask");
-	this->script_gateway		= "./" + setting_map.value("script")	.value("get_gateway");
-
-	//ConfigPage
-	QString configPath		= setting_map.value("ConfigPage")	.value("path") + "/";
-	QString configExec		= setting_map.value("ConfigPage")	.value("exec");
-	QString configPage 		= "cd " + configPath + " && " + "./" + configExec + " "; 
-	QString config_client_logo	= setting_map.value("ConfigPage")	.value("client_logo");
-	QString config_network_type	= setting_map.value("ConfigPage")	.value("network_type");
-	QString config_citrix_rdp_type	= setting_map.value("ConfigPage")	.value("citrix_rdp_type");
-	QString config_citrix_store	= setting_map.value("ConfigPage")	.value("citrix_store");
-	QString config_citrix_url	= setting_map.value("ConfigPage")	.value("citrix_url");
-	QString config_rdp_server	= setting_map.value("ConfigPage")	.value("rdp_server");
-	QString config_rdp_domain	= setting_map.value("ConfigPage")	.value("rdp_domain");
-
-//TODO execute "./" + script_map
-
-	//test:
-	//std::cout << script_ip.toStdString() << std::endl;
-	//std::cout << "network_type command: '" << config_network_type << "'" << std::endl;
-
-	
-	this->client_logo 	= 	configPath + exec_cmd_process_reStr(configPage + config_client_logo);
-	this->network_type 	= 	exec_cmd_process_reStr(configPage + config_network_type);
-	this->citrix_rdp_type	= 	exec_cmd_process_reStr(configPage + config_citrix_rdp_type);
-	this->citrix_store	= 	exec_cmd_process_reStr(configPage + config_citrix_store);
-	this->citrix_url	= 	exec_cmd_process_reStr(configPage + config_citrix_url);
-	this->rdp_server	= 	exec_cmd_process_reStr(configPage + config_rdp_server);
-	this->rdp_domain	= 	exec_cmd_process_reStr(configPage + config_rdp_domain);
-	//std::cout << "network_type: '" << network_type.toStdString() << "'" << std::endl;
-	//std::cout << "citrix_rdp_type: '" << citrix_rdp_type.toStdString() << "'" << std::endl;
-	//std::cout << configPage + config_citrix_rdp_type << std::endl;
-	std::cout << "client_logo: '" << client_logo.toStdString() << "'" << std::endl;
-	std::cout << "citrix_store: '" << citrix_store.toStdString() << "'" << std::endl;
-	std::cout << "citrix_url: '" << citrix_url.toStdString() << "'" << std::endl;
-
 }
 
 
