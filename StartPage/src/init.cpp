@@ -1,11 +1,11 @@
 //init.cpp
 
 #include "../inc/init.h"
+#include "../../../libs/tools/inc/setting.h"
+#include "../../../libs/tools/inc/custom_exceptions.h"
 #include <QProcess>
 #include <iostream>
 #include <memory>
-#include "../../../libs/tools/inc/setting.h"
-#include "../../../libs/tools/inc/custom_exceptions.h"
 
 /**
  * Constructor
@@ -24,9 +24,9 @@ Init::Init() :
 {
 	
 	//std::cout << "Init Constructor\n";
-	std::unique_ptr<Setting> setting(new Setting);
+    std::unique_ptr<Setting> setting (new Setting);
 	try {
-		setting.get()->loadSettings();
+        setting.get()->loadSettings();
 	} catch(const developer_error& e) {
 		//TODO
 		std::cout << -1 << "Load Setting in Init-Konstruktor nicht geklappt" << std::endl;
