@@ -11,6 +11,7 @@
 #include <QSignalMapper>
 #include <QApplication>
 #include <QDebug>
+#include "../../libs/tools/inc/exec_cmd.h"
 
 //
 // Konstruktor
@@ -33,16 +34,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		//handle the error
 		std::cout << -1 << "Load Setting in Init-Konstruktor failed" << std::endl;
 	}
-/*
-// start clock
-QTime qtime = QTime::currentTime(); //Timer auslesen
-QString stime = qtime.toString(Qt::LocalDate);//Timerwert als String wandeln
-ui->lblClock->setText(stime);//Text von Label setzen
-startTimer(5000);
 
-// fill widgets with texts
-MainWindow::fillWidgetsTexts();
-*/
+    // start clock
+    QTime qtime = QTime::currentTime(); //Timer auslesen
+    QString stime = qtime.toString(Qt::LocalDate);//Timerwert als String wandeln
+    ui->lblClock->setText(stime);//Text von Label setzen
+    startTimer(5000);
+
+    // fill widgets with texts
+    MainWindow::fillWidgetsTexts();
+
 //std::cout << exec_script(SHELL_IP).toStdString() << std::endl;
 }
 
@@ -85,13 +86,13 @@ void MainWindow::positionWidgets() {
 ui->lblClock->move(this->geometry().center()); // funktioniert !!!
 ui->lblClock->updateGeometry();
 }
-
+*/
 //
 // button Exit
 void MainWindow::on_btnExit_clicked() {
-QApplication::exit();
+    QApplication::exit();
 }
-
+/*
 //
 // button Citrix
 //
@@ -206,6 +207,7 @@ void MainWindow::on_btnDesktop_clicked(int index) {
 	qDebug(buffer.data());
 	ui->lblDebugLine->setText(QString(buffer_error));
 }
+*/
 
 //
 // process timer event
@@ -225,68 +227,55 @@ void MainWindow::timerEvent(QTimerEvent *event) {
 	} else {
 		ui->lblNetworkStatus->setText(LABEL_NETWORK_OFFLINE);
 	}
-
 }
 
-	* fill widgets with correct texts
-* use bash scripts --> easy applicable to different systems (just modify the scripts)
-	void MainWindow::fillWidgetsTexts() {
-		// login button
-		ui->btnCitrix->setText(BTN_CITRIX);
-		ui->btnCitrix->setToolTip(BTN_CITRIX_TOOLTIP);
+//
+// fill widgets with correct texts
+// use bash scripts --> easy applicable to different systems (just modify the scripts)
+void MainWindow::fillWidgetsTexts() {
+    // login button
+    ui->btnCitrix->setText(BTN_CITRIX);
+    ui->btnCitrix->setToolTip(BTN_CITRIX_TOOLTIP);
 
-		// Network labels
-		ui->grpBoxNetwork->setTitle(GRP_BOX_NETWORK); // grpBoxNetwork
-		ui->lblNetworkStatus->setText(LABEL_NETWORK_ONLINE); // label network status
-		ui->lblIpText->setText(LABEL_IP); // label IP
-		ui->lblNetmaskText->setText(LABEL_NETMASK); // label NETMASK
-		ui->lblGatewayText->setText(LABEL_GATEWAY); // label GATEWAY
-		ui->lblTypeText->setText(LABEL_TYPE); // label TYPE
+    // Network labels
+    ui->grpBoxNetwork->setTitle(GRP_BOX_NETWORK); // grpBoxNetwork
+    ui->lblNetworkStatus->setText(LABEL_NETWORK_ONLINE); // label network status
+    ui->lblIpText->setText(LABEL_IP); // label IP
+    ui->lblNetmaskText->setText(LABEL_NETMASK); // label NETMASK
+    ui->lblGatewayText->setText(LABEL_GATEWAY); // label GATEWAY
+    ui->lblTypeText->setText(LABEL_TYPE); // label TYPE
 
-		// status and debug label
-		ui->lblStatusLine->setText(""); // empty label STATUSLINE
-		ui->lblDebugLine->setText(""); // empty label DEBUGLINE
+    // status and debug label
+    ui->lblStatusLine->setText(""); // empty label STATUSLINE
+    ui->lblDebugLine->setText(""); // empty label DEBUGLINE
 
-		// fill network labels
-		this->fillNetworkLabels();
-	}
+    // fill network labels
+    this->fillNetworkLabels();
+}
 
 
-* fill network labels
-* @return: true=network connected, false=offline
+//
+// fill network labels
+//
+// @return: true=network connected, false=offline
 bool MainWindow::fillNetworkLabels() {
 	bool returnval = true; // if connected, return true
 
 	// IP
-	QString program = SHELL_IP;
-	QStringList arguments;
-	procSystem = new QProcess(this);
-	procSystem->start(program, arguments);
-	procSystem->waitForFinished();
-	QString output = procSystem->readAllStandardOutput();
-	ui->lblIp->setText(output);
-	if (output=="\n") { // if no ip --> offline, return false
-		returnval = false;
-	}
-
+    QString ip = exec_cmd_process_re_QString(init.get_script_ip());
+    ui->lblIp->setText(ip);
 	// NETMASK
-	program = SHELL_NETMASK;
-	procSystem = new QProcess(this);
-	procSystem->start(program, arguments);
-	procSystem->waitForFinished();
-	output = procSystem->readAllStandardOutput();
-	ui->lblNetmask->setText(output);
+    QString netmask = exec_cmd_process_re_QString(init.get_script_netmask());
+    ui->lblNetmask->setText(netmask);
 
 	// GATEWAY
-	program = SHELL_GATEWAY;
-	procSystem = new QProcess(this);
-	procSystem->start(program, arguments);
-	procSystem->waitForFinished();
-	output = procSystem->readAllStandardOutput();
-	ui->lblGateway->setText(output);
+    QString gateway = exec_cmd_process_re_QString(init.get_script_gateway());
+    ui->lblGateway->setText(gateway);
 
 	// TYPE
+    QString type = init.get_network_type();
+    ui->lblType->setText(type);
 
 	return returnval;
 }
-* */
+

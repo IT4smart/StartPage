@@ -45,17 +45,17 @@ class MainWindow : public QMainWindow {
 		QString exec_script(QString script_full_path);
 
 		//void positionWidgets(); // hier werden die Elemente neu positioniert
-		private slots:
-		//	void on_btnExit_clicked();
+    private slots:
+        void on_btnExit_clicked();
 	//	void on_btnCitrix_clicked();
 	//	void on_btnDesktop_clicked(int);
 
 	private:
-			Init init;
-	//	QProcess *procCitrix; // process for citrix
-	//	QProcess *procSystem; // process for system commands
-	//	void fillWidgetsTexts(); // fill all widgets in correct texts and language
-	//	bool fillNetworkLabels(); // fill all network labels in correct texts and language, return: true=connected, false=offline
+        Init init;
+        void fillWidgetsTexts(); // fill all widgets in correct texts and language
+        bool fillNetworkLabels(); // fill all network labels in correct texts and language, return: true=connected, false=offline
+    //    QProcess *procCitrix; // process for citrix
+    //    QProcess *procSystem; // process for system commands
 	//	QSignalMapper *signalMapper; // signal mapper zur übergabe der signale von signal nach slot
 		//tests
 	//	QStringList names;
@@ -63,8 +63,7 @@ class MainWindow : public QMainWindow {
 
 
 	protected:
-	//	void timerEvent(QTimerEvent *event); // for clock
-
+        void timerEvent(QTimerEvent *event); // for clock
 
 };
 

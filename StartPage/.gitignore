@@ -1,5 +1,6 @@
 *.a
 StartPage
+Startpage
 UnitTest
 *_automoc.cpp
 moc_*.cpp
@@ -9,6 +10,5 @@ Makefile
 CMakeCache.txt
 ui_mainwindow.h
 session.vim
-StartPage.pro.user
 
 doc

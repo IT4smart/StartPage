@@ -307,47 +307,6 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QLabel" name="lblLogo2">
-     <property name="geometry">
-      <rect>
-       <x>800</x>
-       <y>20</y>
-       <width>200</width>
-       <height>200</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap resource="resources.qrc">:/ubuntu.png</pixmap>
-     </property>
-     <property name="scaledContents">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lblLogo1">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>20</y>
-       <width>200</width>
-       <height>200</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;BILD logo ...&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap resource="resources.qrc">:/ubuntu.png</pixmap>
-     </property>
-     <property name="scaledContents">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QWidget" name="horizontalLayoutWidget">
      <property name="geometry">
       <rect>
@@ -364,16 +323,12 @@
     <zorder>grpBoxNetwork</zorder>
     <zorder>lblClock</zorder>
     <zorder>lblDebugLine</zorder>
-    <zorder>lblLogo2</zorder>
-    <zorder>lblLogo1</zorder>
     <zorder>horizontalLayoutWidget</zorder>
     <zorder>btnCitrix</zorder>
    </widget>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

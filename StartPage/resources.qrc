@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>ubuntu.png</file>
+        <file>wait.gif</file>
+        <file>desktop.png</file>
     </qresource>
 </RCC>
