@@ -1,7 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>ubuntu.png</file>
         <file>wait.gif</file>
         <file>desktop.png</file>
+        <file>net_offline.png</file>
+        <file>net_online.png</file>
     </qresource>
 </RCC>

@@ -1,6 +1,7 @@
 #ifndef INIT_H
 #define INIT_H
 #include <QString>
+#include <QPair>
 
 class Init {
 	
@@ -27,13 +28,15 @@ class Init {
 		QString get_citrix_url();
 		QString get_rdp_server();
 		QString get_rdp_domain();
+        QString get_language();
+
 	private:
-        //Var script paths
+        // vars script paths
 		QString script_ip;
 		QString script_netmask;
 		QString script_gateway;
 
-        //Vars from ConfigPage
+        // vars from ConfigPage
 		QString client_logo;
 		QString network_type;
 		QString citrix_rdp_type;
@@ -41,6 +44,8 @@ class Init {
 		QString citrix_url;
 		QString rdp_server;
 		QString rdp_domain;
+        QString language;
+
 };
 
 

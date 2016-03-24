@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "./inc/citrix.h"
 #include "../../libs/tools/inc/custom_exceptions.h"
+#include "../../libs/tools/inc/exec_cmd.h"
 #include <iostream>
 #include <qprocess.h>
 #include <QTime>
@@ -11,7 +12,6 @@
 #include <QSignalMapper>
 #include <QApplication>
 #include <QDebug>
-#include "../../libs/tools/inc/exec_cmd.h"
 
 //
 // Konstruktor
@@ -22,11 +22,12 @@
  * and in there, an developer_error exception can be thrown. 
  *
  */
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) 
-					  , init("empty")
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), init("empty")
 					  //, procCitrix(nullptr), procSystem(nullptr), signalMapper(nullptr), names(), links()
 {
 	ui->setupUi(this);
+
+    // initialize vars with init-constructor
 	try {
 		init = Init();
 	} catch(const developer_error& e) {
@@ -39,10 +40,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     QTime qtime = QTime::currentTime(); //Timer auslesen
     QString stime = qtime.toString(Qt::LocalDate);//Timerwert als String wandeln
     ui->lblClock->setText(stime);//Text von Label setzen
-    startTimer(5000);
+    startTimer(1000);
 
-    // fill widgets with texts
-    MainWindow::fillWidgetsTexts();
 
 //std::cout << exec_script(SHELL_IP).toStdString() << std::endl;
 }
@@ -53,6 +52,62 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow() {
 	delete ui;
 }
+
+/** @brief init_screen
+ * @param x
+ * @param y
+ */
+void MainWindow::init_screen(int screen_w, int screen_h) {
+    // save screen resolution
+    screen_res = new QPair<int,int>(screen_w, screen_h);
+
+    // position logo
+    QString logo_path = init.get_client_logo();
+    QPixmap imgLogo(logo_path);
+    int logo_w = 0.1 * screen_w; // width of logo
+    int logo_h = 0.1 * screen_h; // height of logo
+    int logo_offset_w = 0.05 * screen_w; // pos of left top corner
+    int logo_offset_h = 0.05 * screen_h; // pos of left top corner
+    ui->lblLogo->setGeometry(logo_offset_w, logo_offset_h, logo_w, logo_h);
+    ui->lblLogo->setPixmap(imgLogo.scaled(logo_w, logo_h, Qt::KeepAspectRatio, Qt::FastTransformation));
+//    QLabel* l = new QLabel;
+//    l->setParent(ui->centralWidget);
+//    l->setGeometry(logo_offset_w,logo_offset_h,logo_w+logo_offset_w,logo_h+logo_offset_h);
+//    l->setPixmap(imgLogo.scaled(logo_w, logo_h, Qt::KeepAspectRatio, Qt::FastTransformation));
+
+    // position clock
+    int clock_w = 0.1 * screen_w; // width of clock
+    int clock_h = 0.1 * screen_h; // height of clock
+    int clock_offset_w = 0.05 * screen_w; // pos of left top corner
+    int clock_offset_h = 0.85 * screen_h; // pos of left top corner
+    ui->lblClock->setGeometry(100,720,200,100);
+//    FRAMELAYOUT statt QMAINWINDOW ????
+//    ui->lblClock->setGeometry(clock_offset_w, clock_offset_h, clock_w, clock_h);
+//    ui->lblClock->setText("TEST");
+//    ui->lblClock->show();
+
+    // fill widgets with texts
+    MainWindow::fillWidgetsTexts();
+
+}
+
+/**
+ * @brief get_screen_res_x
+ * @return
+ */
+int MainWindow::get_screen_res_x() {
+    return screen_res->first;
+}
+
+/**
+ * @brief get_screen_res_y
+ * @return
+ */
+int MainWindow::get_screen_res_y() {
+    return screen_res->second;
+}
+
+
 
 
 

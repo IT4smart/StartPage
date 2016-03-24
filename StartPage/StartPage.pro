@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     ../../libs/tools/src/maps.cpp \
     ../../libs/tools/src/remove_file.cpp \
     ../../libs/tools/src/set_permission.cpp \
-    ../../libs/tools/src/setting.cpp
+    ../../libs/tools/src/setting.cpp \
+    startpage.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -36,11 +37,13 @@ HEADERS  += mainwindow.h \
     ../../libs/tools/inc/maps.h \
     ../../libs/tools/inc/remove_file.h \
     ../../libs/tools/inc/set_permission.h \
-    ../../libs/tools/inc/setting.h
+    ../../libs/tools/inc/setting.h \
+    startpage.h
 
 
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    startpage.ui
 
 RESOURCES += \
     resources.qrc

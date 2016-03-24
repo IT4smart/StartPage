@@ -88,6 +88,7 @@ Init::Init() :
 	QString config_citrix_url	= setting.get()->get_Map_Value("ConfigPage", "citrix_url");
 	QString config_rdp_server	= setting.get()->get_Map_Value("ConfigPage", "rdp_server");
 	QString config_rdp_domain	= setting.get()->get_Map_Value("ConfigPage", "rdp_domain");
+    QString config_language	= setting.get()->get_Map_Value("ConfigPage", "language");
 
 
 	//set the internal variables
@@ -98,6 +99,7 @@ Init::Init() :
 	this->citrix_url	= 	exec_cmd_process_re_QString(configPage + config_citrix_url);
 	this->rdp_server	= 	exec_cmd_process_re_QString(configPage + config_rdp_server);
 	this->rdp_domain	= 	exec_cmd_process_re_QString(configPage + config_rdp_domain);
+    this->language      = 	exec_cmd_process_re_QString(configPage + config_language);
 
 	//test:
 	///*
@@ -110,7 +112,9 @@ Init::Init() :
 	   std::cout << "client_logo: '" << client_logo.toStdString() << "'" << std::endl;
 	   std::cout << "citrix_store: '" << citrix_store.toStdString() << "'" << std::endl;
 	   std::cout << "citrix_url: '" << citrix_url.toStdString() << "'" << std::endl;
-	   //*/
+       std::cout << "language: '" << language.toStdString() << "'" << std::endl;
+
+    //*/
 }
 
 
@@ -207,3 +211,10 @@ QString Init::get_rdp_domain() {
 	return this->rdp_domain;
 }
 
+/**
+ * getter
+ * @return language
+ */
+QString Init::get_language() {
+    return this->language;
+}

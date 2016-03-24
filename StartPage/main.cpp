@@ -4,21 +4,30 @@
 #include <QDesktopWidget>
 #include <iostream>
 #include <QDebug>
+#include <startpage.h>
+
 
 int main(int argc, char *argv[]) {
-    QApplication a(argc, argv); // application
+    QApplication a(argc, argv); // create application
 
-    // create desktop
-    QDesktopWidget dw;
-    int x=dw.width(); //get screen resolution x
-    int y=dw.height(); //get screen resolution y
-    qDebug() << "x,y=" << x << "*" << y <<"\n";
+    // get screen resolution
+    QDesktopWidget *dw = QApplication::desktop();
+    int screen_res_w = dw->width(); //get screen resolution x --> works only with 1 screen!
+    int screen_res_h = dw->height(); //get screen resolution y --> works only with 1 screen!
 
     // create window
-    MainWindow w;
+    StartPage s; // constructor creates init-class
+    s.init_screen(screen_res_w,screen_res_h); // initialize screen with actual screen resolution
+    s.showFullScreen();
+//    s.show();
+
+
+
+
+ /*   MainWindow w; // constructor creates init-class
     w.setWindowFlags(Qt::WindowStaysOnTopHint); // window stays on top
     w.showFullScreen(); // show window as full screen
-//    w.show();
+    w.init_screen(x,y); // save the screen resolution in init class
 
     // move all widgets according to screen size (basis is set to 1024x768)
 /*    QRect rec = QApplication::desktop()->screenGeometry();
@@ -28,5 +37,5 @@ int main(int argc, char *argv[]) {
 */
     // end
     return a.exec();
-                }
+}
 

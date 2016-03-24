@@ -38,20 +38,23 @@ class MainWindow : public QMainWindow {
 		// otherwise there will be problems with the copying of the ui* pointer
 		MainWindow(const MainWindow&) = delete;
 		MainWindow* operator=(const MainWindow&) = delete;
-
-
-
-
 		QString exec_script(QString script_full_path);
 
-		//void positionWidgets(); // hier werden die Elemente neu positioniert
+        Init init; // init class
+
+        // screen resolution
+        void init_screen(int x, int y); // initialize screen with elements and correct resolution
+        int get_screen_res_x();
+        int get_screen_res_y();
+
+
+        //void positionWidgets(); // hier werden die Elemente neu positioniert
     private slots:
         void on_btnExit_clicked();
 	//	void on_btnCitrix_clicked();
 	//	void on_btnDesktop_clicked(int);
 
 	private:
-        Init init;
         void fillWidgetsTexts(); // fill all widgets in correct texts and language
         bool fillNetworkLabels(); // fill all network labels in correct texts and language, return: true=connected, false=offline
     //    QProcess *procCitrix; // process for citrix
@@ -60,6 +63,8 @@ class MainWindow : public QMainWindow {
 		//tests
 	//	QStringList names;
 	//	QStringList links;
+
+        QPair<int,int> *screen_res; // screen resolution --> works only with 1 screen!
 
 
 	protected:
