@@ -18,6 +18,7 @@ int main(int argc, char *argv[]) {
     // create window
     StartPage s; // constructor creates init-class
     s.init_screen(screen_res_w, screen_res_h); // initialize screen with actual screen resolution
+    s.setWindowFlags(Qt::WindowStaysOnBottomHint);
     s.showFullScreen(); // show full screen
 
 //    s.show();
