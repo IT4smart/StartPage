@@ -26,19 +26,23 @@ QMap<QString,QString> Citrix::getDesktops() {
     // run system command
     QString command = PRG_STOREBROWSE+" -E '"+link_store+"'";
     QPair<QString,QString> pair = exec_cmd_process(command); // returns result and error as QPair
-
     QString result = pair.first;
     QString error = pair.second;
-qDebug() << "return:\n" << pair.first;
-qDebug() << "err:\n" << pair.second;
 
     // error handling
     if (result=="") { // there is no result --> empty
+        // do something later
         if (error.contains("ERROR_HTTP")) { // no web connection
             qDebug() << "HTTP ERROR!";
+        } else if (error.contains("AUTH_SERVER")) { // authorization error
+            qDebug() << "AUTH_SERVER ERROR!";
+        } else if (error.contains("OUT_OF_LICENSES")) {
+            qDebug() << "OUT_OF_LICENSES ERROR!";
         } else {
-            qDebug() << "ignore";
+            qDebug() << "error:" << error;
         }
+        return ret_map; // return empty map
+
     } else { // there is a result --> compute it
         // split str
         QString sbuf = QString(pair.first.data()); // get buffer result
@@ -52,7 +56,7 @@ qDebug() << "err:\n" << pair.second;
             ret_map.insert(colums.at(1), colums.at(0));
         }
 
-        return ret_map;
+        return ret_map; // return full map
     }
 
 }

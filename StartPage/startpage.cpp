@@ -15,6 +15,10 @@
 #include <QMessageBox>
 #include <QDate>
 #include <QString>
+#include <QMovie>
+#include <QMap>
+#include <chrono>
+#include <thread>
 
 /**
  * constructor
@@ -143,7 +147,7 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     int login_w = 0.1 * screen_w; // width of tool button
     int login_h = 0.125 * screen_h; // height of tool button
     int login_offset_w = (screen_w - login_w)/2; // pos of left top corner
-    int login_offset_h = (screen_h - login_h)/2; // pos of left top corner
+    int login_offset_h = (screen_h - 2*login_h)/2; // pos of left top corner
     QFont font_login;
     font_login.setPointSize(0.02 * screen_h);
     ui->tbtnLogin->setFont(font_login);
@@ -156,6 +160,18 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     }
     ui->tbtnLogin->setIconSize(QSize(0.7*login_w,0.7*login_h)); // icon size
     ui->tbtnLogin->setGeometry(login_offset_w, login_offset_h, login_w, login_h);
+
+    // position message
+    int msg_w = 0.3 * screen_w; // width of message
+    int msg_h = 0.1 * screen_h; // height of message
+    int msg_offset_w = (screen_w - msg_w)/2; // pos of left top corner
+    int msg_offset_h = (screen_h)/2; // pos of left top corner
+    QFont font_msg; // font
+    font_msg.setPointSize(0.02 * screen_h);
+    ui->lblMessage->setText("");
+    ui->lblMessage->setFont(font_msg);
+    ui->lblMessage->setGeometry(msg_offset_w, msg_offset_h, msg_w, msg_h);
+
 }
 
 /**
@@ -209,10 +225,10 @@ void StartPage::on_tbtnNetStatus_clicked() {
     font.setPointSize(0.015*this->get_screen_res_h());
     msgBox.setWindowTitle("Netzwerk Status");
     msgBox.setFont(font);
-    msgBox.setText("IP-Adresse:\t"+ip+"\n"
-                   +"Netzmaske:\t"+mask+"\n"
-                   +"Gateway:\t"+gateway+"\n"
-                   +"IP-Vergabe:\t"+type);
+    msgBox.setText("IP-Adresse:\t"+ip+"\t\n"
+                   +"Netzmaske:\t"+mask+"\t\n"
+                   +"Gateway:\t"+gateway+"\t\n"
+                   +"IP-Vergabe:\t"+type+"\t\n\n");
     msgBox.setIcon(QMessageBox::Information);
     msgBox.exec();
 }
@@ -237,17 +253,69 @@ void StartPage::on_tbtnLogin_clicked() {
 void StartPage::startLoginCitrix() {
     qDebug() << "startLoginCitrix";
 
-    QString ctx_link = init.get_citrix_url();
-    QString ctx_store = init.get_citrix_store();
+    QString ctx_link = init.get_citrix_url(); // get netscaler url
+    QString ctx_store = init.get_citrix_store(); // get store url
 
-    // link or store empty???
+    // ***TODO: link or store empty???
 
+    // make desktop inresponsive
+    ui->centralwidget->setEnabled(false); // disable buttons
+    ui->lblMessage->setVisible(true);
+    ui->lblMessage->setText("... bitte warten ..."); // waiting message
+    ui->centralwidget->repaint(); // repaint centralwidget (container)
+
+    // get desktop(s)
     Citrix *ctx = new Citrix(ctx_link, ctx_store); // constructor
-    ui->centralwidget->setEnabled(false);
-    ui->centralwidget->repaint();
-    ctx->getDesktops();
-//    Citrix::Citrix ctx = new Citrix::Citrix();
-//    ctx.getDesktops();
+    QMap<QString,QString> desktops = ctx->getDesktops();
+
+    if (desktops.size()==0) { // no desktops --> normal start again
+        // show messagebox
+        QMessageBox msgBox;
+        QFont font;
+        font.setPointSize(0.015*this->get_screen_res_h());
+        msgBox.setWindowTitle("Verbindungsfehler");
+        msgBox.setFont(font);
+        msgBox.setText("Es war keine Verbindung zum Citrix Store möglich.\n\n"
+                       "Bitte überprüfen Sie die:\n"
+                       "- Kabel-/WLAN-Verbindung\n"
+                       "- Citrixstore-Adresse\n"
+                       "- externe Gateway Adresse\n\n"
+                       "Wenn Sie nicht weiter wissen, informieren Sie bitte Ihren Administrator!\n");
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+
+    } else if (desktops.size()==1) { // just one desktop --> start
+        // make desktop inresponsive
+        ui->centralwidget->setEnabled(false); // disable buttons
+        ui->lblMessage->setVisible(true);
+        ui->lblMessage->setText("... bitte warten ..."); // waiting message
+        ui->centralwidget->repaint(); // repaint centralwidget (container)
+
+        // start desktop
+        QPair<QString,QString> ret_pair = ctx->startDesktop(desktops.first());
+        qDebug() << "re_pair msg:\n" << ret_pair.first << "\nerr:\n" <<ret_pair.second;
+        if (ret_pair.second=="") { // no error
+            // wait for 15 secs --> the buttons will work after 15 secs again
+            std::this_thread::sleep_for(std::chrono::milliseconds(15000));
+        }
+
+    } else { // more desktops --> show desktops
+        // make desktop responsive again
+        ui->tbtnLogin->setDisabled(true);
+        ui->tbtnLogin->setVisible(false);
+        ui->lblMessage->setText("FERTIG!!!"); // // disable waiting message
+        ui->centralwidget->setEnabled(true); // disable buttons
+        ui->centralwidget->repaint(); // repaint centralwidget (container)
+
+        // create desktop buttons
+
+    }
+
+
+    // make desktop responsive again --> for later
+    ui->centralwidget->setEnabled(true); // enable buttons
+    ui->lblMessage->setVisible(false); // // disable waiting message
+    ui->centralwidget->repaint(); // repaint centralwidget (container)
 }
 
 /*    // baue neue Buttons auf
@@ -280,4 +348,44 @@ void StartPage::startLoginCitrix() {
  */
 void StartPage::startLoginRdp() {
     qDebug() << "startLoginRdp";
+}
+
+/**
+ * @brief MainWindow::slot_buffer
+ * @param buffer
+ */
+void StartPage::slot_buffer(QByteArray buffer) {
+    qDebug() << "slot_buffer ...:\n" << buffer.data();
+    // split str
+/*    QString sbuf = buffer.data();
+    sbuf.remove("'"); // remove '-zeichen
+    QStringList zeilen = sbuf.split("\n", QString::SkipEmptyParts);
+
+    // Trenne in Zeilen
+    for (int i=0;i<zeilen.size();i++) {
+        // trenne in Spalten
+        QStringList spalten = zeilen.at(i).split("\t", QString::SkipEmptyParts);
+        names.push_back(spalten.at(1).toLocal8Bit());
+        links.push_back(spalten.at(0).toLocal8Bit());
+    }
+
+    // Baue neue Buttons auf
+    signalMapper = new QSignalMapper(this); // signal mapper zur übergabe von daten von signals to slots
+    for (int i=0;i<names.size();i++) {
+        QPushButton *btn = new QPushButton(names.at(i)); // create button
+        btn->setFont(QFont("Calibri", 26)); // set font
+        ui->hLayoutElements->addWidget(btn); // add button to layout
+        signalMapper->setMapping(btn, i); // setze mapper
+        connect(btn, SIGNAL(clicked()), signalMapper, SLOT(map())); // connect btn to slot map
+    }
+    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(on_btnDesktop_clicked(int)));
+*/
+}
+
+/**
+ * @brief MainWindow::slot_buffer_error
+ */
+void StartPage::slot_buffer_error(QByteArray buffer_error) {
+    qDebug() << "slot_buffer_error ...:\n" << buffer_error.data();
+    //ui->lblStatusLine->setText(STATUS_LINE_SELECT_DESKTOP); // set status line
 }

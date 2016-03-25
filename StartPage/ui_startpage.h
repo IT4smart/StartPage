@@ -31,6 +31,7 @@ public:
     QLabel *lblClock;
     QToolButton *tbtnNetStatus;
     QToolButton *tbtnLogin;
+    QLabel *lblMessage;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -65,6 +66,11 @@ public:
         tbtnLogin->setObjectName(QStringLiteral("tbtnLogin"));
         tbtnLogin->setGeometry(QRect(500, 230, 131, 111));
         tbtnLogin->setFont(font);
+        lblMessage = new QLabel(centralwidget);
+        lblMessage->setObjectName(QStringLiteral("lblMessage"));
+        lblMessage->setGeometry(QRect(330, 360, 481, 31));
+        lblMessage->setFont(font);
+        lblMessage->setAlignment(Qt::AlignCenter);
         StartPage->setCentralWidget(centralwidget);
         menubar = new QMenuBar(StartPage);
         menubar->setObjectName(QStringLiteral("menubar"));
@@ -86,6 +92,7 @@ public:
         lblClock->setText(QApplication::translate("StartPage", "lblClock", 0));
         tbtnNetStatus->setText(QApplication::translate("StartPage", "tbtnNetStatus", 0));
         tbtnLogin->setText(QApplication::translate("StartPage", "tbtnLogin", 0));
+        lblMessage->setText(QApplication::translate("StartPage", "lblMessage", 0));
     } // retranslateUi
 
 };
