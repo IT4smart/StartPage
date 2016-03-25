@@ -4,5 +4,7 @@
         <file>desktop.png</file>
         <file>net_offline.png</file>
         <file>net_online.png</file>
+        <file>citrix.png</file>
+        <file>rdp_ms.png</file>
     </qresource>
 </RCC>

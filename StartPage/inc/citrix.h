@@ -25,14 +25,14 @@ class Citrix {
          * link_store = internal link of chosen store, e.g. https://ddcxd1.ass-hn.de/citrix/xdstore/discovery
          */
         Citrix(QString link_netscaler, QString link_store); // constructor
-
         QMap<QString,QString> getDesktops(); // get desktops from store, return: QMap with <key,value>
-        QPair<QByteArray,QByteArray> startDesktop(QString link_desktop); // start desktop with desktop link
-        QPair<QByteArray,QByteArray> deleteCitrixAuthentication(); // delete citrix login information
+        QPair<QString,QString> startDesktop(QString link_desktop); // start desktop with desktop link
+        QPair<QString,QString> deleteCitrixAuthentication(); // delete citrix login information
 
    private:
         QString link_netscaler; // external link of Netscaler
         QString link_store; // internal link of chosen store
+
 
 //        QStringList getStores(); // get list of stores
 //        void addStore(); // add store --> login window will appear

@@ -1,6 +1,8 @@
 #include <QProcess>
 #include "../inc/citrix.h"
 #include "../../../libs/tools/inc/exec_cmd.h"
+#include <QDebug>
+#include <QPair>
 
 /*
  * constructor
@@ -23,21 +25,36 @@ QMap<QString,QString> Citrix::getDesktops() {
 
     // run system command
     QString command = PRG_STOREBROWSE+" -E '"+link_store+"'";
-    QPair<QByteArray,QByteArray> pair = exec_cmd_process(command);
+    QPair<QString,QString> pair = exec_cmd_process(command); // returns result and error as QPair
 
-    // split str
-    QString sbuf = pair.first.data(); // get buffer result
-    sbuf.remove("'"); // remove '-char
+    QString result = pair.first;
+    QString error = pair.second;
+qDebug() << "return:\n" << pair.first;
+qDebug() << "err:\n" << pair.second;
 
-    // cut in rows
-    QStringList rows = sbuf.split("\n", QString::SkipEmptyParts);
-    for (int i=0;i<rows.size();i++) {
-        // cut row in colums
-        QStringList colums = rows.at(i).split("\t", QString::SkipEmptyParts);
-        ret_map.insert(colums.at(1), colums.at(0));
+    // error handling
+    if (result=="") { // there is no result --> empty
+        if (error.contains("ERROR_HTTP")) { // no web connection
+            qDebug() << "HTTP ERROR!";
+        } else {
+            qDebug() << "ignore";
+        }
+    } else { // there is a result --> compute it
+        // split str
+        QString sbuf = QString(pair.first.data()); // get buffer result
+        sbuf.remove("'"); // remove '-char
+
+        // cut in rows
+        QStringList rows = sbuf.split("\n", QString::SkipEmptyParts);
+        for (int i=0;i<rows.size();i++) {
+            // cut row in colums
+            QStringList colums = rows.at(i).split("\t", QString::SkipEmptyParts);
+            ret_map.insert(colums.at(1), colums.at(0));
+        }
+
+        return ret_map;
     }
 
-    return ret_map;
 }
 
 /*
@@ -46,12 +63,12 @@ QMap<QString,QString> Citrix::getDesktops() {
  * parameter:
  * desktopLink
  *
- * return: QPair<QByteArray,QByteArray> (= <buffer_result,buffer_error)
+ * return: QPair<QString,QString> (= <buffer_result,buffer_error)
  */
-QPair<QByteArray,QByteArray> Citrix::startDesktop(QString desktop_link) {
+QPair<QString,QString> Citrix::startDesktop(QString desktop_link) {
     // run system command
     QString command = PRG_STOREBROWSE + " -L '" + desktop_link + "' '" + link_store + "'";
-    QPair<QByteArray,QByteArray> ret_pair = exec_cmd_process(command);
+    QPair<QString,QString> ret_pair = exec_cmd_process(command);
 
     // return QPair
     return ret_pair;
@@ -60,10 +77,10 @@ QPair<QByteArray,QByteArray> Citrix::startDesktop(QString desktop_link) {
 /*
  * delete citrix login information
  */
-QPair<QByteArray,QByteArray> Citrix::deleteCitrixAuthentication() {
+QPair<QString,QString> Citrix::deleteCitrixAuthentication() {
     // run system command
     QString command = PRG_KILLALL+" "+PROC_AUTHMANAGERDAEMON+" "+PROC_SERVICERECORD;
-    QPair<QByteArray,QByteArray> ret_pair = exec_cmd_process(command);
+    QPair<QString,QString> ret_pair = exec_cmd_process(command);
 
     // return QPair
     return ret_pair;

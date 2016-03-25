@@ -17,25 +17,12 @@ int main(int argc, char *argv[]) {
 
     // create window
     StartPage s; // constructor creates init-class
-    s.init_screen(screen_res_w,screen_res_h); // initialize screen with actual screen resolution
-    s.showFullScreen();
+    s.init_screen(screen_res_w, screen_res_h); // initialize screen with actual screen resolution
+    s.showFullScreen(); // show full screen
+
 //    s.show();
 
-
-
-
- /*   MainWindow w; // constructor creates init-class
-    w.setWindowFlags(Qt::WindowStaysOnTopHint); // window stays on top
-    w.showFullScreen(); // show window as full screen
-    w.init_screen(x,y); // save the screen resolution in init class
-
-    // move all widgets according to screen size (basis is set to 1024x768)
-/*    QRect rec = QApplication::desktop()->screenGeometry();
-    int height = rec.height();
-    int width = rec.width();
-    w.ui->widgetContainer->move((width-1024)/2,(height-768)/2);
-*/
-    // end
+    // end --> will never be reached, because of loop
     return a.exec();
 }
 

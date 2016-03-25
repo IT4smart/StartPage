@@ -14,6 +14,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QDate>
+#include <QString>
 
 /**
  * constructor
@@ -57,8 +58,6 @@ StartPage::StartPage(QWidget *parent) :
         ui->tbtnNetStatus->setText("offline");
         ui->tbtnNetStatus->setIcon(QIcon(":/net_offline.png"));
     }
-
-
 }
 
 /**
@@ -96,6 +95,7 @@ void StartPage::timerEvent(QTimerEvent *event) {
         ui->tbtnNetStatus->setIcon(QIcon(":/net_offline.png"));
     }
 }
+
 
 /** @brief init_screen
  * @param x
@@ -135,19 +135,27 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     ui->tbtnNetStatus->setFont(font_netstatus);
     ui->tbtnNetStatus->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     //    ui->tbtnNetStatus->setText("online"); --> change text dynamically
-    ui->tbtnNetStatus->setIconSize(QSize(0.7*netstatus_wh,0.7*netstatus_wh)); // icon size
     //    ui->tbtnNetStatus->setIcon(QIcon(":/net_online.png")); --> change icon dynamically
+    ui->tbtnNetStatus->setIconSize(QSize(0.7*netstatus_wh,0.7*netstatus_wh)); // icon size
     ui->tbtnNetStatus->setGeometry(netstatus_offset_w, netstatus_offset_h, netstatus_wh, netstatus_wh);
 
-    // position button
-
-
-
-    //    QLabel* l = new QLabel;
-    //    l->setParent(ui->centralWidget);
-    //    l->setGeometry(logo_offset_w,logo_offset_h,logo_w+logo_offset_w,logo_h+logo_offset_h);
-    //    l->setPixmap(imgLogo.scaled(logo_w, logo_h, Qt::KeepAspectRatio, Qt::FastTransformation));
-
+    // position login button
+    int login_w = 0.1 * screen_w; // width of tool button
+    int login_h = 0.125 * screen_h; // height of tool button
+    int login_offset_w = (screen_w - login_w)/2; // pos of left top corner
+    int login_offset_h = (screen_h - login_h)/2; // pos of left top corner
+    QFont font_login;
+    font_login.setPointSize(0.02 * screen_h);
+    ui->tbtnLogin->setFont(font_login);
+    ui->tbtnLogin->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    ui->tbtnLogin->setText("anmelden"); // --> change text dynamically
+    if (init.get_citrix_rdp_type()=="citrix") {
+        ui->tbtnLogin->setIcon(QIcon(":/citrix.png")); //--> change icon dynamically
+    } else {
+        ui->tbtnLogin->setIcon(QIcon(":/rdp_ms.png")); //--> change icon dynamically
+    }
+    ui->tbtnLogin->setIconSize(QSize(0.7*login_w,0.7*login_h)); // icon size
+    ui->tbtnLogin->setGeometry(login_offset_w, login_offset_h, login_w, login_h);
 }
 
 /**
@@ -207,4 +215,69 @@ void StartPage::on_tbtnNetStatus_clicked() {
                    +"IP-Vergabe:\t"+type);
     msgBox.setIcon(QMessageBox::Information);
     msgBox.exec();
+}
+
+/**
+ * @brief on_tbtnLogin_clicked
+ */
+void StartPage::on_tbtnLogin_clicked() {
+    if (init.get_citrix_rdp_type()=="citrix") {
+        startLoginCitrix(); // start_citrix
+    } else {
+        startLoginRdp(); // start rdp
+    }
+
+    // make tbtnLogin button visible again
+}
+
+
+/**
+ * @brief StartPage::startLoginCitrix
+ */
+void StartPage::startLoginCitrix() {
+    qDebug() << "startLoginCitrix";
+
+    QString ctx_link = init.get_citrix_url();
+    QString ctx_store = init.get_citrix_store();
+
+    // link or store empty???
+
+    Citrix *ctx = new Citrix(ctx_link, ctx_store); // constructor
+    ui->centralwidget->setEnabled(false);
+    ui->centralwidget->repaint();
+    ctx->getDesktops();
+//    Citrix::Citrix ctx = new Citrix::Citrix();
+//    ctx.getDesktops();
+}
+
+/*    // baue neue Buttons auf
+    signalMapper = new QSignalMapper(this); // signal mapper zur übergabe von daten von signals to slots
+    for (int i=0;i<names.size();i++) {
+
+        QToolButton *btn = new QToolButton(this);
+        btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+        btn->setText(names.at(i));
+        btn->setIconSize(QSize(96,96)); // icon size
+        btn->setIcon(QIcon(":/Desktop.png"));
+        // icon taken from: http://www.softicons.com/system-icons/hadaikum-icons-by-tiny-lab/desktop-icon
+        btn->setFixedSize(150,150); // button size
+
+//        btn->setPalette(QPalette(QColor(0,0,1))); // background color for button
+//        btn->setAutoFillBackground(true);
+
+/*        QPushButton *btn = new QPushButton(names.at(i)); // create button
+        btn->setFont(QFont("Calibri", 26)); // set font
+        ui->hLayoutElements->addWidget(btn); // add button to layout
+        signalMapper->setMapping(btn, i); // setze mapper
+        connect(btn, SIGNAL(clicked()), signalMapper, SLOT(map())); // connect btn to slot map
+    }
+    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(on_btnDesktop_clicked(int)));
+/*
+}
+
+/**
+ * @brief StartPage::startLoginRdp
+ */
+void StartPage::startLoginRdp() {
+    qDebug() << "startLoginRdp";
 }

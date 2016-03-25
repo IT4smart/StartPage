@@ -28,16 +28,18 @@ class StartPage : public QMainWindow
 
         // functions
         Init init; // init class
-        QString exec_script(QString script_full_path); // execution of script
         void init_screen(int w, int h); // initialize screen with elements and correct resolution
-        int get_screen_res_w();
-        int get_screen_res_h();
 
         // vars
 
     private:
         // functions
         bool getNetworkStatus(); // get network status --> return: true=connected, false=offline
+        QString exec_script(QString script_full_path); // execution of script
+        int get_screen_res_w();
+        int get_screen_res_h();
+        void startLoginCitrix(); // start citrix login
+        void startLoginRdp(); // start rdp login
 
         // vars
         Ui::StartPage *ui; // user interface
@@ -49,6 +51,9 @@ class StartPage : public QMainWindow
 
     private slots:
         void on_tbtnNetStatus_clicked(); // network button
+        void on_tbtnLogin_clicked(); // login button
+
+
 };
 
 #endif // STARTPAGE_H
