@@ -52,8 +52,6 @@ class StartPage : public QMainWindow
     private slots:
         void on_tbtnNetStatus_clicked(); // network button
         void on_tbtnLogin_clicked(); // login button
-        void slot_buffer(QByteArray); // slot to get return string of process
-        void slot_buffer_error(QByteArray); // slot to get error string of process
 
 };
 

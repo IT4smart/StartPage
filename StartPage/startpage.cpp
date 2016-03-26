@@ -19,6 +19,10 @@
 #include <QMap>
 #include <chrono>
 #include <thread>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QMapIterator>
+#include <math.h>
 
 /**
  * constructor
@@ -131,26 +135,26 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     ui->lblClock->setGeometry(clock_offset_w, clock_offset_h, clock_w, clock_h);
 
     // position network status
-    int netstatus_wh = 0.1 * screen_h; // width and height of tool button
+    int netstatus_wh = 0.11 * screen_h; // width and height of tool button
     int netstatus_offset_w = screen_w - 0.05*screen_w - netstatus_wh; // pos of left top corner
     int netstatus_offset_h = screen_h - 0.1*screen_h - netstatus_wh; // pos of left top corner
     QFont font_netstatus;
     font_netstatus.setPointSize(0.015 * screen_h);
     ui->tbtnNetStatus->setFont(font_netstatus);
+    ui->tbtnNetStatus->setCheckable(false);
     ui->tbtnNetStatus->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    //    ui->tbtnNetStatus->setText("online"); --> change text dynamically
-    //    ui->tbtnNetStatus->setIcon(QIcon(":/net_online.png")); --> change icon dynamically
     ui->tbtnNetStatus->setIconSize(QSize(0.7*netstatus_wh,0.7*netstatus_wh)); // icon size
     ui->tbtnNetStatus->setGeometry(netstatus_offset_w, netstatus_offset_h, netstatus_wh, netstatus_wh);
 
     // position login button
-    int login_w = 0.1 * screen_w; // width of tool button
-    int login_h = 0.125 * screen_h; // height of tool button
+    int login_w = 0.1 * screen_w; // width of login button
+    int login_h = 0.15 * screen_h; // height of login button
     int login_offset_w = (screen_w - login_w)/2; // pos of left top corner
-    int login_offset_h = (screen_h - 2*login_h)/2; // pos of left top corner
+    int login_offset_h = (screen_h - login_h)/2; // pos of left top corner
     QFont font_login;
     font_login.setPointSize(0.02 * screen_h);
     ui->tbtnLogin->setFont(font_login);
+    ui->tbtnLogin->setCheckable(true);
     ui->tbtnLogin->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     ui->tbtnLogin->setText("anmelden"); // --> change text dynamically
     if (init.get_citrix_rdp_type()=="citrix") {
@@ -165,9 +169,9 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     int msg_w = 0.3 * screen_w; // width of message
     int msg_h = 0.1 * screen_h; // height of message
     int msg_offset_w = (screen_w - msg_w)/2; // pos of left top corner
-    int msg_offset_h = (screen_h)/2; // pos of left top corner
+    int msg_offset_h = screen_h - 2*msg_h; // pos of left top corner
     QFont font_msg; // font
-    font_msg.setPointSize(0.02 * screen_h);
+    font_msg.setPointSize(0.03 * screen_h);
     ui->lblMessage->setText("");
     ui->lblMessage->setFont(font_msg);
     ui->lblMessage->setGeometry(msg_offset_w, msg_offset_h, msg_w, msg_h);
@@ -256,66 +260,130 @@ void StartPage::startLoginCitrix() {
     QString ctx_link = init.get_citrix_url(); // get netscaler url
     QString ctx_store = init.get_citrix_store(); // get store url
 
-    // ***TODO: link or store empty???
-
-    // make desktop inresponsive
-    ui->centralwidget->setEnabled(false); // disable buttons
-    ui->lblMessage->setVisible(true);
-    ui->lblMessage->setText("... bitte warten ..."); // waiting message
-    ui->centralwidget->repaint(); // repaint centralwidget (container)
-
-    // get desktop(s)
-    Citrix *ctx = new Citrix(ctx_link, ctx_store); // constructor
-    QMap<QString,QString> desktops = ctx->getDesktops();
-
-    if (desktops.size()==0) { // no desktops --> normal start again
+    // store empty???
+    if (ctx_store=="") { // store is empty
         // show messagebox
         QMessageBox msgBox;
         QFont font;
         font.setPointSize(0.015*this->get_screen_res_h());
         msgBox.setWindowTitle("Verbindungsfehler");
         msgBox.setFont(font);
-        msgBox.setText("Es war keine Verbindung zum Citrix Store möglich.\n\n"
-                       "Bitte überprüfen Sie die:\n"
-                       "- Kabel-/WLAN-Verbindung\n"
-                       "- Citrixstore-Adresse\n"
-                       "- externe Gateway Adresse\n\n"
+        msgBox.setText("Es ist keine Verbindung zum Citrix Store möglich.\n\n"
+                       "Die Citrix Storeadresse ist leer!\n\n"
                        "Wenn Sie nicht weiter wissen, informieren Sie bitte Ihren Administrator!\n");
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
 
-    } else if (desktops.size()==1) { // just one desktop --> start
+    } else { // continue
         // make desktop inresponsive
         ui->centralwidget->setEnabled(false); // disable buttons
         ui->lblMessage->setVisible(true);
         ui->lblMessage->setText("... bitte warten ..."); // waiting message
         ui->centralwidget->repaint(); // repaint centralwidget (container)
 
-        // start desktop
-        QPair<QString,QString> ret_pair = ctx->startDesktop(desktops.first());
-        qDebug() << "re_pair msg:\n" << ret_pair.first << "\nerr:\n" <<ret_pair.second;
-        if (ret_pair.second=="") { // no error
-            // wait for 15 secs --> the buttons will work after 15 secs again
-            std::this_thread::sleep_for(std::chrono::milliseconds(15000));
+        // get desktop(s)
+        Citrix *ctx = new Citrix(ctx_link, ctx_store); // constructor
+        QMap<QString,QString> desktops = ctx->getDesktops();
+for (int i=0;i<20;i++) {
+    desktops.insert("key" +QString::number(i),"link");
+}
+        if (desktops.size()==0) { // no desktops --> normal start again
+            // show messagebox
+            QMessageBox msgBox;
+            QFont font;
+            font.setPointSize(0.015*this->get_screen_res_h());
+            msgBox.setWindowTitle("Verbindungsfehler");
+            msgBox.setFont(font);
+            msgBox.setText("Es ist keine Verbindung zum Citrix Store möglich.\n\n"
+                           "Bitte überprüfen Sie die:\n"
+                           "- Kabel-/WLAN-Verbindung\n"
+                           "- Citrixstore-Adresse\n"
+                           "- externe Gateway Adresse\n\n"
+                           "Wenn Sie nicht weiter wissen, informieren Sie bitte Ihren Administrator!\n");
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.exec();
+
+        } else if (desktops.size()==1) { // just one desktop --> start
+            // make desktop inresponsive
+            ui->centralwidget->setEnabled(false); // disable buttons
+            ui->lblMessage->setVisible(true);
+            ui->lblMessage->setText("... bitte warten ..."); // waiting message
+            ui->centralwidget->repaint(); // repaint centralwidget (container)
+
+            // start desktop
+            QPair<QString,QString> ret_pair = ctx->startDesktop(desktops.first());
+            qDebug() << "re_pair msg:\n" << ret_pair.first << "\nerr:\n" <<ret_pair.second;
+            if (ret_pair.second=="") { // no error
+                // wait for 15 secs --> the buttons will work after 15 secs again (because of timing for login procedure)
+                std::this_thread::sleep_for(std::chrono::milliseconds(15000));
+            }
+
+        } else { // more desktops --> show desktops
+            // make desktop responsive again
+            ui->centralwidget->setEnabled(true); // enable buttons
+            ui->tbtnLogin->setDisabled(true); // login button invisible
+            ui->tbtnLogin->setVisible(false);
+            ui->lblMessage->setText("... bitte auswählen ..."); // // show new message
+            ui->lblMessage->setVisible(true);
+
+            // determine max no. of apps/desktops --> max. number is 4 rows of desktop in correct resolution
+            int btn_w = 0.13 * this->screen_res_w; // width of button
+            int btn_h = 0.13 * this->screen_res_h; // height of button
+            int no_btns_in_row = this->screen_res_w / (1.1*btn_w); // leave space between buttons
+            int no_desktops = desktops.size(); // no. of desktops to show
+            int no_rows = round(double(no_desktops)/double(no_btns_in_row)+double(0.49)); // determine no of needed rows
+
+qDebug() << "No:" << no_btns_in_row << " rows:" << no_rows;
+            // create layouts
+            QVBoxLayout *v_layout = new QVBoxLayout(ui->centralwidget); // create QVBoxLayout
+            QList<QHBoxLayout*> h_layout_list;
+            for (int i=0;i<no_rows;i++) { // create all needed rows
+                QHBoxLayout *h_layout = new QHBoxLayout;//create QHBoxLayout
+                v_layout->addLayout(h_layout);
+                h_layout_list.append(h_layout); // append QHBoxLayout to QVBoxLayout
+            }
+
+            QMapIterator<QString,QString> i(desktops); // iterator for map
+            int row_act; // actual row to put in button
+            int desktop_nr = 1; // actual desktop number
+            while (i.hasNext()) {
+                i.next(); // get next map element
+
+                // create buttons
+                QToolButton *btn = new QToolButton;
+                QFont font_btn; // font and size
+                font_btn.setPointSize(0.02 * this->screen_res_h);
+                btn->setFont(font_btn); // set font
+                btn->setCheckable(false); // not selectable by tab
+                btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon); // make button with text under icon
+                btn->setText(i.key()); // set button text
+                btn->setIcon(QIcon(":/desktop.png"));
+                btn->setIconSize(QSize(0.7*btn_w,0.7*btn_h)); // icon size
+                btn->setFixedSize(QSize(btn_w,btn_h));
+
+                // add button to layout
+                row_act = std::max(round(double(desktop_nr)/double(no_btns_in_row)+double(0.49))-1.0,0.0);
+                h_layout_list.at(row_act)->addWidget(btn);
+
+                // TODO: delete buttons & signals --> do it in slot after button is pressed
+
+                desktop_nr++;
+            }
+
+
         }
 
-    } else { // more desktops --> show desktops
-        // make desktop responsive again
-        ui->tbtnLogin->setDisabled(true);
-        ui->tbtnLogin->setVisible(false);
-        ui->lblMessage->setText("FERTIG!!!"); // // disable waiting message
-        ui->centralwidget->setEnabled(true); // disable buttons
+        // make desktop responsive again --> for later
+        ui->centralwidget->setEnabled(true); // enable buttons
+        ui->tbtnLogin->setDisabled(false); // login button visible
+        ui->tbtnLogin->setVisible(true);
+        ui->lblMessage->setText(""); // // show now message
+        ui->lblMessage->setVisible(false);
         ui->centralwidget->repaint(); // repaint centralwidget (container)
 
-        // create desktop buttons
 
     }
 
-
-    // make desktop responsive again --> for later
-    ui->centralwidget->setEnabled(true); // enable buttons
-    ui->lblMessage->setVisible(false); // // disable waiting message
-    ui->centralwidget->repaint(); // repaint centralwidget (container)
 }
 
 /*    // baue neue Buttons auf
@@ -350,27 +418,8 @@ void StartPage::startLoginRdp() {
     qDebug() << "startLoginRdp";
 }
 
-/**
- * @brief MainWindow::slot_buffer
- * @param buffer
- */
-void StartPage::slot_buffer(QByteArray buffer) {
-    qDebug() << "slot_buffer ...:\n" << buffer.data();
-    // split str
-/*    QString sbuf = buffer.data();
-    sbuf.remove("'"); // remove '-zeichen
-    QStringList zeilen = sbuf.split("\n", QString::SkipEmptyParts);
-
-    // Trenne in Zeilen
-    for (int i=0;i<zeilen.size();i++) {
-        // trenne in Spalten
-        QStringList spalten = zeilen.at(i).split("\t", QString::SkipEmptyParts);
-        names.push_back(spalten.at(1).toLocal8Bit());
-        links.push_back(spalten.at(0).toLocal8Bit());
-    }
-
     // Baue neue Buttons auf
-    signalMapper = new QSignalMapper(this); // signal mapper zur übergabe von daten von signals to slots
+/*    signalMapper = new QSignalMapper(this); // signal mapper zur übergabe von daten von signals to slots
     for (int i=0;i<names.size();i++) {
         QPushButton *btn = new QPushButton(names.at(i)); // create button
         btn->setFont(QFont("Calibri", 26)); // set font
@@ -380,12 +429,4 @@ void StartPage::slot_buffer(QByteArray buffer) {
     }
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(on_btnDesktop_clicked(int)));
 */
-}
 
-/**
- * @brief MainWindow::slot_buffer_error
- */
-void StartPage::slot_buffer_error(QByteArray buffer_error) {
-    qDebug() << "slot_buffer_error ...:\n" << buffer_error.data();
-    //ui->lblStatusLine->setText(STATUS_LINE_SELECT_DESKTOP); // set status line
-}

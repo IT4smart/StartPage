@@ -16,8 +16,6 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenuBar>
-#include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QWidget>
 
@@ -32,8 +30,6 @@ public:
     QToolButton *tbtnNetStatus;
     QToolButton *tbtnLogin;
     QLabel *lblMessage;
-    QMenuBar *menubar;
-    QStatusBar *statusbar;
 
     void setupUi(QMainWindow *StartPage)
     {
@@ -62,23 +58,18 @@ public:
         tbtnNetStatus->setObjectName(QStringLiteral("tbtnNetStatus"));
         tbtnNetStatus->setGeometry(QRect(940, 470, 191, 51));
         tbtnNetStatus->setFont(font);
+        tbtnNetStatus->setFocusPolicy(Qt::NoFocus);
         tbtnLogin = new QToolButton(centralwidget);
         tbtnLogin->setObjectName(QStringLiteral("tbtnLogin"));
         tbtnLogin->setGeometry(QRect(500, 230, 131, 111));
         tbtnLogin->setFont(font);
+        tbtnLogin->setFocusPolicy(Qt::NoFocus);
         lblMessage = new QLabel(centralwidget);
         lblMessage->setObjectName(QStringLiteral("lblMessage"));
-        lblMessage->setGeometry(QRect(330, 360, 481, 31));
+        lblMessage->setGeometry(QRect(327, 360, 481, 31));
         lblMessage->setFont(font);
         lblMessage->setAlignment(Qt::AlignCenter);
         StartPage->setCentralWidget(centralwidget);
-        menubar = new QMenuBar(StartPage);
-        menubar->setObjectName(QStringLiteral("menubar"));
-        menubar->setGeometry(QRect(0, 0, 1920, 25));
-        StartPage->setMenuBar(menubar);
-        statusbar = new QStatusBar(StartPage);
-        statusbar->setObjectName(QStringLiteral("statusbar"));
-        StartPage->setStatusBar(statusbar);
 
         retranslateUi(StartPage);
 
