@@ -154,7 +154,7 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     QFont font_login;
     font_login.setPointSize(0.02 * screen_h);
     ui->tbtnLogin->setFont(font_login);
-    ui->tbtnLogin->setCheckable(true);
+    ui->tbtnLogin->setCheckable(false);
     ui->tbtnLogin->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     ui->tbtnLogin->setText("anmelden"); // --> change text dynamically
     if (init.get_citrix_rdp_type()=="citrix") {
@@ -164,6 +164,7 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     }
     ui->tbtnLogin->setIconSize(QSize(0.7*login_w,0.7*login_h)); // icon size
     ui->tbtnLogin->setGeometry(login_offset_w, login_offset_h, login_w, login_h);
+    ui->tbtnLogin->raise();
 
     // position message
     int msg_w = 0.3 * screen_w; // width of message
@@ -175,6 +176,14 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     ui->lblMessage->setText("");
     ui->lblMessage->setFont(font_msg);
     ui->lblMessage->setGeometry(msg_offset_w, msg_offset_h, msg_w, msg_h);
+
+    // position layout container
+    int layoutc_w = screen_w; // width of message
+    int layoutc_h = 0.6 * screen_h; // height of message
+    int layoutc_offset_w = 0; // pos of left top corner
+    int layoutc_offset_h = 0.2 * screen_h; // pos of left top corner
+    ui->lblLayoutContainer->setText("");
+    ui->lblLayoutContainer->setGeometry(layoutc_offset_w, layoutc_offset_h, layoutc_w, layoutc_h);
 
 }
 
@@ -303,13 +312,14 @@ for (int i=0;i<20;i++) {
             msgBox.setIcon(QMessageBox::Critical);
             msgBox.exec();
 
-        } else if (desktops.size()==1) { // just one desktop --> start
-            // make desktop inresponsive
-            ui->centralwidget->setEnabled(false); // disable buttons
-            ui->lblMessage->setVisible(true);
-            ui->lblMessage->setText("... bitte warten ..."); // waiting message
+            // make desktop responsive again --> for later
+            ui->tbtnLogin->setDisabled(false); // login button visible
+            ui->tbtnLogin->setVisible(true);
+            ui->lblMessage->setText(""); // // show now message
+            ui->lblMessage->setVisible(false);
             ui->centralwidget->repaint(); // repaint centralwidget (container)
 
+        } else if (desktops.size()==1) { // just one desktop --> start
             // start desktop
             QPair<QString,QString> ret_pair = ctx->startDesktop(desktops.first());
             qDebug() << "re_pair msg:\n" << ret_pair.first << "\nerr:\n" <<ret_pair.second;
@@ -317,6 +327,14 @@ for (int i=0;i<20;i++) {
                 // wait for 15 secs --> the buttons will work after 15 secs again (because of timing for login procedure)
                 std::this_thread::sleep_for(std::chrono::milliseconds(15000));
             }
+
+            // make desktop responsive again --> for later
+            ui->centralwidget->setEnabled(true); // enable buttons
+            ui->tbtnLogin->setDisabled(false); // login button visible
+            ui->tbtnLogin->setVisible(true);
+            ui->lblMessage->setText(""); // // show now message
+            ui->lblMessage->setVisible(false);
+            ui->centralwidget->repaint(); // repaint centralwidget (container)
 
         } else { // more desktops --> show desktops
             // make desktop responsive again
@@ -335,7 +353,7 @@ for (int i=0;i<20;i++) {
 
 qDebug() << "No:" << no_btns_in_row << " rows:" << no_rows;
             // create layouts
-            QVBoxLayout *v_layout = new QVBoxLayout(ui->centralwidget); // create QVBoxLayout
+            QVBoxLayout *v_layout = new QVBoxLayout(ui->lblLayoutContainer); // create QVBoxLayout
             QList<QHBoxLayout*> h_layout_list;
             for (int i=0;i<no_rows;i++) { // create all needed rows
                 QHBoxLayout *h_layout = new QHBoxLayout;//create QHBoxLayout
@@ -360,26 +378,23 @@ qDebug() << "No:" << no_btns_in_row << " rows:" << no_rows;
                 btn->setIcon(QIcon(":/desktop.png"));
                 btn->setIconSize(QSize(0.7*btn_w,0.7*btn_h)); // icon size
                 btn->setFixedSize(QSize(btn_w,btn_h));
+                btn->raise(); // put button in foreground
 
                 // add button to layout
                 row_act = std::max(round(double(desktop_nr)/double(no_btns_in_row)+double(0.49))-1.0,0.0);
                 h_layout_list.at(row_act)->addWidget(btn);
 
-                // TODO: delete buttons & signals --> do it in slot after button is pressed
+                //
 
+                // TODO: show selected button in middle --> do it in slot after button is pressed
+                // TODO: delete buttons & signals --> do it in slot after button is pressed
+                // TODO: make desktop responsive again --> do it in slot after button is pressed
                 desktop_nr++;
             }
 
 
         }
 
-        // make desktop responsive again --> for later
-        ui->centralwidget->setEnabled(true); // enable buttons
-        ui->tbtnLogin->setDisabled(false); // login button visible
-        ui->tbtnLogin->setVisible(true);
-        ui->lblMessage->setText(""); // // show now message
-        ui->lblMessage->setVisible(false);
-        ui->centralwidget->repaint(); // repaint centralwidget (container)
 
 
     }

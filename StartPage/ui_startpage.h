@@ -30,6 +30,7 @@ public:
     QToolButton *tbtnNetStatus;
     QToolButton *tbtnLogin;
     QLabel *lblMessage;
+    QLabel *lblLayoutContainer;
 
     void setupUi(QMainWindow *StartPage)
     {
@@ -66,9 +67,14 @@ public:
         tbtnLogin->setFocusPolicy(Qt::NoFocus);
         lblMessage = new QLabel(centralwidget);
         lblMessage->setObjectName(QStringLiteral("lblMessage"));
-        lblMessage->setGeometry(QRect(327, 360, 481, 31));
+        lblMessage->setGeometry(QRect(327, 480, 481, 31));
         lblMessage->setFont(font);
         lblMessage->setAlignment(Qt::AlignCenter);
+        lblLayoutContainer = new QLabel(centralwidget);
+        lblLayoutContainer->setObjectName(QStringLiteral("lblLayoutContainer"));
+        lblLayoutContainer->setGeometry(QRect(250, 110, 651, 91));
+        lblLayoutContainer->setFont(font);
+        lblLayoutContainer->setAlignment(Qt::AlignCenter);
         StartPage->setCentralWidget(centralwidget);
 
         retranslateUi(StartPage);
@@ -84,6 +90,7 @@ public:
         tbtnNetStatus->setText(QApplication::translate("StartPage", "tbtnNetStatus", 0));
         tbtnLogin->setText(QApplication::translate("StartPage", "tbtnLogin", 0));
         lblMessage->setText(QApplication::translate("StartPage", "lblMessage", 0));
+        lblLayoutContainer->setText(QApplication::translate("StartPage", "lblLayoutContainer", 0));
     } // retranslateUi
 
 };
