@@ -293,7 +293,7 @@ void StartPage::startLoginCitrix() {
         // get desktop(s)
         Citrix *ctx = new Citrix(ctx_link, ctx_store); // constructor
         QMap<QString,QString> desktops = ctx->getDesktops();
-for (int i=0;i<20;i++) {
+for (int i=0;i<25;i++) {
     desktops.insert("key" +QString::number(i),"link");
 }
         if (desktops.size()==0) { // no desktops --> normal start again
@@ -345,57 +345,83 @@ for (int i=0;i<20;i++) {
             ui->lblMessage->setVisible(true);
 
             // determine max no. of apps/desktops --> max. number is 4 rows of desktop in correct resolution
-            int btn_w = 0.13 * this->screen_res_w; // width of button
-            int btn_h = 0.13 * this->screen_res_h; // height of button
-            int no_btns_in_row = this->screen_res_w / (1.1*btn_w); // leave space between buttons
+            int btn_w = 0.13 * this->get_screen_res_w(); // width of button
+            int btn_h = 0.13 * this->get_screen_res_h(); // height of button
+            int max_btns_in_row = this->screen_res_w / (1.1*btn_w); // leave space between buttons
             int no_desktops = desktops.size(); // no. of desktops to show
-            int no_rows = round(double(no_desktops)/double(no_btns_in_row)+double(0.49)); // determine no of needed rows
+            int no_rows = round(double(no_desktops)/double(max_btns_in_row)+double(0.49)); // determine no of needed rows
+            int max_desktops = max_btns_in_row * 4;
+            qDebug() << "max btns per row:" << max_btns_in_row << " needed rows:" << no_rows;
 
-qDebug() << "No:" << no_btns_in_row << " rows:" << no_rows;
-            // create layouts
-            QVBoxLayout *v_layout = new QVBoxLayout(ui->lblLayoutContainer); // create QVBoxLayout
-            QList<QHBoxLayout*> h_layout_list;
-            for (int i=0;i<no_rows;i++) { // create all needed rows
-                QHBoxLayout *h_layout = new QHBoxLayout;//create QHBoxLayout
-                v_layout->addLayout(h_layout);
-                h_layout_list.append(h_layout); // append QHBoxLayout to QVBoxLayout
+            // is there enough space for all buttons?
+            if (no_desktops>max_desktops) { // no --> show error!
+                // show messagebox
+                QMessageBox msgBox;
+                QFont font;
+                font.setPointSize(0.015 * this->get_screen_res_h());
+                msgBox.setWindowTitle("Maximale Anzahl Buttons überschritten");
+                msgBox.setFont(font);
+                msgBox.setText("Es sind mehr Desktops zur Auswahl als angezeigt werden kann.\n\n"
+                               "Bitte informieren Sie bitte Ihren Administrator!\n");
+                msgBox.setIcon(QMessageBox::Critical);
+                msgBox.exec();
+
+            } else { // yes --> show buttons
+                // create layouts
+                QVBoxLayout *v_layout = new QVBoxLayout(ui->lblLayoutContainer); // create QVBoxLayout
+                QList<QHBoxLayout*> h_layout_list;
+                for (int i=0;i<no_rows;i++) { // create all needed rows
+                    QHBoxLayout *h_layout = new QHBoxLayout;//create QHBoxLayout
+                    v_layout->addLayout(h_layout);
+                    h_layout_list.append(h_layout); // append QHBoxLayout to QVBoxLayout
+                }
+
+                QMapIterator<QString,QString> i(desktops); // iterator for map
+                int row_act; // actual row to put in button
+                int desktop_nr = 1; // actual desktop number
+                while (i.hasNext()) {
+                    i.next(); // get next map element
+
+                    // create buttons
+                    QToolButton *btn = new QToolButton;
+                    QFont font_btn; // font and size
+                    font_btn.setPointSize(0.02 * this->screen_res_h);
+                    btn->setFont(font_btn); // set font
+                    btn->setCheckable(false); // not selectable by tab
+                    btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon); // make button with text under icon
+                    btn->setText(i.key()); // set button text
+                    btn->setIcon(QIcon(":/desktop.png"));
+                    btn->setIconSize(QSize(0.7*btn_w,0.7*btn_h)); // icon size
+                    btn->setFixedSize(QSize(btn_w,btn_h));
+                    btn->raise(); // put button in foreground
+
+                    // add button to layout
+                    row_act = std::max(round(double(desktop_nr)/double(max_btns_in_row)+double(0.49))-1.0,0.0);
+                    h_layout_list.at(row_act)->addWidget(btn);
+
+                    // add signals to slot
+/*                    signalMapper = new QSignalMapper(this); // signal mapper zur übergabe von daten von signals to slots
+                    for (int i=0;i<names.size();i++) {
+                        QPushButton *btn = new QPushButton(names.at(i)); // create button
+                        btn->setFont(QFont("Calibri", 26)); // set font
+                        ui->hLayoutElements->addWidget(btn); // add button to layout
+                        signalMapper->setMapping(btn, i); // setze mapper
+                        connect(btn, SIGNAL(clicked()), signalMapper, SLOT(map())); // connect btn to slot map
+                    }
+                    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(on_btnDesktop_clicked(int)));
+*/
+
+                    desktop_nr++;
+
+                    // TODO: show selected button in middle --> do it in slot after button is pressed
+                    // TODO: delete buttons & signals --> do it in slot after button is pressed
+                    // TODO: make desktop responsive again --> do it in slot after button is pressed
+
+                }
+
             }
-
-            QMapIterator<QString,QString> i(desktops); // iterator for map
-            int row_act; // actual row to put in button
-            int desktop_nr = 1; // actual desktop number
-            while (i.hasNext()) {
-                i.next(); // get next map element
-
-                // create buttons
-                QToolButton *btn = new QToolButton;
-                QFont font_btn; // font and size
-                font_btn.setPointSize(0.02 * this->screen_res_h);
-                btn->setFont(font_btn); // set font
-                btn->setCheckable(false); // not selectable by tab
-                btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon); // make button with text under icon
-                btn->setText(i.key()); // set button text
-                btn->setIcon(QIcon(":/desktop.png"));
-                btn->setIconSize(QSize(0.7*btn_w,0.7*btn_h)); // icon size
-                btn->setFixedSize(QSize(btn_w,btn_h));
-                btn->raise(); // put button in foreground
-
-                // add button to layout
-                row_act = std::max(round(double(desktop_nr)/double(no_btns_in_row)+double(0.49))-1.0,0.0);
-                h_layout_list.at(row_act)->addWidget(btn);
-
-                //
-
-                // TODO: show selected button in middle --> do it in slot after button is pressed
-                // TODO: delete buttons & signals --> do it in slot after button is pressed
-                // TODO: make desktop responsive again --> do it in slot after button is pressed
-                desktop_nr++;
-            }
-
 
         }
-
-
 
     }
 
