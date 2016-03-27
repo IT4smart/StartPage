@@ -4,7 +4,7 @@
 #include <QDesktopWidget>
 #include <iostream>
 #include <QDebug>
-#include <startpage.h>
+#include "startpage.h"
 
 
 int main(int argc, char *argv[]) {
