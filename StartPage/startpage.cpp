@@ -23,6 +23,7 @@
 #include <QHBoxLayout>
 #include <QMapIterator>
 #include <math.h>
+#include <QSignalMapper>
 
 /**
  * constructor
@@ -109,7 +110,7 @@ void StartPage::timerEvent(QTimerEvent *event) {
  * @param x
  * @param y
  */
-void StartPage::init_screen(int screen_w, int screen_h) {
+void StartPage::init_screen(int screen_w, int screen_h) {    
     // save screen resolution
     screen_res_w = screen_w;
     screen_res_h = screen_h;
@@ -251,7 +252,10 @@ void StartPage::on_tbtnNetStatus_clicked() {
  */
 void StartPage::on_tbtnLogin_clicked() {
     if (init.get_citrix_rdp_type()=="citrix") {
+        // save citrix class
+        this->ctx = new Citrix(init.get_citrix_url(), init.get_citrix_store()); // constructor
         startLoginCitrix(); // start_citrix
+
     } else {
         startLoginRdp(); // start rdp
     }
@@ -266,11 +270,11 @@ void StartPage::on_tbtnLogin_clicked() {
 void StartPage::startLoginCitrix() {
     qDebug() << "startLoginCitrix";
 
-    QString ctx_link = init.get_citrix_url(); // get netscaler url
-    QString ctx_store = init.get_citrix_store(); // get store url
+    // delete user credentials
+    QPair<QString,QString> ret_pair = ctx->deleteCitrixAuthentication(); // delete citrix login information
 
     // store empty???
-    if (ctx_store=="") { // store is empty
+    if (this->init.get_citrix_store()=="") { // store is empty
         // show messagebox
         QMessageBox msgBox;
         QFont font;
@@ -291,11 +295,10 @@ void StartPage::startLoginCitrix() {
         ui->centralwidget->repaint(); // repaint centralwidget (container)
 
         // get desktop(s)
-        Citrix *ctx = new Citrix(ctx_link, ctx_store); // constructor
         QMap<QString,QString> desktops = ctx->getDesktops();
-for (int i=0;i<25;i++) {
-    desktops.insert("key" +QString::number(i),"link");
-}
+//for (int i=0;i<20;i++) { // TEST mit multi desktops
+//    desktops.insert("key" +QString::number(i),"link");
+//}
         if (desktops.size()==0) { // no desktops --> normal start again
             // show messagebox
             QMessageBox msgBox;
@@ -313,6 +316,7 @@ for (int i=0;i<25;i++) {
             msgBox.exec();
 
             // make desktop responsive again --> for later
+            ui->centralwidget->setEnabled(true); // disable buttons
             ui->tbtnLogin->setDisabled(false); // login button visible
             ui->tbtnLogin->setVisible(true);
             ui->lblMessage->setText(""); // // show now message
@@ -321,7 +325,7 @@ for (int i=0;i<25;i++) {
 
         } else if (desktops.size()==1) { // just one desktop --> start
             // start desktop
-            QPair<QString,QString> ret_pair = ctx->startDesktop(desktops.first());
+            QPair<QString,QString> ret_pair = this->ctx->startDesktop(desktops.first());
             qDebug() << "re_pair msg:\n" << ret_pair.first << "\nerr:\n" <<ret_pair.second;
             if (ret_pair.second=="") { // no error
                 // wait for 15 secs --> the buttons will work after 15 secs again (because of timing for login procedure)
@@ -361,24 +365,25 @@ for (int i=0;i<25;i++) {
                 font.setPointSize(0.015 * this->get_screen_res_h());
                 msgBox.setWindowTitle("Maximale Anzahl Buttons überschritten");
                 msgBox.setFont(font);
-                msgBox.setText("Es sind mehr Desktops zur Auswahl als angezeigt werden kann.\n\n"
-                               "Bitte informieren Sie bitte Ihren Administrator!\n");
+                msgBox.setText("Es sind mehr Desktops zur Auswahl als in Ihrer Bildschirmauflösung angezeigt werden können.\n\n"
+                               "Bitte erhöhen Sie Ihre Bildschirmauflösung oder informieren Sie bitte Ihren Administrator!\n");
                 msgBox.setIcon(QMessageBox::Critical);
                 msgBox.exec();
 
             } else { // yes --> show buttons
                 // create layouts
-                QVBoxLayout *v_layout = new QVBoxLayout(ui->lblLayoutContainer); // create QVBoxLayout
+                this->ctx_desktop_v_layout = new QVBoxLayout(ui->lblLayoutContainer); // create QVBoxLayout
                 QList<QHBoxLayout*> h_layout_list;
                 for (int i=0;i<no_rows;i++) { // create all needed rows
                     QHBoxLayout *h_layout = new QHBoxLayout;//create QHBoxLayout
-                    v_layout->addLayout(h_layout);
+                    this->ctx_desktop_v_layout->addLayout(h_layout);
                     h_layout_list.append(h_layout); // append QHBoxLayout to QVBoxLayout
                 }
 
                 QMapIterator<QString,QString> i(desktops); // iterator for map
                 int row_act; // actual row to put in button
                 int desktop_nr = 1; // actual desktop number
+                this->signalMapper = new QSignalMapper(this); // signal mapper zur übergabe von daten von signals to slots
                 while (i.hasNext()) {
                     i.next(); // get next map element
 
@@ -395,62 +400,96 @@ for (int i=0;i<25;i++) {
                     btn->setFixedSize(QSize(btn_w,btn_h));
                     btn->raise(); // put button in foreground
 
+                    // store desktop keys/values in local list
+                    desktops_list.append(qMakePair(i.key(), i.value()));
+
                     // add button to layout
                     row_act = std::max(round(double(desktop_nr)/double(max_btns_in_row)+double(0.49))-1.0,0.0);
                     h_layout_list.at(row_act)->addWidget(btn);
 
                     // add signals to slot
-/*                    signalMapper = new QSignalMapper(this); // signal mapper zur übergabe von daten von signals to slots
-                    for (int i=0;i<names.size();i++) {
-                        QPushButton *btn = new QPushButton(names.at(i)); // create button
-                        btn->setFont(QFont("Calibri", 26)); // set font
-                        ui->hLayoutElements->addWidget(btn); // add button to layout
-                        signalMapper->setMapping(btn, i); // setze mapper
-                        connect(btn, SIGNAL(clicked()), signalMapper, SLOT(map())); // connect btn to slot map
-                    }
-                    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(on_btnDesktop_clicked(int)));
-*/
+                    this->signalMapper->setMapping(btn, desktop_nr); // setze mapper
+                    connect(btn, SIGNAL(clicked()), signalMapper, SLOT(map())); // connect btn to slot map
 
-                    desktop_nr++;
-
-                    // TODO: show selected button in middle --> do it in slot after button is pressed
-                    // TODO: delete buttons & signals --> do it in slot after button is pressed
-                    // TODO: make desktop responsive again --> do it in slot after button is pressed
+                    desktop_nr++; // increase desktop number
 
                 }
 
+                // connect signalmapper to slot
+                connect(this->signalMapper, SIGNAL(mapped(int)), this, SLOT(on_btnDesktop_clicked(int)));
             }
-
         }
+    }
+}
+
+
+/**
+ * @brief StartPage::on_btnDesktop_clicked
+ * @param index
+ */
+void StartPage::on_btnDesktop_clicked(int index) {
+    qDebug() << "*** on_btnDesktop_clicked: " << index;
+    QPair<QString,QString> desktop_chosen = desktops_list.at(index-1);
+    QString link_chosen = desktop_chosen.second;
+
+    // delete all desktop layout elements
+    QObjectList childrenList = ui->lblLayoutContainer->children();
+    QToolButton *btn_chosen; // store chosen button to delete later
+    for (int i=0;i<childrenList.size();i++) {
+        QString cname = childrenList.at(i)->metaObject()->className();
+        qDebug() << "child" << i << ": class=" << cname;
+        if (cname=="QToolButton") { // hide and delete all buttons
+            QToolButton *temp = qobject_cast<QToolButton *>(childrenList.at(i));
+            temp->hide(); // hide
+            temp->disconnect(); // disconnect from signals
+            temp->deleteLater(); // finally delete object
+        } else if (cname=="QVBoxLayout") { // hide and delete all layouts
+            QVBoxLayout *temp = qobject_cast<QVBoxLayout *>(childrenList.at(i));
+            temp->disconnect(); // disconnect from signals
+            temp->deleteLater(); // finally delete object
+        }
+    }
+
+    // delete desktop list
+    desktops_list.empty();
+
+    // change ui
+    ui->centralwidget->setEnabled(false); // disable screen
+    ui->lblMessage->setText("... bitte warten ..."); // // show new message
+    ui->lblMessage->setVisible(true);
+    ui->centralwidget->repaint();
+
+    // start chosen desktop
+    QPair<QString,QString> ret_pair = this->ctx->startDesktop(desktop_chosen.second);
+    if (ret_pair.second=="") { // no error
+        // wait for 15 secs --> the buttons will work after 15 secs again (because of timing for login procedure)
+        std::this_thread::sleep_for(std::chrono::milliseconds(15000));
+    } else if (ret_pair.second.contains("ServerLaunchFailure")) { // error desktop cant be started
+        // show messagebox
+        QMessageBox msgBox;
+        QFont font;
+        font.setPointSize(0.015 * this->get_screen_res_h());
+        msgBox.setWindowTitle("Desktop Fehler");
+        msgBox.setFont(font);
+        msgBox.setText("Der ausgewählte Desktop kann nicht gestartet werden. Vermutlich sind die Citrix Studio Einstellungen falsch.\n\n"
+                       "Bitte informieren Sie bitte Ihren Administrator!\n");
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
 
     }
 
+    // make desktop responsive again --> for later
+    ui->centralwidget->setEnabled(true); // enable buttons
+    ui->tbtnLogin->setDisabled(false); // login button visible
+    ui->tbtnLogin->setVisible(true);
+    ui->tbtnLogin->raise(); // put button in foreground
+    ui->lblMessage->setText(""); // // show now message
+    ui->lblMessage->setVisible(false);
+    ui->centralwidget->repaint(); // repaint centralwidget (container)
+
 }
 
-/*    // baue neue Buttons auf
-    signalMapper = new QSignalMapper(this); // signal mapper zur übergabe von daten von signals to slots
-    for (int i=0;i<names.size();i++) {
 
-        QToolButton *btn = new QToolButton(this);
-        btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-        btn->setText(names.at(i));
-        btn->setIconSize(QSize(96,96)); // icon size
-        btn->setIcon(QIcon(":/Desktop.png"));
-        // icon taken from: http://www.softicons.com/system-icons/hadaikum-icons-by-tiny-lab/desktop-icon
-        btn->setFixedSize(150,150); // button size
-
-//        btn->setPalette(QPalette(QColor(0,0,1))); // background color for button
-//        btn->setAutoFillBackground(true);
-
-/*        QPushButton *btn = new QPushButton(names.at(i)); // create button
-        btn->setFont(QFont("Calibri", 26)); // set font
-        ui->hLayoutElements->addWidget(btn); // add button to layout
-        signalMapper->setMapping(btn, i); // setze mapper
-        connect(btn, SIGNAL(clicked()), signalMapper, SLOT(map())); // connect btn to slot map
-    }
-    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(on_btnDesktop_clicked(int)));
-/*
-}
 
 /**
  * @brief StartPage::startLoginRdp
@@ -458,16 +497,4 @@ for (int i=0;i<25;i++) {
 void StartPage::startLoginRdp() {
     qDebug() << "startLoginRdp";
 }
-
-    // Baue neue Buttons auf
-/*    signalMapper = new QSignalMapper(this); // signal mapper zur übergabe von daten von signals to slots
-    for (int i=0;i<names.size();i++) {
-        QPushButton *btn = new QPushButton(names.at(i)); // create button
-        btn->setFont(QFont("Calibri", 26)); // set font
-        ui->hLayoutElements->addWidget(btn); // add button to layout
-        signalMapper->setMapping(btn, i); // setze mapper
-        connect(btn, SIGNAL(clicked()), signalMapper, SLOT(map())); // connect btn to slot map
-    }
-    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(on_btnDesktop_clicked(int)));
-*/
 

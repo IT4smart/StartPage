@@ -9,12 +9,7 @@
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv); // create application
-//    double no_rows = round(double(8/7)+double(0.49));
-//    int no_rows = round(double(7)/double(7)+double(0.49));
-    //int no_rows = round(8/7+0.49);
-//qDebug() << no_rows;
-//    return a.exec();
-//}
+
     // get screen resolution
     QDesktopWidget *dw = QApplication::desktop();
     int screen_res_w = dw->width(); //get screen resolution x --> works only with 1 screen!
@@ -29,6 +24,5 @@ int main(int argc, char *argv[]) {
 
     // end --> will never be reached, because of loop
     return a.exec();
-
 }
 
