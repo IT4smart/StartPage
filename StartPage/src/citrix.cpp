@@ -90,16 +90,29 @@ QPair<QString,QString> Citrix::deleteCitrixAuthentication() {
     return ret_pair;
 }
 
-/*
- * get list of stores
- */
-/*QStringList Citrix::getStores() {
-}*/
 
-/*
- * add store --> login window might appear
+/**
+ * @brief Citrix::getActualStore
+ * @return
  */
-/*void Citrix::addStore() {
-}*/
+QString Citrix::getActualStore() {
+    // run system command
+    QString command = PRG_STOREBROWSE + " -l '" + link_netscaler + "'";
+    QPair<QString,QString> ret_pair = exec_cmd_process(command);
+
+    return ret_pair.first; // return only storeaddress
+}
+
+
+/** addStore --> login window might appear
+ * @brief Citrix::addStore
+ */
+void Citrix::addStore() {
+    qDebug() << "addStore";
+    // run system command
+    QString command = PRG_STOREBROWSE + " -a '" + link_netscaler + "'";
+    QPair<QString,QString> ret_pair = exec_cmd_process(command);
+    qDebug() << "return:\n" << ret_pair.first << "\nerror:\n" << ret_pair.second;
+}
 
 

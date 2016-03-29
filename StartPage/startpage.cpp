@@ -273,19 +273,23 @@ void StartPage::startLoginCitrix() {
     // delete user credentials
     QPair<QString,QString> ret_pair = ctx->deleteCitrixAuthentication(); // delete citrix login information
 
-    // store empty???
-    if (this->init.get_citrix_store()=="") { // store is empty
+    // is netscaler link and store empty???
+//    if (true) { // netscaler link and store are empty
+    if (this->init.get_citrix_url()=="" && this->init.get_citrix_store()=="") { // netscaler link and store are empty
         // show messagebox
         QMessageBox msgBox;
         QFont font;
         font.setPointSize(0.015*this->get_screen_res_h());
         msgBox.setWindowTitle("Verbindungsfehler");
         msgBox.setFont(font);
-        msgBox.setText("Es ist keine Verbindung zum Citrix Store möglich.\n\n"
-                       "Die Citrix Storeadresse ist leer!\n\n"
+        msgBox.setText("Es ist keine Verbindung zum Citrix Store möglich. "
+                       "Die Citrix Netscaler- und Storeadresse sind leer!\n\n"
+                       "Bitte geben Sie diese in der Konfigurationsseite ein.\n\n"
                        "Wenn Sie nicht weiter wissen, informieren Sie bitte Ihren Administrator!\n");
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
+
+//        this->startConfigPage();
 
     } else { // continue
         // make desktop inresponsive
@@ -293,6 +297,13 @@ void StartPage::startLoginCitrix() {
         ui->lblMessage->setVisible(true);
         ui->lblMessage->setText("... bitte warten ..."); // waiting message
         ui->centralwidget->repaint(); // repaint centralwidget (container)
+
+        // determine the actual store
+        QString actual_store = ctx->getActualStore(); // list store
+        if (actual_store=="") { // is actual store empty?
+            // add actual store to system --> login will appear
+            ctx->addStore();
+        }
 
         // get desktop(s)
         QMap<QString,QString> desktops = ctx->getDesktops();
@@ -437,7 +448,7 @@ void StartPage::on_btnDesktop_clicked(int index) {
     QToolButton *btn_chosen; // store chosen button to delete later
     for (int i=0;i<childrenList.size();i++) {
         QString cname = childrenList.at(i)->metaObject()->className();
-        qDebug() << "child" << i << ": class=" << cname;
+//        qDebug() << "child" << i << ": class=" << cname;
         if (cname=="QToolButton") { // hide and delete all buttons
             QToolButton *temp = qobject_cast<QToolButton *>(childrenList.at(i));
             temp->hide(); // hide
@@ -472,7 +483,7 @@ void StartPage::on_btnDesktop_clicked(int index) {
         msgBox.setWindowTitle("Desktop Fehler");
         msgBox.setFont(font);
         msgBox.setText("Der ausgewählte Desktop kann nicht gestartet werden. Vermutlich sind die Citrix Studio Einstellungen falsch.\n\n"
-                       "Bitte informieren Sie bitte Ihren Administrator!\n");
+                       "Bitte informieren Sie Ihren Administrator!\n");
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
 
@@ -498,3 +509,15 @@ void StartPage::startLoginRdp() {
     qDebug() << "startLoginRdp";
 }
 
+
+/**
+ * @brief StartPage::startConfigPage
+ */
+void StartPage::startConfigPage() {
+    qDebug() << "startConfigPage";
+    QString command = "sudo ../../configurationpage/ConfigPage/ConfigPage";
+    QPair<QString,QString> pair = exec_cmd_process(command); // returns result and error as QPair
+    QString result = pair.first;
+    QString error = pair.second;
+    qDebug() << "result:\n" << result << "\nerror:\n" << error;
+}

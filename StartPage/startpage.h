@@ -11,6 +11,19 @@
 #include <vector>
 #include <QVBoxLayout>
 
+/*const QString BTN_CITRIX = "anmelden";
+const QString BTN_CITRIX_TOOLTIP = "klicken zum Anmelden";
+const QString STATUS_LINE_EMPTY = "";
+const QString STATUS_LINE_WAIT = "... bitte warten ...";
+const QString STATUS_LINE_SELECT_DESKTOP = "... bitte Desktop auswählen ...";
+const QString GRP_BOX_NETWORK = "Netzwerk";
+const QString LABEL_NETWORK_ONLINE = "verbunden";
+const QString LABEL_NETWORK_OFFLINE = "offline";
+const QString LABEL_IP = "IP-Adresse:";
+const QString LABEL_NETMASK = "Netzmaske:";
+const QString LABEL_GATEWAY = "Gateway:";
+const QString LABEL_TYPE = "IP Vergabe:";
+*/
 
 namespace Ui {
     class StartPage;
@@ -41,6 +54,7 @@ class StartPage : public QMainWindow
         int get_screen_res_h();
         void startLoginCitrix(); // start citrix login
         void startLoginRdp(); // start rdp login
+        void startConfigPage(); // start the configurationpage
 
         // vars
         Ui::StartPage *ui; // user interface
