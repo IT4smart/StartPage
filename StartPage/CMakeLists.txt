@@ -29,7 +29,7 @@ find_package(Qt5Widgets REQUIRED)
 add_definitions(-DGLEW_STATIC)
 
 
-qt5_wrap_ui(UI_HEADERS mainwindow.ui)
+qt5_wrap_ui(UI_HEADERS startpage.ui)
 #qt5_add_resources(UI_RESOURCES bsed.qrc)
 qt5_add_resources(UI_RESOURCES )
 
@@ -50,9 +50,9 @@ add_library(
 	#name:
 	${LibName}
 	#sources and headers: (except the main.cpp)
-	mainwindow.cpp
-	mainwindow.h
-	ui_mainwindow.h
+	startpage.cpp
+	startpage.h
+	ui_startpage.h
 	${SOURCE_FILE}
 	${HEADER_FILE}
 	)
