@@ -31,7 +31,7 @@ add_definitions(-DGLEW_STATIC)
 
 qt5_wrap_ui(UI_HEADERS startpage.ui)
 #qt5_add_resources(UI_RESOURCES bsed.qrc)
-qt5_add_resources(UI_RESOURCES )
+qt5_add_resources(UI_RESOURCES resources.qrc)
 
 #Explaination: Generate a list of files that match the <globbing-expressions> and store it into the <variable>. Globbing expressions are similar to regular expressions, but much simpler. If RELATIVE flag is specified, the results will be returned as relative paths to the given path.
 #grep all sourcefiles

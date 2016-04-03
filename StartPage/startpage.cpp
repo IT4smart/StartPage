@@ -140,7 +140,8 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     int netstatus_offset_w = screen_w - 0.05*screen_w - netstatus_wh; // pos of left top corner
     int netstatus_offset_h = screen_h - 0.1*screen_h - netstatus_wh; // pos of left top corner
     QFont font_netstatus;
-    font_netstatus.setPointSize(0.015 * screen_h);
+    font_netstatus.setPointSize(0.01 * screen_h);
+    //font_netstatus.setFamily("Helvetica [Cronyx]");
     ui->tbtnNetStatus->setFont(font_netstatus);
     ui->tbtnNetStatus->setCheckable(false);
     ui->tbtnNetStatus->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -153,7 +154,7 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     int login_offset_w = (screen_w - login_w)/2; // pos of left top corner
     int login_offset_h = (screen_h - login_h)/2; // pos of left top corner
     QFont font_login;
-    font_login.setPointSize(0.02 * screen_h);
+    font_login.setPointSize(0.015 * screen_h);
     ui->tbtnLogin->setFont(font_login);
     ui->tbtnLogin->setCheckable(false);
     ui->tbtnLogin->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -173,7 +174,7 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     int msg_offset_w = (screen_w - msg_w)/2; // pos of left top corner
     int msg_offset_h = screen_h - 2*msg_h; // pos of left top corner
     QFont font_msg; // font
-    font_msg.setPointSize(0.03 * screen_h);
+    font_msg.setPointSize(0.02 * screen_h);
     ui->lblMessage->setText("");
     ui->lblMessage->setFont(font_msg);
     ui->lblMessage->setGeometry(msg_offset_w, msg_offset_h, msg_w, msg_h);
