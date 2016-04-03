@@ -115,6 +115,22 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     screen_res_w = screen_w;
     screen_res_h = screen_h;
 
+    // background color
+    QPalette pal; // color palette
+    pal.setColor(QPalette::Background, QColor(200,200,255)); // set background color
+//    pal.setColor(QPalette::Background, QColor(100,100,255)); // set background color
+    ui->centralwidget->setAutoFillBackground(true);
+    ui->centralwidget->setPalette(pal); // add palette to label
+
+
+    // position layout container
+    int layoutc_w = screen_w; // width of message
+    int layoutc_h = 0.6 * screen_h; // height of message
+    int layoutc_offset_w = 0; // pos of left top corner
+    int layoutc_offset_h = 0.2 * screen_h; // pos of left top corner
+    ui->lblLayoutContainer->setText("");
+    ui->lblLayoutContainer->setGeometry(layoutc_offset_w, layoutc_offset_h, layoutc_w, layoutc_h);
+
     // position company logo
     QString logo_path = init.get_client_logo();
     QPixmap imgLogo(logo_path);
@@ -178,14 +194,6 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     ui->lblMessage->setText("");
     ui->lblMessage->setFont(font_msg);
     ui->lblMessage->setGeometry(msg_offset_w, msg_offset_h, msg_w, msg_h);
-
-    // position layout container
-    int layoutc_w = screen_w; // width of message
-    int layoutc_h = 0.6 * screen_h; // height of message
-    int layoutc_offset_w = 0; // pos of left top corner
-    int layoutc_offset_h = 0.2 * screen_h; // pos of left top corner
-    ui->lblLayoutContainer->setText("");
-    ui->lblLayoutContainer->setGeometry(layoutc_offset_w, layoutc_offset_h, layoutc_w, layoutc_h);
 
 }
 
