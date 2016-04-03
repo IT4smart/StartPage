@@ -118,20 +118,20 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     // position company logo
     QString logo_path = init.get_client_logo();
     QPixmap imgLogo(logo_path);
-    int logo_w = 0.1 * screen_w; // width of logo
-    int logo_h = 0.1 * screen_h; // height of logo
+    int logo_w = 0.15 * screen_w; // width of logo
+    int logo_h = 0.15 * screen_h; // height of logo
     int logo_offset_w = 0.05 * screen_w; // pos of left top corner
     int logo_offset_h = 0.05 * screen_h; // pos of left top corner
     ui->lblLogo->setGeometry(logo_offset_w, logo_offset_h, logo_w, logo_h);
     ui->lblLogo->setPixmap(imgLogo.scaled(logo_w, logo_h, Qt::KeepAspectRatio, Qt::FastTransformation));
 
     // position clock and date
-    int clock_w = 0.15 * screen_w; // width of clock
-    int clock_h = 0.15 * screen_h; // height of clock
+    int clock_w = 0.2 * screen_w; // width of clock
+    int clock_h = 0.2 * screen_h; // height of clock
     int clock_offset_w = 0.05 * screen_w; // pos of left top corner
     int clock_offset_h = screen_h - 0.1*screen_h - clock_h; // pos of left top corner
     QFont font_clock; // font
-    font_clock.setPointSize(0.02 * screen_h);
+    font_clock.setPointSize(0.03 * screen_h);
     ui->lblClock->setFont(font_clock);
     ui->lblClock->setGeometry(clock_offset_w, clock_offset_h, clock_w, clock_h);
 
@@ -140,7 +140,7 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     int netstatus_offset_w = screen_w - 0.05*screen_w - netstatus_wh; // pos of left top corner
     int netstatus_offset_h = screen_h - 0.1*screen_h - netstatus_wh; // pos of left top corner
     QFont font_netstatus;
-    font_netstatus.setPointSize(0.01 * screen_h);
+    font_netstatus.setPointSize(0.015 * screen_h);
     //font_netstatus.setFamily("Helvetica [Cronyx]");
     ui->tbtnNetStatus->setFont(font_netstatus);
     ui->tbtnNetStatus->setCheckable(false);
@@ -150,7 +150,7 @@ void StartPage::init_screen(int screen_w, int screen_h) {
 
     // position login button
     int login_w = 0.1 * screen_w; // width of login button
-    int login_h = 0.15 * screen_h; // height of login button
+    int login_h = 0.1 * screen_h; // height of login button
     int login_offset_w = (screen_w - login_w)/2; // pos of left top corner
     int login_offset_h = (screen_h - login_h)/2; // pos of left top corner
     QFont font_login;
@@ -272,8 +272,9 @@ void StartPage::startLoginCitrix() {
     qDebug() << "startLoginCitrix";
 
     // delete user credentials
+    qDebug() << "vor deleteAuth";
     QPair<QString,QString> ret_pair = ctx->deleteCitrixAuthentication(); // delete citrix login information
-
+    qDebug() << "nach deleteAuth";
     // is netscaler link and store empty???
 //    if (true) { // netscaler link and store are empty
     if (this->init.get_citrix_url()=="" && this->init.get_citrix_store()=="") { // netscaler link and store are empty
