@@ -290,8 +290,6 @@ void StartPage::startLoginCitrix() {
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
 
-//        this->startConfigPage();
-
     } else { // continue
         // make desktop inresponsive
         ui->centralwidget->setEnabled(false); // disable buttons
@@ -327,6 +325,8 @@ void StartPage::startLoginCitrix() {
             msgBox.setIcon(QMessageBox::Critical);
             msgBox.exec();
 
+            QPair<QString,QString> ret_pair = ctx->deleteCitrixAuthentication(); // delete citrix login information
+
             // make desktop responsive again --> for later
             ui->centralwidget->setEnabled(true); // disable buttons
             ui->tbtnLogin->setDisabled(false); // login button visible
@@ -343,6 +343,7 @@ void StartPage::startLoginCitrix() {
                 // wait for 15 secs --> the buttons will work after 15 secs again (because of timing for login procedure)
                 std::this_thread::sleep_for(std::chrono::milliseconds(15000));
             }
+            ret_pair = ctx->deleteCitrixAuthentication(); // delete citrix login information
 
             // make desktop responsive again --> for later
             ui->centralwidget->setEnabled(true); // enable buttons
@@ -382,6 +383,8 @@ void StartPage::startLoginCitrix() {
                 msgBox.setIcon(QMessageBox::Critical);
                 msgBox.exec();
 
+                QPair<QString,QString> ret_pair = ctx->deleteCitrixAuthentication(); // delete citrix login information
+
             } else { // yes --> show buttons
                 // create layouts
                 this->ctx_desktop_v_layout = new QVBoxLayout(ui->lblLayoutContainer); // create QVBoxLayout
@@ -402,7 +405,7 @@ void StartPage::startLoginCitrix() {
                     // create buttons
                     QToolButton *btn = new QToolButton;
                     QFont font_btn; // font and size
-                    font_btn.setPointSize(0.02 * this->screen_res_h);
+                    font_btn.setPointSize(0.015 * this->screen_res_h);
                     btn->setFont(font_btn); // set font
                     btn->setCheckable(false); // not selectable by tab
                     btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon); // make button with text under icon
@@ -489,6 +492,8 @@ void StartPage::on_btnDesktop_clicked(int index) {
         msgBox.exec();
 
     }
+
+    ret_pair = ctx->deleteCitrixAuthentication(); // delete citrix login information
 
     // make desktop responsive again --> for later
     ui->centralwidget->setEnabled(true); // enable buttons
