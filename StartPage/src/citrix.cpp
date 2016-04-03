@@ -82,11 +82,14 @@ QPair<QString,QString> Citrix::startDesktop(QString desktop_link) {
  * delete citrix login information
  */
 QPair<QString,QString> Citrix::deleteCitrixAuthentication() {
+qDebug() << "deleteCitrixAuthentication ...";
     // run system command
     QString command = PRG_KILLALL+" "+PROC_AUTHMANAGERDAEMON+" "+PROC_SERVICERECORD;
     QPair<QString,QString> ret_pair = exec_cmd_process(command);
 
-    // return QPair
+qDebug() << "deleteCitrixAuthentication: result:\n" << ret_pair.first << "\nerror:" << ret_pair.second;
+
+    // return QPair    
     return ret_pair;
 }
 
