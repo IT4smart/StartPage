@@ -24,6 +24,7 @@
 #include <QMapIterator>
 #include <math.h>
 #include <QSignalMapper>
+#include <syslog.h>
 
 /**
  * constructor
@@ -38,12 +39,18 @@ StartPage::StartPage(QWidget *parent) :
     // setup ui
     ui->setupUi(this);
 
+    // set up syslog
+    setlogmask (LOG_UPTO (LOG_INFO));
+    openlog ("IT4S-StartPage", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
+    
     // initialize vars with init-constructor
     try {
+        syslog (LOG_INFO, "Initialize StartPage");
         init = Init();
     } catch(const developer_error& e) {
         //TODO
         //handle the error
+        syslog (LOG_ERR, "Load Setting in Init-Konstruktor failed");
         std::cout << -1 << "Load Setting in Init-Konstruktor failed" << std::endl;
     }
 
@@ -57,13 +64,16 @@ StartPage::StartPage(QWidget *parent) :
     startTimer(1000); // set interrupt timer --> 1000 = 1 second
 
     // get network status
+    syslog (LOG_INFO, "Getting first time network status...");
     bool online = this->getNetworkStatus();
 
     // change network logo
     if (online) {
+        syslog (LOG_NOTICE, "We are online.");
         ui->tbtnNetStatus->setText("online");
         ui->tbtnNetStatus->setIcon(QIcon(":/net_online.png"));
     } else {
+        syslog (LOG_NOTICE, "We are offline.");
         ui->tbtnNetStatus->setText("offline");
         ui->tbtnNetStatus->setIcon(QIcon(":/net_offline.png"));
     }
@@ -74,6 +84,8 @@ StartPage::StartPage(QWidget *parent) :
  * @brief StartPage::~StartPage
  */
 StartPage::~StartPage() {
+    // close syslog
+    closelog ();
     delete ui;
 }
 
@@ -93,13 +105,16 @@ void StartPage::timerEvent(QTimerEvent *event) {
     ui->lblClock->setText(stime+"\n"+sdate);
 
     // get network status
+    syslog (LOG_INFO, "Getting network status");
     bool online = this->getNetworkStatus();
 
     // change network logo
     if (online) {
+        syslog (LOG_NOTICE, "We are online.");
         ui->tbtnNetStatus->setText("online");
         ui->tbtnNetStatus->setIcon(QIcon(":/net_online.png"));
     } else {
+        syslog (LOG_NOTICE, "We are offline.");
         ui->tbtnNetStatus->setText("offline");
         ui->tbtnNetStatus->setIcon(QIcon(":/net_offline.png"));
     }
@@ -221,6 +236,7 @@ int StartPage::get_screen_res_h() {
 bool StartPage::getNetworkStatus() {
     bool returnval = true; // if connected, return true
     QString ip = exec_cmd_process_re_QString(init.get_script_ip()); // get ip
+    syslog (LOG_INFO, "Current ip: %s", ip.toStdString().c_str());
 
     if (ip=="") { returnval=false; } // if empty ip -> return false
     return returnval;
