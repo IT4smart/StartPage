@@ -4,3 +4,4 @@ build-*
 *.o
 qrc_resources.cpp
 resources.qrc.depends
+ui_startpage.h

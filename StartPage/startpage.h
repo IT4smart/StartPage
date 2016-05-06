@@ -11,19 +11,18 @@
 #include <vector>
 #include <QVBoxLayout>
 
-/*const QString BTN_CITRIX = "anmelden";
-const QString BTN_CITRIX_TOOLTIP = "klicken zum Anmelden";
-const QString STATUS_LINE_EMPTY = "";
-const QString STATUS_LINE_WAIT = "... bitte warten ...";
-const QString STATUS_LINE_SELECT_DESKTOP = "... bitte Desktop auswählen ...";
-const QString GRP_BOX_NETWORK = "Netzwerk";
-const QString LABEL_NETWORK_ONLINE = "verbunden";
-const QString LABEL_NETWORK_OFFLINE = "offline";
-const QString LABEL_IP = "IP-Adresse:";
-const QString LABEL_NETMASK = "Netzmaske:";
-const QString LABEL_GATEWAY = "Gateway:";
-const QString LABEL_TYPE = "IP Vergabe:";
-*/
+/*************
+ * Possible log level:
+ * DEBUG --> The message is only for debugging purposes.
+ * INFO --> The message is purely informational.
+ * NOTICE --> The message describes a normal but important event.
+ * WARNING --> The message is a warning.
+ * ERR --> The message describes an error.
+ * CRIT --> The message states a critical condition.
+ * ALERT --> Action on the message must be taken immediately.
+ * EMERG --> The message says the system is unusable.
+ *************/
+const QString IT4S_LOG_LEVEL = "DEBUG";
 
 namespace Ui {
     class StartPage;

@@ -40,7 +40,23 @@ StartPage::StartPage(QWidget *parent) :
     ui->setupUi(this);
 
     // set up syslog
-    setlogmask (LOG_UPTO (LOG_INFO));
+    if(IT4S_LOG_LEVEL == "INFO") {
+        setlogmask (LOG_UPTO (LOG_INFO));
+    } else if (IT4S_LOG_LEVEL == "NOTICE") {
+        setlogmask (LOG_UPTO (LOG_NOTICE));
+    } else if (IT4S_LOG_LEVEL == "WARNING") {
+        setlogmask (LOG_UPTO (LOG_WARNING));
+    } else if (IT4S_LOG_LEVEL == "ERR") {
+        setlogmask (LOG_UPTO (LOG_ERR));
+    } else if (IT4S_LOG_LEVEL == "CRIT") {
+        setlogmask (LOG_UPTO (LOG_CRIT));
+    } else if (IT4S_LOG_LEVEL == "ALERT") {
+        setlogmask (LOG_UPTO (LOG_ALERT));
+    } else if (IT4S_LOG_LEVEL == "EMERG") {
+        setlogmask (LOG_UPTO (LOG_EMERG));
+    } else {
+        setlogmask (LOG_UPTO (LOG_DEBUG));
+    }
     openlog ("IT4S-StartPage", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
     
     // initialize vars with init-constructor
@@ -191,8 +207,10 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     ui->tbtnLogin->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     ui->tbtnLogin->setText("anmelden"); // --> change text dynamically
     if (init.get_citrix_rdp_type()=="citrix") {
+        syslog (LOG_INFO, "Citrix Modus");
         ui->tbtnLogin->setIcon(QIcon(":/citrix.png")); //--> change icon dynamically
     } else {
+        syslog (LOG_INFO, "RDP Modus");
         ui->tbtnLogin->setIcon(QIcon(":/rdp_ms.png")); //--> change icon dynamically
     }
     ui->tbtnLogin->setIconSize(QSize(0.7*login_w,0.7*login_h)); // icon size
@@ -246,18 +264,22 @@ bool StartPage::getNetworkStatus() {
  * @brief StartPage::on_tbtnNetStatus_clicked
  */
 void StartPage::on_tbtnNetStatus_clicked() {
+    syslog (LOG_DEBUG, "Clicked on network status button");
     // get network info
     QString ip = exec_cmd_process_re_QString(init.get_script_ip()); // ip
     QString mask = "<offline>";
     QString gateway = "<offline>";
     QString type = init.get_network_type(); // network type
     if (getNetworkStatus()) { // network is online
+        syslog (LOG_DEBUG, "We are online");
         mask = exec_cmd_process_re_QString(init.get_script_netmask()); // netmask
         gateway = exec_cmd_process_re_QString(init.get_script_gateway()); // gateway
     } else { // network is offline
+        syslog (LOG_DEBUG, "We are offline");
         ip = "<offline>";
     }
 
+    syslog (LOG_DEBUG, "Network status: ip=%s, netmask=%s, gateway=%s, type=%s", ip.toStdString().c_str(), mask.toStdString().c_str(), gateway.toStdString().c_str(), type.toStdString().c_str());
     // create messagebox
     QMessageBox msgBox;
     QFont font;
@@ -278,10 +300,12 @@ void StartPage::on_tbtnNetStatus_clicked() {
 void StartPage::on_tbtnLogin_clicked() {
     if (init.get_citrix_rdp_type()=="citrix") {
         // save citrix class
+        syslog (LOG_DEBUG, "Clicked on citrix login button.");
         this->ctx = new Citrix(init.get_citrix_url(), init.get_citrix_store()); // constructor
         startLoginCitrix(); // start_citrix
 
     } else {
+        syslog (LOG_DEBUG, "Clicked on rdp login button.");
         startLoginRdp(); // start rdp
     }
 
@@ -294,14 +318,18 @@ void StartPage::on_tbtnLogin_clicked() {
  */
 void StartPage::startLoginCitrix() {
     qDebug() << "startLoginCitrix";
+    syslog (LOG_DEBUG, "Call function startLoginCitrix()");
 
     // delete user credentials
     qDebug() << "vor deleteAuth";
+    syslog (LOG_DEBUG, "Before call function deleteAuth");
     QPair<QString,QString> ret_pair = ctx->deleteCitrixAuthentication(); // delete citrix login information
     qDebug() << "nach deleteAuth";
+    syslog (LOG_DEBUG, "After call function deleteAuth");
     // is netscaler link and store empty???
 //    if (true) { // netscaler link and store are empty
     if (this->init.get_citrix_url()=="" && this->init.get_citrix_store()=="") { // netscaler link and store are empty
+        syslog (LOG_WARNING, "Connection error to citrix server");
         // show messagebox
         QMessageBox msgBox;
         QFont font;
@@ -320,6 +348,7 @@ void StartPage::startLoginCitrix() {
         ui->centralwidget->setEnabled(false); // disable buttons
         ui->lblMessage->setVisible(true);
         ui->lblMessage->setText("... bitte warten ..."); // waiting message
+        syslog (LOG_DEBUG, "Set message on screen 'bitte warten'");
         ui->centralwidget->repaint(); // repaint centralwidget (container)
 
         // determine the actual store
