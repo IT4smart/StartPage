@@ -2,8 +2,17 @@ project(StartPage)
 cmake_minimum_required(VERSION 3.0)
 
 # The version number.
-set (VERSION_MAJOR 1)
-set (VERSION_MINOR 0)
+set (StartPage_VERSION_MAJOR 0)
+set (StartPage_VERSION_MINOR 9)
+set (StartPage_VERSION_PATCH 0)
+
+# configure a header file to pass some of the CMake settings
+# to the source code
+configure_file (
+    "${PROJECT_SOURCE_DIR}/startpage.h.in"
+    "${PROJECT_BINARY_DIR}/startpage.h"
+)
+
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 #-Weffc++ throws too many error with Qt standard MainWindows
@@ -23,6 +32,7 @@ set(CMAKE_AUTOMOC ON)
 # Find the QtWidgets library
 #hunter_add_package(Qt COMPONENTS qtdeclarative)
 find_package(Qt5Widgets REQUIRED)
+find_package(Qt5Network)
 #find_package(Qt5Declarative)
 #find_package(OpenGL REQUIRED)
 
@@ -57,7 +67,7 @@ add_library(
 	${HEADER_FILE}
 	)
 #use these modules in the library
-qt5_use_modules(${LibName} Widgets)
+qt5_use_modules(${LibName} Widgets Network)
 
 add_executable(
 	${ExeName}

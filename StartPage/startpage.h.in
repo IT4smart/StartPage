@@ -10,6 +10,12 @@
 #include <QPushButton>
 #include <vector>
 #include <QVBoxLayout>
+#include <QNetworkConfigurationManager>
+
+// the configured options and settings for StartPage
+#define StartPage_VERSION_MAJOR @StartPage_VERSION_MAJOR@
+#define StartPage_VERSION_MINOR @StartPage_VERSION_MINOR@
+#define StartPage_VERSION_PATCH @StartPage_VERSION_PATCH@
 
 /*************
  * Possible log level:
@@ -23,6 +29,7 @@
  * EMERG --> The message says the system is unusable.
  *************/
 const QString IT4S_LOG_LEVEL = "DEBUG";
+
 
 namespace Ui {
     class StartPage;
@@ -43,11 +50,12 @@ class StartPage : public QMainWindow
         Init init; // init class
         void init_screen(int w, int h); // initialize screen with elements and correct resolution
 
+        QNetworkConfigurationManager *nwManager; // NetworkManager from Qt to get status of networkinterfaces.
         // vars
 
     private:
         // functions
-        bool getNetworkStatus(); // get network status --> return: true=connected, false=offline
+        void getNetworkStatus(bool online); // set network status
         QString exec_script(QString script_full_path); // execution of script
         int get_screen_res_w();
         int get_screen_res_h();

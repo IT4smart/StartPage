@@ -70,6 +70,10 @@ StartPage::StartPage(QWidget *parent) :
         std::cout << -1 << "Load Setting in Init-Konstruktor failed" << std::endl;
     }
 
+    nwManager = new QNetworkConfigurationManager(this);
+    
+    connect(nwManager, &QNetworkConfigurationManager::onlineStateChanged, this, &StartPage::getNetworkStatus);
+    
     // start clock
     QTime qtime = QTime::currentTime(); // read timer
     QDate qdate = QDate::currentDate();
@@ -81,18 +85,8 @@ StartPage::StartPage(QWidget *parent) :
 
     // get network status
     syslog (LOG_INFO, "Getting first time network status...");
-    bool online = this->getNetworkStatus();
-
-    // change network logo
-    if (online) {
-        syslog (LOG_NOTICE, "We are online.");
-        ui->tbtnNetStatus->setText("online");
-        ui->tbtnNetStatus->setIcon(QIcon(":/net_online.png"));
-    } else {
-        syslog (LOG_NOTICE, "We are offline.");
-        ui->tbtnNetStatus->setText("offline");
-        ui->tbtnNetStatus->setIcon(QIcon(":/net_offline.png"));
-    }
+    this->getNetworkStatus(nwManager->isOnline());
+    //bool online = this->getNetworkStatus();
 }
 
 /**
@@ -121,7 +115,7 @@ void StartPage::timerEvent(QTimerEvent *event) {
     ui->lblClock->setText(stime+"\n"+sdate);
 
     // get network status
-    syslog (LOG_INFO, "Getting network status");
+    /*syslog (LOG_INFO, "Getting network status");
     bool online = this->getNetworkStatus();
 
     // change network logo
@@ -133,7 +127,7 @@ void StartPage::timerEvent(QTimerEvent *event) {
         syslog (LOG_NOTICE, "We are offline.");
         ui->tbtnNetStatus->setText("offline");
         ui->tbtnNetStatus->setIcon(QIcon(":/net_offline.png"));
-    }
+    }*/
 }
 
 
@@ -251,13 +245,17 @@ int StartPage::get_screen_res_h() {
  * @brief StartPage::getNetworkStatus
  * @return true=network connected, false=offline
  */
-bool StartPage::getNetworkStatus() {
-    bool returnval = true; // if connected, return true
-    QString ip = exec_cmd_process_re_QString(init.get_script_ip()); // get ip
-    syslog (LOG_INFO, "Current ip: %s", ip.toStdString().c_str());
-
-    if (ip=="") { returnval=false; } // if empty ip -> return false
-    return returnval;
+void StartPage::getNetworkStatus(bool online) {
+    // change network logo
+    if (online) {
+        syslog (LOG_NOTICE, "We are online.");
+        ui->tbtnNetStatus->setText("online");
+        ui->tbtnNetStatus->setIcon(QIcon(":/net_online.png"));
+    } else {
+        syslog (LOG_NOTICE, "We are offline.");
+        ui->tbtnNetStatus->setText("offline");
+        ui->tbtnNetStatus->setIcon(QIcon(":/net_offline.png"));
+    }
 }
 
 /**
@@ -270,7 +268,7 @@ void StartPage::on_tbtnNetStatus_clicked() {
     QString mask = "<offline>";
     QString gateway = "<offline>";
     QString type = init.get_network_type(); // network type
-    if (getNetworkStatus()) { // network is online
+    if (nwManager->isOnline()) { // network is online
         syslog (LOG_DEBUG, "We are online");
         mask = exec_cmd_process_re_QString(init.get_script_netmask()); // netmask
         gateway = exec_cmd_process_re_QString(init.get_script_gateway()); // gateway
