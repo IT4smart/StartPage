@@ -30,6 +30,9 @@ class Init {
 		QString get_rdp_domain();
         QString get_language();
 
+        //setter ConfigPage --> writes variable to configpage file
+        bool set_citrix_store(QString);
+
 	private:
         // vars script paths
 		QString script_ip;

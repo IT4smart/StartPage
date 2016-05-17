@@ -13,7 +13,6 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
     ./src/citrix.cpp \
     ./src/init.cpp \
     ../../libs/tools/src/custom_exceptions.cpp \
@@ -27,7 +26,7 @@ SOURCES += main.cpp\
     startpage.cpp
 
 
-HEADERS  += mainwindow.h \
+HEADERS  += \
     ./inc/citrix.h \
     ./inc/init.h \
     ../../libs/tools/inc/custom_exceptions.h \
