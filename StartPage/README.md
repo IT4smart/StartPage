@@ -1,5 +1,9 @@
 # StartPage #
 
+## Preparation ##
+Install Qt and several development libaries
+``sudo apt-get install libglu1-mesa-dev qt5-default -y``
+
 ## Compile ##
 To compile the StartPage it is recommend to have installed CMake => 3.0
 At first change from root directory to StartPage directory. Then type ``cmake .``
