@@ -2,3 +2,6 @@
 .*.swp
 build-*
 *.o
+*.qrc.depends
+StartPage.pro.*
+ui_*

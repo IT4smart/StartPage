@@ -66,7 +66,7 @@ class StartPage : public QMainWindow {
         int screen_res_h; // screen resolution height --> works only with 1 screen!
         Storebrowse *storebrowse; // actual storebrowse instance
         QSignalMapper *signalMapper; // signal mapper maps the desktop button signals to the desktop slot
-        QList<QPair<QString,QString>> desktops_list; // list of desktops
+        QList<QPair <QString,QString>> desktops_list; // list of desktops
         QVBoxLayout *ctx_desktop_v_layout; // save QVBoxLayout for buttons --> later delete this, and all buttons are gone
         bool isFirstClick; // true: button not clicked / button clicked once
                         // false: second klick of button --> ignore doubleclicks
