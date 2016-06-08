@@ -536,8 +536,7 @@ void StartPage::startConfigPage() {
     // create the new process (ConfigPage)
     qDebug() << "starting ...";
     QProcess *process = new QProcess();
-    QStringList arguments;
-    process->startDetached(PRG_CONFIG_PAGE, arguments);
+    process->startDetached("/bin/sh", QStringList{PRG_CONFIG_PAGE});
     process->waitForFinished();
 
     // killing actual process (StartPage)

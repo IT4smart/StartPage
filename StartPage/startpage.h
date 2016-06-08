@@ -27,7 +27,7 @@ const QString PRINT_IP = "../Ressources/scripts/printIp.sh"; // gib IP zurück w
 const QString PRINT_NETMASK = "../Ressources/scripts/printNetmask.sh"; // gib Netmask zurück wenn connected, sonst leer
 const QString PRINT_GATEWAY = "../Ressources/scripts/printGateway.sh"; // gib Gateway zurück wenn connected, sonst leer
 const QString PRG_SHELL = "/bin/sh";
-const QString PRG_CONFIG_PAGE = "../../configurationpage/ConfigPage/ConfigPagev2";
+const QString PRG_CONFIG_PAGE = "../Ressources/scripts/startConfigPage.sh";
 
 namespace Ui {
     class StartPage;
