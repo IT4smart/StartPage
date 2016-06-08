@@ -1,69 +1,75 @@
 #ifndef STARTPAGE_H
 #define STARTPAGE_H
 
+#include "storebrowse.h"
 #include <QMainWindow>
-#include "./inc/init.h"
-#include "./inc/citrix.h"
-#include <qprocess.h>
-#include <qsignalmapper.h>
-#include <QVector>
-#include <QPushButton>
-#include <vector>
+#include <QTimerEvent>
+#include <QSettings>
+#include <QApplication>
+#include <QVariant>
+#include <QDebug>
+#include <QPair>
 #include <QVBoxLayout>
+#include <QSignalMapper>
+#include <QtNetwork/QNetworkConfigurationManager>
 
-/*const QString BTN_CITRIX = "anmelden";
-const QString BTN_CITRIX_TOOLTIP = "klicken zum Anmelden";
-const QString STATUS_LINE_EMPTY = "";
-const QString STATUS_LINE_WAIT = "... bitte warten ...";
-const QString STATUS_LINE_SELECT_DESKTOP = "... bitte Desktop auswählen ...";
-const QString GRP_BOX_NETWORK = "Netzwerk";
-const QString LABEL_NETWORK_ONLINE = "verbunden";
-const QString LABEL_NETWORK_OFFLINE = "offline";
-const QString LABEL_IP = "IP-Adresse:";
-const QString LABEL_NETMASK = "Netzmaske:";
-const QString LABEL_GATEWAY = "Gateway:";
-const QString LABEL_TYPE = "IP Vergabe:";
-*/
+
+// constants
+const QString SETTINGS_PATH = "../Ressources/settings.ini"; // hier werden settings gespeichert
+const QString LOGO_PATH = "global/logo_path"; // key für settings.ini
+const QString CITRIX_RDP_TYPE = "global/citrix_rdp_type";
+const QString NETWORK_TYPE = "network/type"; // key for settings.ini
+const QString NETSCALER_URL = "citrix/netscaler_url"; // key for settings.ini
+const QString STORE_URL = "citrix/store_url"; // key for settings.ini
+const QString RDP_DOMAIN = "rdp/domain"; // key
+const QString RDP_URL = "rdp/server_url"; // key
+const QString PRINT_IP = "../Ressources/scripts/printIp.sh"; // gib IP zurück wenn connected, sonst leer
+const QString PRINT_NETMASK = "../Ressources/scripts/printNetmask.sh"; // gib Netmask zurück wenn connected, sonst leer
+const QString PRINT_GATEWAY = "../Ressources/scripts/printGateway.sh"; // gib Gateway zurück wenn connected, sonst leer
+const QString PRG_SHELL = "/bin/sh";
+const QString PRG_CONFIG_PAGE = "../../configurationpage/ConfigPage/ConfigPagev2";
 
 namespace Ui {
     class StartPage;
 }
 
-class StartPage : public QMainWindow
-{
+class StartPage : public QMainWindow {
     Q_OBJECT
 
     public:
-        // conststructor, destructor
+        // functions
         explicit StartPage(QWidget *parent = 0); // constructor
         ~StartPage(); // desctructor
-        StartPage(const StartPage&) = delete; // delete the copy contructors, because they are not needed and
-        StartPage* operator=(const StartPage&) = delete; // otherwise there will be problems with the copying of the ui* pointer
-
-        // functions
-        Init init; // init class
         void init_screen(int w, int h); // initialize screen with elements and correct resolution
+        static QPair<QString,QString> exec_cmd_process(QString command); // execute commands
+
+//        void mouseDoubleClickEvent ( QMouseEvent * event ) {
+//            qDebug() << "doubleClick";
+//        }
 
         // vars
+        QNetworkConfigurationManager *nwManager; // NetworkManager from Qt to get status of networkinterfaces.
 
     private:
         // functions
+        void doTests(); // delete later, for testing only
+        void startConfigPage(); // ConfigPage will be started and StartPage will be killed
+        QVariant getSettingsValue(QString settingsKey); // get Settings value of Settings Key
         bool getNetworkStatus(); // get network status --> return: true=connected, false=offline
-        QString exec_script(QString script_full_path); // execution of script
-        int get_screen_res_w();
-        int get_screen_res_h();
-        void startLoginCitrix(); // start citrix login
-        void startLoginRdp(); // start rdp login
-        void startConfigPage(); // start the configurationpage
+        void loginCitrix(); // start citrix login
+        void setLogin(bool enable); // true=enable, false=disable
+        void changeNetworkLogo(); // change network logo
 
         // vars
-        Ui::StartPage *ui; // user interface
+        Ui::StartPage *ui; // manage the UI
         int screen_res_w; // screen resolution width --> works only with 1 screen!
         int screen_res_h; // screen resolution height --> works only with 1 screen!
+        Storebrowse *storebrowse; // actual storebrowse instance
         QSignalMapper *signalMapper; // signal mapper maps the desktop button signals to the desktop slot
         QList<QPair<QString,QString>> desktops_list; // list of desktops
-        Citrix *ctx; // save citrix class for later
         QVBoxLayout *ctx_desktop_v_layout; // save QVBoxLayout for buttons --> later delete this, and all buttons are gone
+        bool isFirstClick; // true: button not clicked / button clicked once
+                        // false: second klick of button --> ignore doubleclicks
 
 
 
@@ -71,8 +77,8 @@ class StartPage : public QMainWindow
         void timerEvent(QTimerEvent *event); // for clock
 
     private slots:
-        void on_tbtnNetStatus_clicked(); // network button
-        void on_tbtnLogin_clicked(); // login button
+        void on_btnLogin_clicked(); // login button (citrix or rdp)
+        void on_tbtnNetStatus_clicked(); // show net status
         void on_btnDesktop_clicked(int index); // slot der geklickte desktops abfängt
 
 };

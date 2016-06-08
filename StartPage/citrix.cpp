@@ -1,5 +1,5 @@
 #include <QProcess>
-#include "../inc/citrix.h"
+#include "citrix.h"
 #include "../../../libs/tools/inc/exec_cmd.h"
 #include <QDebug>
 #include <QPair>

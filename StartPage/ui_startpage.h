@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'startpage.ui'
 **
-** Created by: Qt User Interface Compiler version 5.5.1
+** Created by: Qt User Interface Compiler version 5.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -15,7 +15,9 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QWidget>
 
@@ -28,9 +30,13 @@ public:
     QLabel *lblLogo;
     QLabel *lblClock;
     QToolButton *tbtnNetStatus;
-    QToolButton *tbtnLogin;
     QLabel *lblMessage;
     QLabel *lblLayoutContainer;
+    QLabel *lblUser;
+    QLabel *lblPW;
+    QLineEdit *leUser;
+    QLineEdit *lePW;
+    QPushButton *btnLogin;
 
     void setupUi(QMainWindow *StartPage)
     {
@@ -60,11 +66,6 @@ public:
         tbtnNetStatus->setGeometry(QRect(940, 470, 191, 51));
         tbtnNetStatus->setFont(font);
         tbtnNetStatus->setFocusPolicy(Qt::NoFocus);
-        tbtnLogin = new QToolButton(centralwidget);
-        tbtnLogin->setObjectName(QStringLiteral("tbtnLogin"));
-        tbtnLogin->setGeometry(QRect(500, 230, 131, 111));
-        tbtnLogin->setFont(font);
-        tbtnLogin->setFocusPolicy(Qt::NoFocus);
         lblMessage = new QLabel(centralwidget);
         lblMessage->setObjectName(QStringLiteral("lblMessage"));
         lblMessage->setGeometry(QRect(327, 480, 481, 31));
@@ -75,9 +76,34 @@ public:
         lblLayoutContainer->setGeometry(QRect(250, 110, 651, 91));
         lblLayoutContainer->setFont(font);
         lblLayoutContainer->setAlignment(Qt::AlignCenter);
+        lblUser = new QLabel(centralwidget);
+        lblUser->setObjectName(QStringLiteral("lblUser"));
+        lblUser->setGeometry(QRect(239, 219, 121, 17));
+        lblUser->setFont(font);
+        lblPW = new QLabel(centralwidget);
+        lblPW->setObjectName(QStringLiteral("lblPW"));
+        lblPW->setGeometry(QRect(240, 280, 111, 17));
+        lblPW->setFont(font);
+        leUser = new QLineEdit(centralwidget);
+        leUser->setObjectName(QStringLiteral("leUser"));
+        leUser->setGeometry(QRect(400, 210, 371, 31));
+        leUser->setFont(font);
+        lePW = new QLineEdit(centralwidget);
+        lePW->setObjectName(QStringLiteral("lePW"));
+        lePW->setGeometry(QRect(400, 270, 371, 31));
+        lePW->setFont(font);
+        lePW->setEchoMode(QLineEdit::Password);
+        btnLogin = new QPushButton(centralwidget);
+        btnLogin->setObjectName(QStringLiteral("btnLogin"));
+        btnLogin->setGeometry(QRect(510, 340, 141, 41));
+        btnLogin->setFont(font);
+        btnLogin->setAutoDefault(true);
         StartPage->setCentralWidget(centralwidget);
 
         retranslateUi(StartPage);
+
+        btnLogin->setDefault(false);
+
 
         QMetaObject::connectSlotsByName(StartPage);
     } // setupUi
@@ -88,9 +114,11 @@ public:
         lblLogo->setText(QApplication::translate("StartPage", "lblLogo", 0));
         lblClock->setText(QApplication::translate("StartPage", "lblClock", 0));
         tbtnNetStatus->setText(QApplication::translate("StartPage", "tbtnNetStatus", 0));
-        tbtnLogin->setText(QApplication::translate("StartPage", "tbtnLogin", 0));
         lblMessage->setText(QApplication::translate("StartPage", "lblMessage", 0));
         lblLayoutContainer->setText(QApplication::translate("StartPage", "lblLayoutContainer", 0));
+        lblUser->setText(QApplication::translate("StartPage", "lblUser", 0));
+        lblPW->setText(QApplication::translate("StartPage", "lblPW", 0));
+        btnLogin->setText(QApplication::translate("StartPage", "btnLogin", 0));
     } // retranslateUi
 
 };
