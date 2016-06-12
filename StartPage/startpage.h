@@ -16,18 +16,27 @@
 
 // constants
 const QString SETTINGS_PATH = "../Ressources/settings.ini"; // hier werden settings gespeichert
+// global keys
 const QString LOGO_PATH = "global/logo_path"; // key für settings.ini
 const QString CITRIX_RDP_TYPE = "global/citrix_rdp_type";
+// network keys
 const QString NETWORK_TYPE = "network/type"; // key for settings.ini
-const QString NETSCALER_URL = "citrix/netscaler_url"; // key for settings.ini
-const QString STORE_URL = "citrix/store_url"; // key for settings.ini
+// citrix keys
+const QString NETSCALER_URL = "citrix/netscaler_url";
+const QString STORE_URL = "citrix/store_url";
+const QString CITRIX_DOMAIN = "citrix/domain";
+// rdp keys
 const QString RDP_DOMAIN = "rdp/domain"; // key
 const QString RDP_URL = "rdp/server_url"; // key
+// scripts
+const QString PRG_SHELL = "/bin/sh";
+const QString PRG_CONFIG_PAGE = "../Ressources/scripts/startConfigPage.sh";
 const QString PRINT_IP = "../Ressources/scripts/printIp.sh"; // gib IP zurück wenn connected, sonst leer
 const QString PRINT_NETMASK = "../Ressources/scripts/printNetmask.sh"; // gib Netmask zurück wenn connected, sonst leer
 const QString PRINT_GATEWAY = "../Ressources/scripts/printGateway.sh"; // gib Gateway zurück wenn connected, sonst leer
-const QString PRG_SHELL = "/bin/sh";
-const QString PRG_CONFIG_PAGE = "../Ressources/scripts/startConfigPage.sh";
+// predefined texts
+const QString LE_USER_TEXT = "Username ohne Domäne";
+
 
 namespace Ui {
     class StartPage;
@@ -42,10 +51,6 @@ class StartPage : public QMainWindow {
         ~StartPage(); // desctructor
         void init_screen(int w, int h); // initialize screen with elements and correct resolution
         static QPair<QString,QString> exec_cmd_process(QString command); // execute commands
-
-//        void mouseDoubleClickEvent ( QMouseEvent * event ) {
-//            qDebug() << "doubleClick";
-//        }
 
         // vars
         QNetworkConfigurationManager *nwManager; // NetworkManager from Qt to get status of networkinterfaces.
@@ -68,18 +73,19 @@ class StartPage : public QMainWindow {
         QSignalMapper *signalMapper; // signal mapper maps the desktop button signals to the desktop slot
         QList<QPair <QString,QString>> desktops_list; // list of desktops
         QVBoxLayout *ctx_desktop_v_layout; // save QVBoxLayout for buttons --> later delete this, and all buttons are gone
-        bool isFirstClick; // true: button not clicked / button clicked once
-                        // false: second klick of button --> ignore doubleclicks
-
+        int mouseClickCount; // 0, 1 or 2 (= double click)
+        bool isFirstChange; // true: line edit User had no entry yet --> initial text still there
+                        // false: not the first
 
 
     protected:
-        void timerEvent(QTimerEvent *event); // for clock
+        void timerEvent(QTimerEvent *tevent); // for clock
 
     private slots:
         void on_btnLogin_clicked(); // login button (citrix or rdp)
         void on_tbtnNetStatus_clicked(); // show net status
         void on_btnDesktop_clicked(int index); // slot der geklickte desktops abfängt
+        void on_leUser_TextChanged(); // text was changed in line edit field
 
 };
 

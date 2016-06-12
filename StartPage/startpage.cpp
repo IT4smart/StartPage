@@ -16,7 +16,8 @@
 #include <QSignalMapper>
 #include <chrono>
 #include <thread>
-
+#include <QLineEdit>
+#include <QKeyEvent>
 
 
 /*
@@ -24,19 +25,19 @@
  */
 StartPage::StartPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::StartPage) {
     // tests --> delete later
-    doTests();
-
-    // set button flag to firstclick (true) --> so second click can be ignored
-    isFirstClick = true;
+    // doTests();
 
     // check if settings file exists
     if (!QFile(SETTINGS_PATH).exists()) {
-        qDebug() << "Filllle does not exist";
+        qDebug() << "File does not exist";
         startConfigPage(); // start ConfigPage and kill StartPage
     }
 
     // setup ui
     ui->setupUi(this);
+
+    // set button flag to firstclick (0) --> so second click can be ignored
+    mouseClickCount = 0;
 
     // network manager to check online state
     nwManager = new QNetworkConfigurationManager(this);
@@ -52,8 +53,11 @@ StartPage::StartPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::StartPag
     QString sdate = qdate.longDayName(qdate.dayOfWeek()) // convert date to string
             + "\n" + qdate.toString(Qt::LocalDate);
     ui->lblClock->setText(stime+"\n"+sdate); // set label
-    startTimer(1000); // set interrupt timer --> 1000 = 1 second
+    startTimer(2000); // set interrupt timer --> 2000 = 2 seconds
 
+    // connect text changes
+    connect(this->ui->leUser, &QLineEdit::textChanged, this, &StartPage::on_leUser_TextChanged);
+    this->isFirstChange = true;
 }
 
 /*
@@ -72,6 +76,7 @@ void StartPage::timerEvent(QTimerEvent *event) {
     ui->lblClock->setText(stime+"\n"+sdate);
 
 }
+
 
 /*
  * change network logo
@@ -159,7 +164,6 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     // connect enter key at password line to signal clicked
     connect(ui->lePW, SIGNAL(returnPressed()),ui->btnLogin,SIGNAL(clicked()));
 
-
     // position line edits
     int leUser_w = 0.25 * screen_w; // widht of line edit User
     int leUser_h = 0.05 * screen_h; // height of line edit User
@@ -173,8 +177,14 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     ui->lePW->setGeometry(lePW_offset_w, lePW_offset_h, lePW_w, lePW_h); // set position
     QFont font_leLogin; // font
     font_leLogin.setPointSize(0.02 * screen_h);
+    font_leLogin.setItalic(true); // information in italic
+    QPalette *palette = new QPalette();
+    palette->setColor(QPalette::Text,Qt::gray); // gray text
+    ui->leUser->setPalette(*palette);
     ui->leUser->setFont(font_leLogin);
     ui->lePW->setFont(font_leLogin);
+    ui->leUser->setText(LE_USER_TEXT); // information
+    ui->leUser->setCursorPosition(0); // cursor in the beginning
 
     // position line edit labels
     int lblUser_w = 0.1 * screen_w;
@@ -204,44 +214,13 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     ui->lblMessage->setText("");
     ui->lblMessage->setFont(font_msg);
     ui->lblMessage->setGeometry(msg_offset_w, msg_offset_h, msg_w, msg_h);
-
-
-}
-
-/*
- * on_btnLogin_clicked
- */
-void StartPage::on_btnLogin_clicked() {
-    // MAKE IT ONLY CLICKABLE ONCE !!!
-    if (this->isFirstClick) { // check if button was clicked first or second time (-> ignore double clicks)
-        // first button click
-        this->isFirstClick = false;
-        this->loginCitrix(); // start citrix login // ODER RDP LATER ...
-    } else {
-        // second button click -> ignore
-        this->isFirstClick = true; // set back to first click
-    }
-
-//  use ...:  const QString CITRIX_RDP_TYPE = "global/citrix_rdp_type";
-
-
- /*   if (init.get_citrix_rdp_type()=="citrix") {
-        // save citrix class
-        this->ctx = new Citrix(init.get_citrix_url(), init.get_citrix_store()); // constructor
-        startLoginCitrix(); // start_citrix
-
-    } else {
-        startLoginRdp(); // start rdp
-    }
-*/
-    // make tbtnLogin button visible again
 }
 
 /*
  * start login citrix
  */
 void StartPage::loginCitrix() {
-    qDebug() << "loginCitrix";
+//    qDebug() << "loginCitrix";
 
     // for safety reason: delete citrix login information beforehand
     QString command = PRG_KILLALL+" "+PROC_AUTHMANAGERDAEMON+" "+PROC_SERVICERECORD;
@@ -250,9 +229,10 @@ void StartPage::loginCitrix() {
     // setup storebrowse module with login data
     QString netscaler_url = getSettingsValue(NETSCALER_URL).toString(); // netscaler link
     QString store_url = getSettingsValue(STORE_URL).toString(); // store link
+    QString citrix_domain = getSettingsValue(CITRIX_DOMAIN).toString(); // citrix domain
 
     // start storebrowse instance
-    QString user = ui->leUser->text();
+    QString user = citrix_domain + "\\" + ui->leUser->text();
     QString pw = ui->lePW->text();
     this->storebrowse = new Storebrowse(netscaler_url, store_url, user, pw);
 
@@ -269,14 +249,8 @@ void StartPage::loginCitrix() {
         this->storebrowse->addStore();
     } // *** WILL THAT REALLY HAPPEN ???
 
-    // there was no doubleclick
-    this->isFirstClick = true; // --> make button react again
-
     // get desktop(s)
     QMap<QString,QString> desktops = this->storebrowse->getDesktops();
-//for (int i=0;i<20;i++) { // TEST mit multi desktops
-//    desktops.insert("key" +QString::number(i),"link");
-//}
     if (desktops.size()==0) { // no desktops --> normal start again
         // show messagebox
         QMessageBox msgBox;
@@ -396,6 +370,94 @@ void StartPage::loginCitrix() {
             connect(this->signalMapper, SIGNAL(mapped(int)), this, SLOT(on_btnDesktop_clicked(int)));
         }
     }
+    // wait for 1 Second --> no double clicks possible
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    this->mouseClickCount = 0; // react to mouse clicks again
+}
+
+/*
+ * set login
+ * true = enable, false = disable
+ */
+void StartPage::setLogin(bool enable) {
+//    qDebug() << "setLogin";
+
+    ui->lblUser->setVisible(enable);
+    ui->lblUser->setDisabled(!enable); // labels User+PW visible
+    ui->lblPW->setVisible(enable);
+    ui->lblPW->setDisabled(!enable);
+    ui->leUser->setVisible(enable);
+    ui->leUser->setDisabled(!enable); // line edits User+PW visible
+    ui->lePW->setVisible(enable);
+    ui->lePW->setDisabled(!enable);
+    ui->btnLogin->setVisible(enable);
+    ui->btnLogin->setDisabled(!enable); // login button visible
+    QFont tmpFont = ui->leUser->font();
+    tmpFont.setItalic(true);
+    ui->leUser->setFont(tmpFont);
+    QPalette tmpPalette = ui->leUser->palette();
+    tmpPalette.setColor(QPalette::Text,Qt::gray); // gray text
+    ui->leUser->setPalette(tmpPalette);
+    ui->leUser->setText(LE_USER_TEXT); // show initial login text
+    ui->leUser->setCursorPosition(0); // cursor in the beginning
+    ui->lePW->setText("");
+    this->isFirstChange = true; // react again on first entry in leUser ...
+
+}
+
+/*
+ * start ConfigPage and kill StartPage
+ */
+void StartPage::startConfigPage() {
+
+    // create the new process (ConfigPage)
+    qDebug() << "starting ...";
+    QProcess *process = new QProcess();
+    process->startDetached("/bin/sh", QStringList{PRG_CONFIG_PAGE});
+    process->waitForFinished();
+
+    // killing actual process (StartPage)
+    qDebug() << "killing ..." << qApp->applicationFilePath();
+    qint64 pid = QCoreApplication::applicationPid();
+    QProcess::startDetached("kill -SIGTERM " + QString::number(pid));
+    //this->~StartPage();
+
+}
+
+
+/***************************
+ * SLOTS
+ ***************************/
+
+/*void on_MouseDoubleClick() {
+    qDebug() << "on_MouseDoubleClick";
+}
+*/
+
+
+/*
+ * on_btnLogin_clicked
+ */
+void StartPage::on_btnLogin_clicked() {
+    mouseClickCount++; // increment mouse click
+    qDebug() << "on_btnLogin_clicked:" << mouseClickCount;
+    // MAKE IT ONLY CLICKABLE ONCE !!!
+    if (mouseClickCount == 1) { // check if button was clicked first or second time (-> ignore double clicks)
+        // first button click
+        this->loginCitrix(); // start citrix login // ODER RDP LATER ...
+    }
+
+
+    //  use ...:  const QString CITRIX_RDP_TYPE = "global/citrix_rdp_type"
+ /*   if (init.get_citrix_rdp_type()=="citrix") {
+        // save citrix class
+        this->ctx = new Citrix(init.get_citrix_url(), init.get_citrix_store()); // constructor
+        startLoginCitrix(); // start_citrix
+
+    } else {
+        startLoginRdp(); // start rdp
+    }
+*/
 }
 
 /*
@@ -404,73 +466,65 @@ void StartPage::loginCitrix() {
  */
 void StartPage::on_btnDesktop_clicked(int index) {
     qDebug() << "*** on_btnDesktop_clicked: " << index;
-    QPair<QString,QString> desktop_chosen = desktops_list.at(index-1);
-    QString link_chosen = desktop_chosen.second;
+    mouseClickCount++; // increase mouse count
+    if (mouseClickCount==1) { // only react on 1 cklick --> ignore double click
+        QPair<QString,QString> desktop_chosen = desktops_list.at(index-1);
+        QString link_chosen = desktop_chosen.second;
 
-    // delete all desktop layout elements
-    QObjectList childrenList = ui->lblLayoutContainer->children();
-    QToolButton *btn_chosen; // store chosen button to delete later
-    for (int i=0;i<childrenList.size();i++) {
-        QString cname = childrenList.at(i)->metaObject()->className();
-//        qDebug() << "child" << i << ": class=" << cname;
-        if (cname=="QToolButton") { // hide and delete all buttons
-            QToolButton *temp = qobject_cast<QToolButton *>(childrenList.at(i));
-            temp->hide(); // hide
-            temp->disconnect(); // disconnect from signals
-            temp->deleteLater(); // finally delete object
-        } else if (cname=="QVBoxLayout") { // hide and delete all layouts
-            QVBoxLayout *temp = qobject_cast<QVBoxLayout *>(childrenList.at(i));
-            temp->disconnect(); // disconnect from signals
-            temp->deleteLater(); // finally delete object
+        // delete all desktop layout elements
+        QObjectList childrenList = ui->lblLayoutContainer->children();
+        QToolButton *btn_chosen; // store chosen button to delete later
+        for (int i=0;i<childrenList.size();i++) {
+            QString cname = childrenList.at(i)->metaObject()->className();
+    //        qDebug() << "child" << i << ": class=" << cname;
+            if (cname=="QToolButton") { // hide and delete all buttons
+                QToolButton *temp = qobject_cast<QToolButton *>(childrenList.at(i));
+                temp->hide(); // hide
+                temp->disconnect(); // disconnect from signals
+                temp->deleteLater(); // finally delete object
+            } else if (cname=="QVBoxLayout") { // hide and delete all layouts
+                QVBoxLayout *temp = qobject_cast<QVBoxLayout *>(childrenList.at(i));
+                temp->disconnect(); // disconnect from signals
+                temp->deleteLater(); // finally delete object
+            }
         }
+
+        // delete desktop list
+        desktops_list.empty();
+
+        // change ui
+        ui->centralwidget->setEnabled(false); // disable screen
+        ui->lblMessage->setText("... bitte warten ..."); // // show new message
+        ui->lblMessage->setVisible(true);
+        ui->centralwidget->repaint();
+
+        // start chosen desktop
+        QPair<QString,QString> ret_pair = this->storebrowse->startDesktop(desktop_chosen.second);
+        if (ret_pair.second=="") { // no error
+            // wait for 10 secs --> the buttons will work after 10 secs again (because of timing for login procedure)
+            std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+        } else if (ret_pair.second.contains("ServerLaunchFailure")) { // error desktop cant be started
+            // show messagebox
+            QMessageBox msgBox;
+            QFont font;
+            font.setPointSize(0.015 * this->screen_res_h);
+            msgBox.setWindowTitle("Desktop Fehler");
+            msgBox.setFont(font);
+            msgBox.setText("Der ausgewählte Desktop kann nicht gestartet werden. Vermutlich sind die Citrix Studio Einstellungen falsch.\n\n"
+                           "Bitte informieren Sie Ihren Administrator!\n");
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.exec();
+
+        }
+
+        ret_pair = this->storebrowse->deleteCitrixAuthentication(); // delete citrix login information
+
+        // make desktop responsive again --> for later
+        ui->centralwidget->setEnabled(true); // enable login
+        this->setLogin(true);
+        this->mouseClickCount = 0; // set mouse count back
     }
 
-    // delete desktop list
-    desktops_list.empty();
-
-    // change ui
-    ui->centralwidget->setEnabled(false); // disable screen
-    ui->lblMessage->setText("... bitte warten ..."); // // show new message
-    ui->lblMessage->setVisible(true);
-    ui->centralwidget->repaint();
-
-    // start chosen desktop
-    QPair<QString,QString> ret_pair = this->storebrowse->startDesktop(desktop_chosen.second);
-    if (ret_pair.second=="") { // no error
-        // wait for 15 secs --> the buttons will work after 15 secs again (because of timing for login procedure)
-        std::this_thread::sleep_for(std::chrono::milliseconds(15000));
-    } else if (ret_pair.second.contains("ServerLaunchFailure")) { // error desktop cant be started
-        // show messagebox
-        QMessageBox msgBox;
-        QFont font;
-        font.setPointSize(0.015 * this->screen_res_h);
-        msgBox.setWindowTitle("Desktop Fehler");
-        msgBox.setFont(font);
-        msgBox.setText("Der ausgewählte Desktop kann nicht gestartet werden. Vermutlich sind die Citrix Studio Einstellungen falsch.\n\n"
-                       "Bitte informieren Sie Ihren Administrator!\n");
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.exec();
-
-    }
-
-    ret_pair = this->storebrowse->deleteCitrixAuthentication(); // delete citrix login information
-
-    // make desktop responsive again --> for later
-    ui->centralwidget->setEnabled(true); // enable login
-    ui->lblUser->setDisabled(false); // labels User+PW visible
-    ui->lblUser->setVisible(true);
-    ui->lblPW->setDisabled(false);
-    ui->lblPW->setVisible(true);
-    ui->leUser->setDisabled(false); // line edits User+PW visible
-    ui->leUser->setVisible(true);
-    ui->lePW->setDisabled(false);
-    ui->lePW->setVisible(true);
-    ui->btnLogin->setDisabled(false); // login button visible
-    ui->btnLogin->setVisible(true);
-    ui->btnLogin->raise(); // put button in foreground
-    ui->lblMessage->setText(""); // // show now message
-    ui->lblMessage->setVisible(false);
-    ui->centralwidget->repaint(); // repaint centralwidget (container)
 
 }
 
@@ -508,44 +562,28 @@ void StartPage::on_tbtnNetStatus_clicked() {
 }
 
 /*
- * set login
- * true = enable, false = disable
+ * on_le_TextChanged
  */
-void StartPage::setLogin(bool enable) {
-    qDebug() << "setLogin";
-
-    ui->lblUser->setVisible(enable);
-    ui->lblUser->setDisabled(!enable); // labels User+PW visible
-    ui->lblPW->setVisible(enable);
-    ui->lblPW->setDisabled(!enable);
-    ui->leUser->setVisible(enable);
-    ui->leUser->setDisabled(!enable); // line edits User+PW visible
-    ui->lePW->setVisible(enable);
-    ui->lePW->setDisabled(!enable);
-    ui->leUser->setText(""); // delete login text
-    ui->lePW->setText("");
-    ui->btnLogin->setVisible(enable);
-    ui->btnLogin->setDisabled(!enable); // login button visible
+void StartPage::on_leUser_TextChanged() {
+    if (this->isFirstChange // only do it with first change
+        &&  (this->ui->leUser->text().length() == LE_USER_TEXT.length()+1)) // if just one piece was entered
+    {
+        QString tmpText = this->ui->leUser->text().at(0); // store first letter
+        this->ui->leUser->setText(tmpText); // put the first letter back in
+        this->isFirstChange = false; // ignore later changes
+        QFont tmpFont = this->ui->leUser->font();// no more italic font
+        tmpFont.setItalic(false);
+        this->ui->leUser->setFont(tmpFont);
+        QPalette tmpPalette = this->ui->leUser->palette(); // change textcolor to black
+        tmpPalette.setColor(QPalette::Text, Qt::black);
+        this->ui->leUser->setPalette(tmpPalette);
+    }
 }
 
-/*
- * start ConfigPage and kill StartPage
- */
-void StartPage::startConfigPage() {
 
-    // create the new process (ConfigPage)
-    qDebug() << "starting ...";
-    QProcess *process = new QProcess();
-    process->startDetached("/bin/sh", QStringList{PRG_CONFIG_PAGE});
-    process->waitForFinished();
-
-    // killing actual process (StartPage)
-    qDebug() << "killing ..." << qApp->applicationFilePath();
-    qint64 pid = QCoreApplication::applicationPid();
-    QProcess::startDetached("kill -SIGTERM " + QString::number(pid));
-    //this->~StartPage();
-
-}
+/***************************
+ * SUPPORTING FUNCTIONS
+ ***************************/
 
 /*
  * get Settings Value from Settings Key

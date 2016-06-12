@@ -12,11 +12,11 @@ TARGET = StartPage
 TEMPLATE = app
 
 HEADERS  += startpage.h \
-            storebrowse.h \
+            storebrowse.h
 
 SOURCES += main.cpp \
         startpage.cpp \
-        storebrowse.cpp \
+        storebrowse.cpp
 
 FORMS    += startpage.ui
 

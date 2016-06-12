@@ -25,7 +25,7 @@ struct sharedStruct {
     char password[128];
 };
 
-class Storebrowse {
+class Storebrowse : QObject {
     public:
 
 //        bool try_login(void); // login procedure

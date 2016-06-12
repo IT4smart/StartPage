@@ -66,7 +66,7 @@ QString Storebrowse::getActualStore() {
  * @brief Storebrowse::addStore
  */
 void Storebrowse::addStore() {
-    qDebug() << "addStore";
+//    qDebug() << "addStore";
     // run system command
     QString command = PRG_STOREBROWSE + " -a '" + this->netscaler_url + "'";
     QPair<QString,QString> ret_pair = StartPage::exec_cmd_process(command);
@@ -138,7 +138,7 @@ QPair<QString,QString> Storebrowse::startDesktop(QString desktop_link) {
  * delete citrix login information
  */
 QPair<QString,QString> Storebrowse::deleteCitrixAuthentication() {
-qDebug() << "deleteCitrixAuthentication ...";
+//qDebug() << "deleteCitrixAuthentication ...";
     // run system command
     QString command = PRG_KILLALL+" "+PROC_AUTHMANAGERDAEMON+" "+PROC_SERVICERECORD;
     QPair<QString,QString> ret_pair = StartPage::exec_cmd_process(command);
