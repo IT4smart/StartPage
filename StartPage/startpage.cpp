@@ -155,7 +155,7 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     int login_offset_w = (screen_w + 3*login_w)/2; // pos of left top corner
     int login_offset_h = (screen_h - login_h)/2; // pos of left top corner
     QFont font_login;
-    font_login.setPointSize(0.02 * screen_h);
+    font_login.setPointSize(0.015 * screen_h);
     ui->btnLogin->setFont(font_login);
     ui->btnLogin->setCheckable(false);
     ui->btnLogin->setText("anmelden"); // --> change text dynamically
@@ -176,7 +176,7 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     ui->leUser->setGeometry(leUser_offset_w, leUser_offset_h, leUser_w, leUser_h); // set position
     ui->lePW->setGeometry(lePW_offset_w, lePW_offset_h, lePW_w, lePW_h); // set position
     QFont font_leLogin; // font
-    font_leLogin.setPointSize(0.02 * screen_h);
+    font_leLogin.setPointSize(0.015 * screen_h);
     font_leLogin.setItalic(true); // information in italic
     QPalette *palette = new QPalette();
     palette->setColor(QPalette::Text,Qt::gray); // gray text
@@ -198,7 +198,7 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     ui->lblUser->setGeometry(lblUser_offset_w, lblUser_offset_h, lblUser_w, lblUser_h);
     ui->lblPW->setGeometry(lblPW_offset_w, lblPW_offset_h, lblPW_w, lblPW_h);
     QFont font_lblLogin; // font
-    font_lblLogin.setPointSize(0.02 * screen_h);
+    font_lblLogin.setPointSize(0.015 * screen_h);
     ui->lblUser->setFont(font_lblLogin);
     ui->lblPW->setFont(font_lblLogin);
     ui->lblUser->setText("Benutzer:");
