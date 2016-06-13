@@ -223,7 +223,7 @@ void StartPage::loginCitrix() {
 //    qDebug() << "loginCitrix";
 
     // for safety reason: delete citrix login information beforehand
-    QString command = PRG_KILLALL+" "+PROC_AUTHMANAGERDAEMON+" "+PROC_SERVICERECORD;
+    QString command = PRG_KILLALL+" "+PROC_AUTHMANAGERDAEMON+" "+PROC_SERVICERECORD+" "+PROC_STOREBROWSE;
     QPair<QString,QString> ret_pair = this->exec_cmd_process(command);
 
     // setup storebrowse module with login data
@@ -501,8 +501,8 @@ void StartPage::on_btnDesktop_clicked(int index) {
         // start chosen desktop
         QPair<QString,QString> ret_pair = this->storebrowse->startDesktop(desktop_chosen.second);
         if (ret_pair.second=="") { // no error
-            // wait for 10 secs --> the buttons will work after 10 secs again (because of timing for login procedure)
-            std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+            // wait for 15 secs --> the buttons will work after 15 secs again (because of timing for login procedure)
+            std::this_thread::sleep_for(std::chrono::milliseconds(15000));
         } else if (ret_pair.second.contains("ServerLaunchFailure")) { // error desktop cant be started
             // show messagebox
             QMessageBox msgBox;

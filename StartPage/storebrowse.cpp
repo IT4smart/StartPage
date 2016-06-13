@@ -140,7 +140,7 @@ QPair<QString,QString> Storebrowse::startDesktop(QString desktop_link) {
 QPair<QString,QString> Storebrowse::deleteCitrixAuthentication() {
 //qDebug() << "deleteCitrixAuthentication ...";
     // run system command
-    QString command = PRG_KILLALL+" "+PROC_AUTHMANAGERDAEMON+" "+PROC_SERVICERECORD;
+    QString command = PRG_KILLALL+" "+PROC_AUTHMANAGERDAEMON+" "+PROC_SERVICERECORD+" "+PROC_STOREBROWSE;
     QPair<QString,QString> ret_pair = StartPage::exec_cmd_process(command);
 
     // return QPair

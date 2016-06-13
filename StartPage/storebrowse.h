@@ -16,6 +16,7 @@ const QString PRG_STOREBROWSE = "/opt/Citrix/ICAClient/util/storebrowse";
 const QString PRG_KILLALL = "/usr/bin/killall";
 const QString PROC_AUTHMANAGERDAEMON = "AuthManagerDaemon";
 const QString PROC_SERVICERECORD = "ServiceRecord";
+const QString PROC_STOREBROWSE = "storebrowse";
 
 struct sharedStruct {
     bool terminated;
