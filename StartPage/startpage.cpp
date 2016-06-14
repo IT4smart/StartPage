@@ -53,7 +53,7 @@ StartPage::StartPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::StartPag
     QString sdate = qdate.longDayName(qdate.dayOfWeek()) // convert date to string
             + "\n" + qdate.toString(Qt::LocalDate);
     ui->lblClock->setText(stime+"\n"+sdate); // set label
-    startTimer(2000); // set interrupt timer --> 2000 = 2 seconds
+    startTimer(5000); // set interrupt timer --> 5000 = 5 seconds --> change time every 5 seconds
 
     // connect text changes
     connect(this->ui->leUser, &QLineEdit::textChanged, this, &StartPage::on_leUser_TextChanged);
@@ -166,29 +166,31 @@ void StartPage::init_screen(int screen_w, int screen_h) {
 
     // position line edits
     int leUser_w = 0.25 * screen_w; // widht of line edit User
-    int leUser_h = 0.05 * screen_h; // height of line edit User
+    int leUser_h = 0.04 * screen_h; // height of line edit User
     int lePW_w = leUser_w; // same like line edit user
     int lePW_h = leUser_h; // same like line edit user
     int leUser_offset_w = (screen_w - 1*leUser_w)/2; // pos of left top corner
-    int leUser_offset_h = login_offset_h - 0.25*leUser_h; // take same offset of login button
+    int leUser_offset_h = login_offset_h; // take same offset of login button
     int lePW_offset_w = leUser_offset_w; // take same offset of line edit user
     int lePW_offset_h = leUser_offset_h + 1.5 * lePW_h;
     ui->leUser->setGeometry(leUser_offset_w, leUser_offset_h, leUser_w, leUser_h); // set position
     ui->lePW->setGeometry(lePW_offset_w, lePW_offset_h, lePW_w, lePW_h); // set position
-    QFont font_leLogin; // font
-    font_leLogin.setPointSize(0.015 * screen_h);
-    font_leLogin.setItalic(true); // information in italic
+    QFont font_leUser; // font User --> italic
+    QFont font_lePW; // font PW --> kein italic
+    font_leUser.setPointSize(0.015 * screen_h);
+    font_lePW.setPointSize(0.015 * screen_h);
+    font_leUser.setItalic(true); // information in italic
     QPalette *palette = new QPalette();
     palette->setColor(QPalette::Text,Qt::gray); // gray text
     ui->leUser->setPalette(*palette);
-    ui->leUser->setFont(font_leLogin);
-    ui->lePW->setFont(font_leLogin);
+    ui->leUser->setFont(font_leUser);
+    ui->lePW->setFont(font_lePW);
     ui->leUser->setText(LE_USER_TEXT); // information
     ui->leUser->setCursorPosition(0); // cursor in the beginning
 
     // position line edit labels
     int lblUser_w = 0.1 * screen_w;
-    int lblUser_h = 0.05 * screen_h;
+    int lblUser_h = 0.04 * screen_h;
     int lblPW_w = lblUser_w; // same as lblUser
     int lblPW_h = lblUser_h; // same as lblUser
     int lblUser_offset_w = leUser_offset_w - lblUser_w; // pos of left top corner
@@ -369,6 +371,7 @@ void StartPage::loginCitrix() {
             // connect signalmapper to slot
             connect(this->signalMapper, SIGNAL(mapped(int)), this, SLOT(on_btnDesktop_clicked(int)));
         }
+
     }
     // wait for 1 Second --> no double clicks possible
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -520,11 +523,11 @@ void StartPage::on_btnDesktop_clicked(int index) {
         ret_pair = this->storebrowse->deleteCitrixAuthentication(); // delete citrix login information
 
         // make desktop responsive again --> for later
+        ui->lblMessage->setText(""); // // show now message
         ui->centralwidget->setEnabled(true); // enable login
         this->setLogin(true);
         this->mouseClickCount = 0; // set mouse count back
     }
-
 
 }
 
