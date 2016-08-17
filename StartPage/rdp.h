@@ -8,7 +8,8 @@
 
 
 const QString PRG_RDP = "/usr/bin/xfreerdp";
-const QString PAR_NOCERT = "/no-cert";
+const QString PAR_NOCERT = "/cert-ignore";
+const QString PAR_FULLSCREEN = "/f";
 const QString PAR_USER = "/u:";
 const QString PAR_PW = "/p:";
 const QString PAR_DOMAIN = "/d:";

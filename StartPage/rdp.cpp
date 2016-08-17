@@ -25,6 +25,7 @@ QPair<QString,QString> Rdp::startRdp() {
 
     QString command = PRG_RDP + " "
                         + PAR_NOCERT + " "
+                        + PAR_FULLSCREEN + " "
                         + PAR_USER + this->user + " "
                         + PAR_PW + this->password + " "
                         + PAR_DOMAIN + this->domain + " "
