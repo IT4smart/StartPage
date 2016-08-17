@@ -37,6 +37,8 @@ public:
     QLineEdit *leUser;
     QLineEdit *lePW;
     QPushButton *btnLogin;
+    QLineEdit *leDomain;
+    QLabel *lblDomain;
 
     void setupUi(QMainWindow *StartPage)
     {
@@ -95,10 +97,22 @@ public:
         lePW->setEchoMode(QLineEdit::Password);
         btnLogin = new QPushButton(centralwidget);
         btnLogin->setObjectName(QStringLiteral("btnLogin"));
-        btnLogin->setGeometry(QRect(510, 340, 141, 41));
+        btnLogin->setGeometry(QRect(850, 260, 141, 41));
         btnLogin->setFont(font);
         btnLogin->setAutoDefault(true);
+        leDomain = new QLineEdit(centralwidget);
+        leDomain->setObjectName(QStringLiteral("leDomain"));
+        leDomain->setGeometry(QRect(400, 330, 371, 31));
+        leDomain->setFont(font);
+        leDomain->setEchoMode(QLineEdit::Normal);
+        lblDomain = new QLabel(centralwidget);
+        lblDomain->setObjectName(QStringLiteral("lblDomain"));
+        lblDomain->setGeometry(QRect(240, 340, 111, 17));
+        lblDomain->setFont(font);
         StartPage->setCentralWidget(centralwidget);
+        QWidget::setTabOrder(leUser, lePW);
+        QWidget::setTabOrder(lePW, leDomain);
+        QWidget::setTabOrder(leDomain, btnLogin);
 
         retranslateUi(StartPage);
 
@@ -119,6 +133,7 @@ public:
         lblUser->setText(QApplication::translate("StartPage", "lblUser", 0));
         lblPW->setText(QApplication::translate("StartPage", "lblPW", 0));
         btnLogin->setText(QApplication::translate("StartPage", "btnLogin", 0));
+        lblDomain->setText(QApplication::translate("StartPage", "lblDomain", 0));
     } // retranslateUi
 
 };

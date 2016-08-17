@@ -194,8 +194,8 @@
    <widget class="QPushButton" name="btnLogin">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>340</y>
+      <x>850</x>
+      <y>260</y>
       <width>141</width>
       <height>41</height>
      </rect>
@@ -215,8 +215,50 @@
      <bool>false</bool>
     </property>
    </widget>
+   <widget class="QLineEdit" name="leDomain">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>330</y>
+      <width>371</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>18</pointsize>
+     </font>
+    </property>
+    <property name="echoMode">
+     <enum>QLineEdit::Normal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblDomain">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>340</y>
+      <width>111</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>18</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>lblDomain</string>
+    </property>
+   </widget>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>leUser</tabstop>
+  <tabstop>lePW</tabstop>
+  <tabstop>leDomain</tabstop>
+  <tabstop>btnLogin</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

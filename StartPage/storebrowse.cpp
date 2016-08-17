@@ -86,18 +86,21 @@ QMap<QString,QString> Storebrowse::getDesktops() {
     QString error = pair.second;
 
     // error handling
-    if (result=="") { // there is no result --> empty
-        // do something later
+    if (result=="") { // there is no result
+        // determine error
+        QString err_type;
         if (error.contains("ERROR_HTTP")) { // no web connection
-            qDebug() << "HTTP ERROR!";
+            err_type = "HTTP ERROR!";
         } else if (error.contains("AUTH_SERVER")) { // authorization error
-            qDebug() << "AUTH_SERVER ERROR!";
+            err_type = "AUTH_SERVER ERROR!";
         } else if (error.contains("OUT_OF_LICENSES")) {
-            qDebug() << "OUT_OF_LICENSES ERROR!";
+            err_type = "OUT_OF_LICENSES ERROR!";
         } else {
-            qDebug() << "error:" << error;
+            err_type = "USER/PW ERROR!";
         }
-        return ret_map; // return empty map
+
+        ret_map.insert("ERROR", err_type);
+        return ret_map; // return map
 
     } else { // there is a result --> compute it
         // split str

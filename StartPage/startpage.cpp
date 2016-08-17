@@ -33,11 +33,14 @@ StartPage::StartPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::StartPag
         startConfigPage(); // start ConfigPage and kill StartPage
     }
 
+    // set citrix/rdp mode
+    this->citrix_rdp_type = getSettingsValue(CITRIX_RDP_TYPE).toString(); // get the mode variable
+
     // setup ui
     ui->setupUi(this);
 
-    // set button flag to firstclick (0) --> so second click can be ignored
-    mouseClickCount = 0;
+    // set button flag to firstclick (0) --> second click can be ignored
+    mouseClickCount = 0; // DOES NOT WORK !!! --> SOLVE WITH THREAD ...
 
     // network manager to check online state
     nwManager = new QNetworkConfigurationManager(this);
@@ -55,7 +58,7 @@ StartPage::StartPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::StartPag
     ui->lblClock->setText(stime+"\n"+sdate); // set label
     startTimer(5000); // set interrupt timer --> 5000 = 5 seconds --> change time every 5 seconds
 
-    // connect text changes
+    // connect text changes --> e.g. delete initial text when clicked/typed
     connect(this->ui->leUser, &QLineEdit::textChanged, this, &StartPage::on_leUser_TextChanged);
     this->isFirstChange = true;
 }
@@ -104,7 +107,14 @@ void StartPage::init_screen(int screen_w, int screen_h) {
 
     // background color
     QPalette pal; // color palette
-    pal.setColor(QPalette::Background, QColor(50,150,250)); // set background color
+    QColor bckgnd_col;
+    if (this->citrix_rdp_type=="citrix") {
+        bckgnd_col.setRgb(50,150,250,255); // background color for citrix
+    } else {
+        bckgnd_col.setRgb(50,150,250,128); // background color for rdp
+    }
+    pal.setColor(QPalette::Background, bckgnd_col); // set background color
+
     ui->centralwidget->setAutoFillBackground(true);
     ui->centralwidget->setPalette(pal); // add palette to label
 
@@ -158,9 +168,16 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     font_login.setPointSize(0.015 * screen_h);
     ui->btnLogin->setFont(font_login);
     ui->btnLogin->setCheckable(false);
-    ui->btnLogin->setText("anmelden"); // --> change text dynamically
+    QString btnLoginText;
+    if (this->citrix_rdp_type=="citrix") {
+        btnLoginText = "anmelden\n(CITRIX)";
+    } else {
+        btnLoginText = "anmelden\n(RDP)";
+    }
+    ui->btnLogin->setText(btnLoginText); // --> change text dynamically
     ui->btnLogin->setGeometry(login_offset_w, login_offset_h, login_w, login_h);
     ui->btnLogin->raise();
+
     // connect enter key at password line to signal clicked
     connect(ui->lePW, SIGNAL(returnPressed()),ui->btnLogin,SIGNAL(clicked()));
 
@@ -169,42 +186,72 @@ void StartPage::init_screen(int screen_w, int screen_h) {
     int leUser_h = 0.04 * screen_h; // height of line edit User
     int lePW_w = leUser_w; // same like line edit user
     int lePW_h = leUser_h; // same like line edit user
+    int leDomain_w = leUser_w; // same like line edit user
+    int leDomain_h = leUser_h; // same like line edit user
+
     int leUser_offset_w = (screen_w - 1*leUser_w)/2; // pos of left top corner
     int leUser_offset_h = login_offset_h; // take same offset of login button
     int lePW_offset_w = leUser_offset_w; // take same offset of line edit user
     int lePW_offset_h = leUser_offset_h + 1.5 * lePW_h;
+    int leDomain_offset_w = leUser_offset_w; // take same offset of line edit user
+    int leDomain_offset_h = leUser_offset_h + 3 * leDomain_h;
+
     ui->leUser->setGeometry(leUser_offset_w, leUser_offset_h, leUser_w, leUser_h); // set position
     ui->lePW->setGeometry(lePW_offset_w, lePW_offset_h, lePW_w, lePW_h); // set position
-    QFont font_leUser; // font User --> italic
+    ui->leDomain->setGeometry(leDomain_offset_w, leDomain_offset_h, leDomain_w, leDomain_h); // set position
+
+    QFont font_leUser; // font User --> italic (für hilfetext)
     QFont font_lePW; // font PW --> kein italic
+    QFont font_leDomain; // font Domain --> kein italic
     font_leUser.setPointSize(0.015 * screen_h);
-    font_lePW.setPointSize(0.015 * screen_h);
     font_leUser.setItalic(true); // information in italic
-    QPalette *palette = new QPalette();
+    font_lePW.setPointSize(0.015 * screen_h);
+    font_leDomain.setPointSize(0.015 * screen_h);
+
+    QPalette *palette = new QPalette(); // for User help text
     palette->setColor(QPalette::Text,Qt::gray); // gray text
     ui->leUser->setPalette(*palette);
     ui->leUser->setFont(font_leUser);
-    ui->lePW->setFont(font_lePW);
     ui->leUser->setText(LE_USER_TEXT); // information
     ui->leUser->setCursorPosition(0); // cursor in the beginning
+    ui->lePW->setFont(font_lePW);
+    ui->leDomain->setFont(font_leDomain);
+    ui->leDomain->setText(this->getSettingsValue(RDP_DOMAIN).toString());
 
     // position line edit labels
     int lblUser_w = 0.1 * screen_w;
     int lblUser_h = 0.04 * screen_h;
     int lblPW_w = lblUser_w; // same as lblUser
     int lblPW_h = lblUser_h; // same as lblUser
+    int lblDomain_w = lblUser_w; // same as lblUser
+    int lblDomain_h = lblUser_h; // same as lblUser
+
     int lblUser_offset_w = leUser_offset_w - lblUser_w; // pos of left top corner
     int lblUser_offset_h = leUser_offset_h;
     int lblPW_offset_w = lblUser_offset_w;
     int lblPW_offset_h = lblUser_offset_h + 1.5 * lblPW_h;
+    int lblDomain_offset_w = lblUser_offset_w;
+    int lblDomain_offset_h = lblUser_offset_h + 3 * lblDomain_h;
+
     ui->lblUser->setGeometry(lblUser_offset_w, lblUser_offset_h, lblUser_w, lblUser_h);
     ui->lblPW->setGeometry(lblPW_offset_w, lblPW_offset_h, lblPW_w, lblPW_h);
+    ui->lblDomain->setGeometry(lblDomain_offset_w, lblDomain_offset_h, lblDomain_w, lblDomain_h);
+
     QFont font_lblLogin; // font
     font_lblLogin.setPointSize(0.015 * screen_h);
     ui->lblUser->setFont(font_lblLogin);
-    ui->lblPW->setFont(font_lblLogin);
     ui->lblUser->setText("Benutzer:");
+    ui->lblPW->setFont(font_lblLogin);
     ui->lblPW->setText("Passwort:");
+    ui->lblDomain->setFont(font_lblLogin);
+    ui->lblDomain->setText("Domäne:");
+
+    // if citrix mode --> two lines (user, pw)
+    // if rdp mode --> three lines (user, pw, domain)
+    if (this->citrix_rdp_type=="citrix") {
+        ui->leDomain->hide();
+        ui->lblDomain->hide();
+    }
 
     // position message
     int msg_w = 0.3 * screen_w; // width of message
@@ -219,10 +266,71 @@ void StartPage::init_screen(int screen_w, int screen_h) {
 }
 
 /*
+ * start login rdp
+ */
+void StartPage::loginRdp() {
+//    qDebug() << "loginRDP";
+
+    // make desktop inresponsive --> visual feedback that sth is happening
+    ui->centralwidget->setEnabled(false); // disable buttons
+    ui->lblMessage->setVisible(true);
+    ui->lblMessage->setText("... bitte warten ..."); // waiting message
+    ui->centralwidget->repaint(); // repaint centralwidget (container)
+
+    // start rdp instance
+    QString user = ui->leUser->text();
+    QString pw = ui->lePW->text();
+    QString domain = ui->leDomain->text();
+    QString server = this->getSettingsValue(RDP_URL).toString();
+    this->rdp = new Rdp(user, pw, domain, server);
+    QPair<QString,QString> ret_pair = this->rdp->startRdp();
+
+    // wait if login procedure successful
+    if (ret_pair.second=="") { // no error
+        // wait for 15 secs --> the buttons will work after 15 secs again (because of timing for login procedure)
+        std::this_thread::sleep_for(std::chrono::milliseconds(15000));
+    } else { // error
+        // show messagebox
+        QMessageBox msgBox;
+        QFont font;
+        font.setPointSize(0.015*this->screen_res_h);
+        msgBox.setWindowTitle("Verbindungsfehler");
+        msgBox.setFont(font);
+        msgBox.setText("Kein Login möglich.\n\n"
+                       "Fehlertyp:\n" + ret_pair.second + "\n\n"
+                       "Bitte überprüfen Sie:\n"
+                       "- Logindaten\n"
+                       "- Kabel online?\n\n"
+                       "Wenn sich dieser Fehler wiederholt,\ninformieren Sie bitte Ihren Administrator!\n");
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+    }
+
+    // make desktop responsive again --> for later
+    ui->centralwidget->setEnabled(true); // enable buttons
+    this->setLogin(true); // set login elements to visible
+    ui->lblMessage->setText(""); // // show no message
+    ui->lblMessage->setVisible(false);
+    ui->centralwidget->repaint(); // repaint centralwidget (container)
+
+    // wait for 1 Second --> no double clicks possible --> DOES NOT WORK !!!
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    this->mouseClickCount = 0; // react to mouse clicks again --> DOES NOT WORK !!!
+
+}
+
+
+/*
  * start login citrix
  */
 void StartPage::loginCitrix() {
 //    qDebug() << "loginCitrix";
+
+    // make desktop inresponsive --> visual feedback that sth is happening
+    ui->centralwidget->setEnabled(false); // disable buttons
+    ui->lblMessage->setVisible(true);
+    ui->lblMessage->setText("... bitte warten ..."); // waiting message
+    ui->centralwidget->repaint(); // repaint centralwidget (container)
 
     // for safety reason: delete citrix login information beforehand
     QString command = PRG_KILLALL+" "+PROC_AUTHMANAGERDAEMON+" "+PROC_SERVICERECORD+" "+PROC_STOREBROWSE;
@@ -238,12 +346,6 @@ void StartPage::loginCitrix() {
     QString pw = ui->lePW->text();
     this->storebrowse = new Storebrowse(netscaler_url, store_url, user, pw);
 
-    // make desktop inresponsive --> visual feedback that sth is happening
-    ui->centralwidget->setEnabled(false); // disable buttons
-    ui->lblMessage->setVisible(true);
-    ui->lblMessage->setText("... bitte warten ..."); // waiting message
-    ui->centralwidget->repaint(); // repaint centralwidget (container)
-
     // determine the actual store
     QString actual_store = this->storebrowse->getActualStore(); // list store
     if (actual_store=="") { // is actual store empty?
@@ -253,18 +355,19 @@ void StartPage::loginCitrix() {
 
     // get desktop(s)
     QMap<QString,QString> desktops = this->storebrowse->getDesktops();
-    if (desktops.size()==0) { // no desktops --> normal start again
+    if (desktops.size()==1 && desktops.firstKey()=="ERROR") { // no desktops --> normal start again
         // show messagebox
         QMessageBox msgBox;
         QFont font;
         font.setPointSize(0.015*this->screen_res_h);
         msgBox.setWindowTitle("Verbindungsfehler");
         msgBox.setFont(font);
-        msgBox.setText("Es ist kein Login möglich.\n\n"
+        msgBox.setText("Kein Login möglich.\n\n"
+                       "Fehlertyp: " + desktops.first() + "\n\n"
                        "Bitte überprüfen Sie:\n"
-                       "- Ihre Logindaten (wahrscheinlichster Grund)\n"
-                       "- Kabelverbindung (muss online sein)\n\n"
-                       "Wenn Sie diesen Fehler wiederholt erhalten,\ninformieren Sie bitte Ihren Administrator!\n");
+                       "- Logindaten\n"
+                       "- Kabel online?\n\n"
+                       "Wenn sich dieser Fehler wiederholt,\ninformieren Sie bitte Ihren Administrator!\n");
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
 
@@ -371,11 +474,11 @@ void StartPage::loginCitrix() {
             // connect signalmapper to slot
             connect(this->signalMapper, SIGNAL(mapped(int)), this, SLOT(on_btnDesktop_clicked(int)));
         }
-
     }
-    // wait for 1 Second --> no double clicks possible
+
+    // wait for 1 Second --> no double clicks possible --> DOES NOT WORK !!!
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    this->mouseClickCount = 0; // react to mouse clicks again
+    this->mouseClickCount = 0; // react to mouse clicks again --> DOES NOT WORK !!!
 }
 
 /*
@@ -389,12 +492,19 @@ void StartPage::setLogin(bool enable) {
     ui->lblUser->setDisabled(!enable); // labels User+PW visible
     ui->lblPW->setVisible(enable);
     ui->lblPW->setDisabled(!enable);
+    ui->lblDomain->setVisible(enable);
+    ui->lblDomain->setDisabled(!enable);
+
     ui->leUser->setVisible(enable);
     ui->leUser->setDisabled(!enable); // line edits User+PW visible
     ui->lePW->setVisible(enable);
     ui->lePW->setDisabled(!enable);
+    ui->leDomain->setVisible(enable);
+    ui->leDomain->setDisabled(!enable);
+
     ui->btnLogin->setVisible(enable);
     ui->btnLogin->setDisabled(!enable); // login button visible
+
     QFont tmpFont = ui->leUser->font();
     tmpFont.setItalic(true);
     ui->leUser->setFont(tmpFont);
@@ -402,9 +512,18 @@ void StartPage::setLogin(bool enable) {
     tmpPalette.setColor(QPalette::Text,Qt::gray); // gray text
     ui->leUser->setPalette(tmpPalette);
     ui->leUser->setText(LE_USER_TEXT); // show initial login text
-    ui->leUser->setCursorPosition(0); // cursor in the beginning
-    ui->lePW->setText("");
+    ui->leUser->setCursorPosition(0); // cursor in the beginning    
     this->isFirstChange = true; // react again on first entry in leUser ...
+
+    ui->lePW->setText("");
+    ui->leDomain->setText(this->getSettingsValue(RDP_DOMAIN).toString());
+
+    // if citrix mode --> two lines (user, pw)
+    // if rdp mode --> three lines (user, pw, domain)
+    if (this->citrix_rdp_type=="citrix") {
+        ui->leDomain->hide();
+        ui->lblDomain->hide();
+    }
 
 }
 
@@ -439,31 +558,22 @@ void StartPage::startConfigPage() {
 
 
 /*
+ * FOR CITRIX AND RDP
  * on_btnLogin_clicked
  */
 void StartPage::on_btnLogin_clicked() {
+    // **** SOLVE DOUBLECLICK ISSUE ****
     mouseClickCount++; // increment mouse click
-    qDebug() << "on_btnLogin_clicked:" << mouseClickCount;
-    // MAKE IT ONLY CLICKABLE ONCE !!!
-    if (mouseClickCount == 1) { // check if button was clicked first or second time (-> ignore double clicks)
-        // first button click
-        this->loginCitrix(); // start citrix login // ODER RDP LATER ...
-    }
 
-
-    //  use ...:  const QString CITRIX_RDP_TYPE = "global/citrix_rdp_type"
- /*   if (init.get_citrix_rdp_type()=="citrix") {
-        // save citrix class
-        this->ctx = new Citrix(init.get_citrix_url(), init.get_citrix_store()); // constructor
-        startLoginCitrix(); // start_citrix
-
+    if (citrix_rdp_type=="citrix") {
+        this->loginCitrix(); // start citrix login
     } else {
-        startLoginRdp(); // start rdp
+        this->loginRdp(); // start rdp Login
     }
-*/
 }
 
 /*
+ * FOR CITRIX ONLY
  * @brief StartPage::on_btnDesktop_clicked
  * @param index
  */

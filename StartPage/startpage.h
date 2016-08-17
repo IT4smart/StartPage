@@ -2,6 +2,7 @@
 #define STARTPAGE_H
 
 #include "storebrowse.h"
+#include "rdp.h"
 #include <QMainWindow>
 #include <QTimerEvent>
 #include <QSettings>
@@ -46,36 +47,41 @@ class StartPage : public QMainWindow {
     Q_OBJECT
 
     public:
-        // functions
+        // FUNCTIONS
         explicit StartPage(QWidget *parent = 0); // constructor
         ~StartPage(); // desctructor
         void init_screen(int w, int h); // initialize screen with elements and correct resolution
         static QPair<QString,QString> exec_cmd_process(QString command); // execute commands
 
-        // vars
+        // VARS
         QNetworkConfigurationManager *nwManager; // NetworkManager from Qt to get status of networkinterfaces.
 
     private:
-        // functions
+        // FUNCTIONS
         void doTests(); // delete later, for testing only
         void startConfigPage(); // ConfigPage will be started and StartPage will be killed
         QVariant getSettingsValue(QString settingsKey); // get Settings value of Settings Key
         bool getNetworkStatus(); // get network status --> return: true=connected, false=offline
         void loginCitrix(); // start citrix login
+        void loginRdp(); // start rdp login
         void setLogin(bool enable); // true=enable, false=disable
         void changeNetworkLogo(); // change network logo
 
-        // vars
+        // VARS
         Ui::StartPage *ui; // manage the UI
         int screen_res_w; // screen resolution width --> works only with 1 screen!
         int screen_res_h; // screen resolution height --> works only with 1 screen!
+        QString citrix_rdp_type; // store in which mode is the StartPage
+        bool isFirstChange; // true: line edit User had no entry yet --> initial text still there
+                        // false: not the first
+        int mouseClickCount; // 0, 1 or 2 (= double click) DOES NOT WORK !!!
+        // for citrix
         Storebrowse *storebrowse; // actual storebrowse instance
         QSignalMapper *signalMapper; // signal mapper maps the desktop button signals to the desktop slot
         QList<QPair <QString,QString>> desktops_list; // list of desktops
         QVBoxLayout *ctx_desktop_v_layout; // save QVBoxLayout for buttons --> later delete this, and all buttons are gone
-        int mouseClickCount; // 0, 1 or 2 (= double click)
-        bool isFirstChange; // true: line edit User had no entry yet --> initial text still there
-                        // false: not the first
+        // for rdp
+        Rdp *rdp; // actual rdp instance
 
 
     protected:
@@ -84,7 +90,7 @@ class StartPage : public QMainWindow {
     private slots:
         void on_btnLogin_clicked(); // login button (citrix or rdp)
         void on_tbtnNetStatus_clicked(); // show net status
-        void on_btnDesktop_clicked(int index); // slot der geklickte desktops abfängt
+        void on_btnDesktop_clicked(int index); // slot der geklickte desktops abfängt (for CITRIX only)
         void on_leUser_TextChanged(); // text was changed in line edit field
 
 };
