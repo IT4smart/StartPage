@@ -1,5 +1,8 @@
 #!/bin/bash
 # build some functions
+
+SRC_DIR=$(pwd)
+
 function fix_arch_ctl()
 {
 	sed '/Architecture/d' -i $1
