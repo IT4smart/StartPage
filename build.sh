@@ -1,6 +1,10 @@
 #!/bin/bash
 # build some functions
 
+NUM_CPUS=`nproc`
+echo "###############"
+echo "### Using ${NUM_CPUS} cores"
+
 SRC_DIR=$(pwd)
 
 function fix_arch_ctl()
@@ -23,7 +27,7 @@ function dpkg_build()
 # build 
 cd StartPage
 cmake .
-make
+make "-j${NUM_CPUS}"
 # get back to root
 cd ..
 
