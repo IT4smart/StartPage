@@ -1,4 +1,6 @@
 *.a
+logs/*
+qrc_ressources.cpp
 StartPage
 Startpage
 *.pro.user
