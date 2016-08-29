@@ -15,6 +15,8 @@
 #include <QtNetwork/QNetworkConfigurationManager>
 
 
+
+
 // constants
 const QString SETTINGS_PATH = "../Ressources/settings.ini"; // hier werden settings gespeichert
 // global keys

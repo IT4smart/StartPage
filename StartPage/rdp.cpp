@@ -1,5 +1,6 @@
 #include "rdp.h"
 #include "startpage.h"
+#include "easylogging++.h"
 
 /*
  * constructor Rdp
@@ -31,6 +32,8 @@ QPair<QString,QString> Rdp::startRdp() {
                         + PAR_DOMAIN + this->domain + " "
                         + PAR_SERVER + this->server;
     QPair<QString,QString> ret_pair = StartPage::exec_cmd_process(command);
+    SYSLOG(DEBUG) << "RDP command: " << command.toStdString();
+    SYSLOG_IF(ret_pair.second != "", ERROR) << ret_pair.second.toStdString();
 
     return ret_pair; // return results (first: no error result, second: error result)
 }

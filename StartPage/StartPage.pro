@@ -13,7 +13,8 @@ TEMPLATE = app
 
 HEADERS  += startpage.h \
             storebrowse.h \
-    rdp.h
+    rdp.h \
+    easylogging++.h
 
 SOURCES += main.cpp \
         startpage.cpp \

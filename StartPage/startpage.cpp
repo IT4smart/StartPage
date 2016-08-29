@@ -1,6 +1,7 @@
 #include "startpage.h"
 #include "ui_startpage.h"
 #include "storebrowse.h"
+#include "easylogging++.h"
 #include <QDebug>
 #include <QSettings>
 #include <QTime>
@@ -30,11 +31,13 @@ StartPage::StartPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::StartPag
     // check if settings file exists
     if (!QFile(SETTINGS_PATH).exists()) {
         qDebug() << "File does not exist";
+        SYSLOG(ERROR) << "Configfile does not exists in in Path ";
         startConfigPage(); // start ConfigPage and kill StartPage
     }
 
     // set citrix/rdp mode
     this->citrix_rdp_type = getSettingsValue(CITRIX_RDP_TYPE).toString(); // get the mode variable
+    SYSLOG(INFO) << "StartPage mode: " << this->citrix_rdp_type.toStdString();
 
     // setup ui
     ui->setupUi(this);
@@ -269,7 +272,8 @@ void StartPage::init_screen(int screen_w, int screen_h) {
  * start login rdp
  */
 void StartPage::loginRdp() {
-//    qDebug() << "loginRDP";
+    //qDebug() << "loginRDP";
+    SYSLOG(DEBUG) << "RDP login.";
 
     // make desktop inresponsive --> visual feedback that sth is happening
     ui->centralwidget->setEnabled(false); // disable buttons

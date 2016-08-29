@@ -1,6 +1,7 @@
 *.a
 StartPage
 Startpage
+*.pro.user
 UnitTest
 *_automoc.cpp
 moc_*.cpp
