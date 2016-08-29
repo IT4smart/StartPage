@@ -11,6 +11,8 @@ Rdp::Rdp(QString user, QString password, QString domain, QString server) {
     this->password = password;//.toStdString();
     this->domain = domain;//.toStdString();
     this->server = server;//.toStdString();
+
+    SYSLOG(DEBUG) << "Set all informationen for a rdp session";
 }
 
 /*

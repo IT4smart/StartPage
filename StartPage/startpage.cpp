@@ -286,6 +286,9 @@ void StartPage::loginRdp() {
     QString pw = ui->lePW->text();
     QString domain = ui->leDomain->text();
     QString server = this->getSettingsValue(RDP_URL).toString();
+
+    SYSLOG(DEBUG) << "RDP-Server: " << server.toStdString();
+
     this->rdp = new Rdp(user, pw, domain, server);
     QPair<QString,QString> ret_pair = this->rdp->startRdp();
 
