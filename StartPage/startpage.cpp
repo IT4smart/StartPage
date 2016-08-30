@@ -300,7 +300,7 @@ void StartPage::loginRdp() {
 
     // start process for citrix
     QProcess *process = new QProcess();
-    process->start("../Ressources/scripts/rdp.sh", arguments);
+    process->startDetached("../Ressources/scripts/rdp.sh", arguments);
     //process->write(command.toLatin1());
     //process->closeWriteChannel();
 
@@ -308,6 +308,7 @@ void StartPage::loginRdp() {
     QByteArray buffer;
     QByteArray buffer_error;
     while(process->waitForFinished()) {
+        SYSLOG(DEBUG) << "Wait for finishing the rdp start process";
         buffer.append(process->readAllStandardOutput());
         buffer_error.append(process->readAllStandardError());
     }
@@ -316,7 +317,9 @@ void StartPage::loginRdp() {
 
     // return the QPair
     ret_pair.first = buffer.data(); // normal stream
+    SYSLOG(INFO) << "RDP result: " << ret_pair.first.toStdString();
     ret_pair.second = buffer_error.data(); // error stream
+    SYSLOG(ERROR) << "RDP error result: " << ret_pair.second.toStdString();
 
     /* end */
 
