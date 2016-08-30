@@ -289,8 +289,36 @@ void StartPage::loginRdp() {
 
     SYSLOG(DEBUG) << "RDP-Server: " << server.toStdString();
 
-    this->rdp = new Rdp(user, pw, domain, server);
-    QPair<QString,QString> ret_pair = this->rdp->startRdp();
+    //this->rdp = new Rdp(user, pw, domain, server);
+    //QPair<QString,QString> ret_pair = this->rdp->startRdp();
+
+    /* try to fix issue with starting rdp */
+    QPair<QString,QString> ret_pair; // initiate return pair of <QByteArray,QByteArray>
+    QStringList arguments;
+
+    arguments << user << pw << domain << server;
+
+    // start process for citrix
+    QProcess *process = new QProcess();
+    process->start("../Ressources/scripts/rdp.sh", arguments);
+    //process->write(command.toLatin1());
+    //process->closeWriteChannel();
+
+    // get buffer and buffer_error
+    QByteArray buffer;
+    QByteArray buffer_error;
+    while(process->waitForFinished()) {
+        buffer.append(process->readAllStandardOutput());
+        buffer_error.append(process->readAllStandardError());
+    }
+
+    process->close(); // close citrix process
+
+    // return the QPair
+    ret_pair.first = buffer.data(); // normal stream
+    ret_pair.second = buffer_error.data(); // error stream
+
+    /* end */
 
     // wait if login procedure successful
     if (ret_pair.second=="") { // no error
