@@ -2,7 +2,7 @@ project(StartPage)
 cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_AUTOMOC ON)
-add_definitions( -DELPP_SYSLOG -DELPP_THREAD_SAFE)
+add_definitions( -DELPP_SYSLOG -DELPP_THREAD_SAFE -DELPP_UNICODE -DELPP_STACKTRACE_ON_CRASH)
 add_definitions("-std=c++14 -Wall -Wextra -Weffc++ -pedantic")
 
 find_package(Qt5Widgets REQUIRED)

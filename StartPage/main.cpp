@@ -1,3 +1,5 @@
+#define SYSLOG(INFO)
+
 #include "startpage.h"
 #include "easylogging++.h"
 #include <QApplication>
@@ -6,6 +8,15 @@
 INITIALIZE_EASYLOGGINGPP
 
 int main(int argc, char *argv[]) {
+
+    // Load configuration from file
+    el::Configurations conf("../Ressources/logger.conf");
+    // Reconfigure single logger
+    el::Loggers::reconfigureLogger("default", conf);
+    // Actually reconfigure all loggers instead
+    el::Loggers::reconfigureAllLoggers(conf);
+    // Now all the loggers will use configuration from file
+
     ELPP_INITIALIZE_SYSLOG("IT4S-StartPage", LOG_PID | LOG_CONS | LOG_PERROR, LOG_USER);
 
     START_EASYLOGGINGPP(argc, argv);

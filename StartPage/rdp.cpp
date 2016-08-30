@@ -33,6 +33,7 @@ QPair<QString,QString> Rdp::startRdp() {
                         + PAR_PW + this->password + " "
                         + PAR_DOMAIN + this->domain + " "
                         + PAR_SERVER + this->server;
+    SYSLOG(DEBUG) << "Start login for rdp session";
     QPair<QString,QString> ret_pair = StartPage::exec_cmd_process(command);
     SYSLOG(DEBUG) << "RDP command: " << command.toStdString();
     SYSLOG_IF(ret_pair.second != "", ERROR) << ret_pair.second.toStdString();

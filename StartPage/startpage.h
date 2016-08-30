@@ -32,7 +32,7 @@ const QString CITRIX_DOMAIN = "citrix/domain";
 const QString RDP_DOMAIN = "rdp/domain"; // key
 const QString RDP_URL = "rdp/server_url"; // key
 // scripts
-const QString PRG_SHELL = "/bin/sh";
+const QString PRG_SHELL = "/bin/bash";
 const QString PRG_CONFIG_PAGE = "../Ressources/scripts/startConfigPage.sh";
 const QString PRINT_IP = "../Ressources/scripts/printIp.sh"; // gib IP zurück wenn connected, sonst leer
 const QString PRINT_NETMASK = "../Ressources/scripts/printNetmask.sh"; // gib Netmask zurück wenn connected, sonst leer

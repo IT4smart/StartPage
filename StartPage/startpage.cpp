@@ -31,7 +31,7 @@ StartPage::StartPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::StartPag
     // check if settings file exists
     if (!QFile(SETTINGS_PATH).exists()) {
         qDebug() << "File does not exist";
-        SYSLOG(ERROR) << "Configfile does not exists in in Path ";
+        SYSLOG(ERROR) << "Configfile does not exists in in Path " << SETTINGS_PATH.toStdString();
         startConfigPage(); // start ConfigPage and kill StartPage
     }
 
