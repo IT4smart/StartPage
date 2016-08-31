@@ -40,5 +40,5 @@ mkdir -p files/opt/IT4S/startpage/StartPage
 cp -ar StartPage/StartPage files/opt/IT4S/startpage/StartPage
 cp -ar Ressources files/opt/IT4S/startpage
 fix_arch_ctl "files/DEBIAN/control"
-dpkg_build files rpb2-startpage.deb
+dpkg_build files "${1}-startpage.deb"
 
