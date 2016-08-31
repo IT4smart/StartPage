@@ -1,5 +1,6 @@
 #include "storebrowse.h"
 #include "startpage.h"
+#include "easylogging++.h"
 
 /*
  * constructor Storebrowse
@@ -55,7 +56,7 @@ void Storebrowse::shared_memory_struct_init(void) {
  */
 QString Storebrowse::getActualStore() {
     // run system command
-    QString command = PRG_STOREBROWSE + " -l '" + this->store_url + "'";
+    QString command = PRG_STOREBROWSE + " -l";
     QPair<QString,QString> ret_pair = StartPage::exec_cmd_process(command);
 
     return ret_pair.first; // return only storeaddress
@@ -81,9 +82,18 @@ QMap<QString,QString> Storebrowse::getDesktops() {
 
     // run system command
     QString command = PRG_STOREBROWSE+" -E '"+this->store_url+"'";
+
+    // logging
+    SYSLOG(INFO) << "Request storefront server for desktops";
+    SYSLOG(DEBUG) << "Command: " << command.toStdString();
+
     QPair<QString,QString> pair = StartPage::exec_cmd_process(command); // returns result and error as QPair
     QString result = pair.first;
     QString error = pair.second;
+
+    // logging
+    SYSLOG_IF(!result.isEmpty(), INFO) << "Desktops: " << result.toStdString();
+    SYSLOG_IF(result.isEmpty(), ERROR) << "Citrix error: " << error.toStdString();
 
     // error handling
     if (result=="") { // there is no result
@@ -131,6 +141,11 @@ QMap<QString,QString> Storebrowse::getDesktops() {
 QPair<QString,QString> Storebrowse::startDesktop(QString desktop_link) {
     // run system command
     QString command = PRG_STOREBROWSE + " -L '" + desktop_link + "' '" + this->store_url + "'";
+
+    // logging
+    SYSLOG(INFO) << "Start Dekstop " << desktop_link.toStdString();
+    SYSLOG(DEBUG) << "Command: " << command.toStdString();
+
     QPair<QString,QString> ret_pair = StartPage::exec_cmd_process(command);
 
     // return QPair
