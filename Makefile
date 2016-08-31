@@ -4,8 +4,8 @@ armv6l:
 	sudo bash build.sh "armv6l"
 armv7:
 	sudo bash build.sh "armv7"
-i386:
-	sudo setarch i686 bash build.sh "i386"
+i686:
+	sudo bash build.sh "i686"
 amd64:
 	sudo bash build.sh "amd64"
 clean:
