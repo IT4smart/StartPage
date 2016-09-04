@@ -9,6 +9,7 @@ SRC_DIR=$(pwd)
 
 function fix_arch_ctl()
 {
+	echo $(arch)x
 	sed '/Architecture/d' -i $1
 	test $(arch)x == i686x && echo "Architecture: i386" >> $1
 	test $(arch)x == armv7lx && echo "Architecture: armhf" >> $1
