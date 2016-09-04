@@ -1,6 +1,7 @@
 #include "startpage.h"
 #include "ui_startpage.h"
 #include "storebrowse.h"
+#include "easylogging++.h"
 #include <QDebug>
 #include <QSettings>
 #include <QTime>
@@ -30,11 +31,13 @@ StartPage::StartPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::StartPag
     // check if settings file exists
     if (!QFile(SETTINGS_PATH).exists()) {
         qDebug() << "File does not exist";
+        SYSLOG(ERROR) << "Configfile does not exists in in Path " << SETTINGS_PATH.toStdString();
         startConfigPage(); // start ConfigPage and kill StartPage
     }
 
     // set citrix/rdp mode
     this->citrix_rdp_type = getSettingsValue(CITRIX_RDP_TYPE).toString(); // get the mode variable
+    SYSLOG(INFO) << "StartPage mode: " << this->citrix_rdp_type.toStdString();
 
     // setup ui
     ui->setupUi(this);
@@ -89,9 +92,11 @@ void StartPage::changeNetworkLogo() {
     if (this->getNetworkStatus()) {
         ui->tbtnNetStatus->setText("online");
         ui->tbtnNetStatus->setIcon(QIcon(":/net_online.png"));
+        SYSLOG(INFO) << "We are online now";
     } else {
         ui->tbtnNetStatus->setText("offline");
         ui->tbtnNetStatus->setIcon(QIcon(":/net_offline.png"));
+        SYSLOG(WARNING) << "We are offline now.";
     }
 
 }
@@ -269,7 +274,8 @@ void StartPage::init_screen(int screen_w, int screen_h) {
  * start login rdp
  */
 void StartPage::loginRdp() {
-//    qDebug() << "loginRDP";
+    //qDebug() << "loginRDP";
+    SYSLOG(DEBUG) << "RDP login.";
 
     // make desktop inresponsive --> visual feedback that sth is happening
     ui->centralwidget->setEnabled(false); // disable buttons
@@ -282,8 +288,42 @@ void StartPage::loginRdp() {
     QString pw = ui->lePW->text();
     QString domain = ui->leDomain->text();
     QString server = this->getSettingsValue(RDP_URL).toString();
-    this->rdp = new Rdp(user, pw, domain, server);
-    QPair<QString,QString> ret_pair = this->rdp->startRdp();
+
+    SYSLOG(DEBUG) << "RDP-Server: " << server.toStdString();
+
+    //this->rdp = new Rdp(user, pw, domain, server);
+    //QPair<QString,QString> ret_pair = this->rdp->startRdp();
+
+    /* try to fix issue with starting rdp */
+    QPair<QString,QString> ret_pair; // initiate return pair of <QByteArray,QByteArray>
+    QStringList arguments;
+
+    arguments << user << pw << domain << server;
+
+    // start process for citrix
+    QProcess *process = new QProcess();
+    process->startDetached("../Ressources/scripts/rdp.sh", arguments);
+    //process->write(command.toLatin1());
+    //process->closeWriteChannel();
+
+    // get buffer and buffer_error
+    QByteArray buffer;
+    QByteArray buffer_error;
+    while(process->waitForFinished()) {
+        SYSLOG(DEBUG) << "Wait for finishing the rdp start process";
+        buffer.append(process->readAllStandardOutput());
+        buffer_error.append(process->readAllStandardError());
+    }
+
+    process->close(); // close citrix process
+
+    // return the QPair
+    ret_pair.first = buffer.data(); // normal stream
+    SYSLOG(INFO) << "RDP result: " << ret_pair.first.toStdString();
+    ret_pair.second = buffer_error.data(); // error stream
+    SYSLOG(ERROR) << "RDP error result: " << ret_pair.second.toStdString();
+
+    /* end */
 
     // wait if login procedure successful
     if (ret_pair.second=="") { // no error
@@ -325,6 +365,7 @@ void StartPage::loginRdp() {
  */
 void StartPage::loginCitrix() {
 //    qDebug() << "loginCitrix";
+    SYSLOG(DEBUG) << "Start loging for citrix";
 
     // make desktop inresponsive --> visual feedback that sth is happening
     ui->centralwidget->setEnabled(false); // disable buttons
@@ -336,22 +377,35 @@ void StartPage::loginCitrix() {
     QString command = PRG_KILLALL+" "+PROC_AUTHMANAGERDAEMON+" "+PROC_SERVICERECORD+" "+PROC_STOREBROWSE;
     QPair<QString,QString> ret_pair = this->exec_cmd_process(command);
 
+    // logging
+    SYSLOG(INFO) << "Delete old sessions";
+    SYSLOG(DEBUG) << "Delete old sessions with command: " << command.toStdString();
+
     // setup storebrowse module with login data
     QString netscaler_url = getSettingsValue(NETSCALER_URL).toString(); // netscaler link
     QString store_url = getSettingsValue(STORE_URL).toString(); // store link
     QString citrix_domain = getSettingsValue(CITRIX_DOMAIN).toString(); // citrix domain
 
+    // logging
+    SYSLOG(DEBUG) << "Netscaler: " << netscaler_url.toStdString();
+    SYSLOG(DEBUG) << "Store: " << store_url.toStdString();
+    SYSLOG(DEBUG) << "citrix domain: " << citrix_domain.toStdString();
+
+
     // start storebrowse instance
     QString user = citrix_domain + "\\" + ui->leUser->text();
+    SYSLOG(DEBUG) << "Set user for authentification: " << user.toStdString();
     QString pw = ui->lePW->text();
+
+    SYSLOG_IF(!netscaler_url.isEmpty(), INFO) << "We requesting the netscaler: " << netscaler_url.toStdString();
+    SYSLOG_IF(!netscaler_url.isEmpty(), INFO) << "We requesting the storefront server: " << store_url.toStdString();
     this->storebrowse = new Storebrowse(netscaler_url, store_url, user, pw);
 
-    // determine the actual store
-    QString actual_store = this->storebrowse->getActualStore(); // list store
-    if (actual_store=="") { // is actual store empty?
-        // add actual store to system
-        this->storebrowse->addStore();
-    } // *** WILL THAT REALLY HAPPEN ???
+    QString current_stores = this->storebrowse->getActualStore();
+    SYSLOG(DEBUG) << "current stores in system: " << current_stores.toStdString();
+
+    // add the store every time again
+    this->storebrowse->addStore();
 
     // get desktop(s)
     QMap<QString,QString> desktops = this->storebrowse->getDesktops();
@@ -383,7 +437,7 @@ void StartPage::loginCitrix() {
     } else if (desktops.size()==1) { // just one desktop --> start
         // start desktop
         QPair<QString,QString> ret_pair = this->storebrowse->startDesktop(desktops.first());
-        qDebug() << "re_pair msg:\n" << ret_pair.first << "\nerr:\n" <<ret_pair.second;
+        //qDebug() << "re_pair msg:\n" << ret_pair.first << "\nerr:\n" <<ret_pair.second;
         if (ret_pair.second=="") { // no error
             // wait for 15 secs --> the buttons will work after 15 secs again (because of timing for login procedure)
             std::this_thread::sleep_for(std::chrono::milliseconds(15000));
@@ -578,7 +632,9 @@ void StartPage::on_btnLogin_clicked() {
  * @param index
  */
 void StartPage::on_btnDesktop_clicked(int index) {
-    qDebug() << "*** on_btnDesktop_clicked: " << index;
+    //qDebug() << "*** on_btnDesktop_clicked: " << index;
+
+
     mouseClickCount++; // increase mouse count
     if (mouseClickCount==1) { // only react on 1 cklick --> ignore double click
         QPair<QString,QString> desktop_chosen = desktops_list.at(index-1);
@@ -645,7 +701,10 @@ void StartPage::on_btnDesktop_clicked(int index) {
  * an_tbtnNetStatus
  */
 void StartPage::on_tbtnNetStatus_clicked() {
-    qDebug() << "on_tbtnNetStatus";
+    //qDebug() << "on_tbtnNetStatus";
+
+    // logging
+    SYSLOG(DEBUG) << "User clicked button for network status";
 
     // get network info
     QString ip = this->exec_cmd_process(PRINT_IP).first; // ip
@@ -658,6 +717,9 @@ void StartPage::on_tbtnNetStatus_clicked() {
     } else { // network is offline
         ip = "<offline>";
     }
+
+    // logging
+    SYSLOG(INFO) << "IP: " << ip.toStdString() << ";Netmask: " << mask.toStdString() << ";Gateway: " << gateway.toStdString() << ";Type: " << type.toStdString();
 
     // create messagebox
     QMessageBox msgBox;
@@ -708,7 +770,8 @@ QVariant StartPage::getSettingsValue(QString settingsKey) {
 
         return settings.value(settingsKey);
     } else {
-        qDebug() << "Key doesn't exist";
+        //qDebug() << "Key doesn't exist";
+        SYSLOG(ERROR) << "Key " << settingsKey.toStdString() << " does not exists.";
 
         // display QMessageBox
         QMessageBox msgBox;

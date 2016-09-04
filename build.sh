@@ -35,11 +35,11 @@ cd ..
 sed '/Package/d' -i "${SRC_DIR}/files/DEBIAN/control"
 sed '/Depends/d' -i "${SRC_DIR}/files/DEBIAN/control"
 echo "Package: ${1}-startpage" >> "${SRC_DIR}/files/DEBIAN/control"
-echo "Depends: qt5-default freerdp-x11" >> "${SRC_DIR}/files/DEBIAN/control"
+echo "Depends: qt5-default, freerdp-x11" >> "${SRC_DIR}/files/DEBIAN/control"
 
 mkdir -p files/opt/IT4S/startpage/StartPage
 cp -ar StartPage/StartPage files/opt/IT4S/startpage/StartPage
 cp -ar Ressources files/opt/IT4S/startpage
 fix_arch_ctl "files/DEBIAN/control"
-dpkg_build files rpb2-startpage.deb
+dpkg_build files "${1}-startpage.deb"
 

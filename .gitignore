@@ -9,6 +9,5 @@ moc_*
 Makefile
 CMakeFile*
 CMakeCache*
-StartPage
 *_automoc*
 cmake_in*
