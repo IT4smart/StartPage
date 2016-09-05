@@ -9,9 +9,9 @@ SRC_DIR=$(pwd)
 
 function fix_arch_ctl()
 {
-	ARCH=dpkg --print-architecture
+	ARCH=$(dpkg --print-architecture)
 	sed '/Architecture/d' -i $1
-	test ${ARCH}x == i686x && echo "Architecture: i386" >> $1
+	test ${ARCH}x == i386x && echo "Architecture: i386" >> $1
 	test ${ARCH}x == armv7lx && echo "Architecture: armhf" >> $1
 	test ${ARCH}x == x86_64x && echo "Architecture: amd64" >> $1
 	sed '$!N; /^\(.*\)\n\1$/!P; D' -i $1
@@ -34,7 +34,7 @@ cd ..
 
 sed '/Package/d' -i "${SRC_DIR}/files/DEBIAN/control"
 sed '/Depends/d' -i "${SRC_DIR}/files/DEBIAN/control"
-echo "Package: ${1}-startpage" >> "${SRC_DIR}/files/DEBIAN/control"
+echo "Package: startpage" >> "${SRC_DIR}/files/DEBIAN/control"
 echo "Depends: qt5-default, freerdp-x11" >> "${SRC_DIR}/files/DEBIAN/control"
 
 mkdir -p files/opt/IT4S/startpage/StartPage
