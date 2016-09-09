@@ -1,7 +1,8 @@
 Origin: IT4S
-Version: 0.9.2
-Section: it4s-main
+Version: 0.9.3
+Section: utils
 Essential: No
 Priority: required
-Maintainer: Alexander Racic <alexander.racic@it4s.eu>
+Maintainer: IT4S GmbH <support@it4s.eu>
+Homepage: http://www.it4s.eu
 Description: Mainscreen where the user can sign in to any remote system
