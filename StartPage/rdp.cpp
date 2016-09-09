@@ -54,16 +54,17 @@ void Rdp::process_started() {
 void Rdp::processErrorStream() {
     process.setReadChannel(QProcess::StandardError);
     QByteArray buffer = process.readAllStandardError();
+    std::string error_msg = buffer.data();
+    SYSLOG(DEBUG) << error_msg;
 
-    SYSLOG(DEBUG) << buffer.data();
 
-    if (buffer.toStdString().find("Authentication failure, check credentials") != std::string::npos) {
+    if (error_msg.find("Authentication failure, check credentials") != std::string::npos) {
         QMessageBox::information(0, "Authentifizierungsfehler", "Falscher Benutzername oder Passwort");
         SYSLOG(ERROR) << "Authentification failure!";
-    } else if(buffer.toStdString().find("getaddrinfo (System error)") != std::string::npos or buffer.toStdString().find("getaddrinfo: System error") != std::string::npos) {
+    } else if(error_msg.find("getaddrinfo (System error)") != std::string::npos or error_msg.find("getaddrinfo: System error") != std::string::npos) {
         QMessageBox::information(0, "Verbindungsfehler", "Serverfehler, bitte konktaktieren Sie ihren Administrator.");
         SYSLOG(ERROR) << "Error connecting to server!";
-    } else if(buffer.toStdString().find("getaddrinfo: System error") != std::string::npos or buffer.toStdString().find("getaddrinfo: System error") != std::string::npos) {
+    } else if(error_msg.find("getaddrinfo: System error") != std::string::npos or error_msg.find("getaddrinfo: System error") != std::string::npos) {
         QMessageBox::information(0, "Verbindungsfehler", "Serverfehler, bitte kontaktieren Sie ihren Administrator");
         SYSLOG(ERROR) << "Error connecting to server!";
     } else {
