@@ -10,9 +10,11 @@ SRC_DIR=$(pwd)
 function fix_arch_ctl()
 {
 	ARCH=$(dpkg --print-architecture)
+    echo "Architecture: ${ARCH}"
 	sed '/Architecture/d' -i $1
 	test ${ARCH}x == i386x && echo "Architecture: i386" >> $1
 	test ${ARCH}x == armv7lx && echo "Architecture: armhf" >> $1
+    test ${ARCH}x == amd64x && echo "Architecture: amd64" >> $1
 	test ${ARCH}x == x86_64x && echo "Architecture: amd64" >> $1
 	sed '$!N; /^\(.*\)\n\1$/!P; D' -i $1
 }
