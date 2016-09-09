@@ -291,41 +291,11 @@ void StartPage::loginRdp() {
 
     SYSLOG(DEBUG) << "RDP-Server: " << server.toStdString();
 
-    //this->rdp = new Rdp(user, pw, domain, server);
-    //QPair<QString,QString> ret_pair = this->rdp->startRdp();
-
-    /* try to fix issue with starting rdp */
-    QPair<QString,QString> ret_pair; // initiate return pair of <QByteArray,QByteArray>
-    QStringList arguments;
-
-    arguments << user << pw << domain << server;
-
-    // start process for citrix
-    QProcess *process = new QProcess();
-    process->startDetached("../Ressources/scripts/rdp.sh", arguments);
-    //process->write(command.toLatin1());
-    //process->closeWriteChannel();
-
-    // get buffer and buffer_error
-    QByteArray buffer;
-    QByteArray buffer_error;
-    while(process->waitForFinished()) {
-        SYSLOG(DEBUG) << "Wait for finishing the rdp start process";
-        buffer.append(process->readAllStandardOutput());
-        buffer_error.append(process->readAllStandardError());
-    }
-
-    process->close(); // close citrix process
-
-    // return the QPair
-    ret_pair.first = buffer.data(); // normal stream
-    SYSLOG(INFO) << "RDP result: " << ret_pair.first.toStdString();
-    ret_pair.second = buffer_error.data(); // error stream
-    SYSLOG(ERROR) << "RDP error result: " << ret_pair.second.toStdString();
-
-    /* end */
+    this->rdp = new Rdp(user, pw, domain, server);
+    this->rdp->startRdp();
 
     // wait if login procedure successful
+    /*
     if (ret_pair.second=="") { // no error
         // wait for 15 secs --> the buttons will work after 15 secs again (because of timing for login procedure)
         std::this_thread::sleep_for(std::chrono::milliseconds(15000));
@@ -345,6 +315,8 @@ void StartPage::loginRdp() {
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
     }
+    */
+
 
     // make desktop responsive again --> for later
     ui->centralwidget->setEnabled(true); // enable buttons
@@ -357,6 +329,15 @@ void StartPage::loginRdp() {
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     this->mouseClickCount = 0; // react to mouse clicks again --> DOES NOT WORK !!!
 
+
+}
+
+void StartPage::enableLogin() {
+    ui->centralwidget->setEnabled(true); // enable buttons
+    this->setLogin(true); // set login elements to visible
+    ui->lblMessage->setText(""); // // show no message
+    ui->lblMessage->setVisible(false);
+    ui->centralwidget->repaint(); // repaint centralwidget (container)
 }
 
 

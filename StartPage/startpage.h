@@ -54,6 +54,7 @@ class StartPage : public QMainWindow {
         ~StartPage(); // desctructor
         void init_screen(int w, int h); // initialize screen with elements and correct resolution
         static QPair<QString,QString> exec_cmd_process(QString command); // execute commands
+        void enableLogin();
 
         // VARS
         QNetworkConfigurationManager *nwManager; // NetworkManager from Qt to get status of networkinterfaces.
@@ -63,10 +64,10 @@ class StartPage : public QMainWindow {
         void doTests(); // delete later, for testing only
         void startConfigPage(); // ConfigPage will be started and StartPage will be killed
         QVariant getSettingsValue(QString settingsKey); // get Settings value of Settings Key
+        void setLogin(bool enable); // true=enable, false=disable
         bool getNetworkStatus(); // get network status --> return: true=connected, false=offline
         void loginCitrix(); // start citrix login
         void loginRdp(); // start rdp login
-        void setLogin(bool enable); // true=enable, false=disable
         void changeNetworkLogo(); // change network logo
 
         // VARS

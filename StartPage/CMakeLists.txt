@@ -11,7 +11,7 @@ find_package(Qt5Network)
 qt5_wrap_ui(UI_HEADERS startpage.ui)
 qt5_add_resources(UI_RESOURCES ressources.qrc)
 
-add_executable(StartPage main.cpp startpage.cpp rdp.cpp storebrowse.cpp ${UI_RESOURCES})
+add_executable(StartPage main.cpp startpage.cpp rdp.cpp storebrowse.cpp ${UI_RESOURCES} ${UI_HEADERS})
 
 qt5_use_modules(StartPage Widgets Network)
 
