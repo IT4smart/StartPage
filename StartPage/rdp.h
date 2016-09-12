@@ -21,7 +21,7 @@ class Rdp : public QObject {
 
     public:
         // methods
-        Rdp(QString user, QString password, QString domain, QString server);
+        Rdp(QString user, QString password, QString domain, QString server, QString rdp_extraflag);
         ~Rdp();
         void startRdp(); // start remote desktop
         QProcess process;
@@ -32,6 +32,7 @@ class Rdp : public QObject {
         QString password; //std::string password;
         QString domain; //std::string domain;
         QString server; //std::string server;
+        QString extraflag;
 
    public slots:
         void process_started();

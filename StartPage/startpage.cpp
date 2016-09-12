@@ -288,10 +288,11 @@ void StartPage::loginRdp() {
     QString pw = ui->lePW->text();
     QString domain = ui->leDomain->text();
     QString server = this->getSettingsValue(RDP_URL).toString();
+    QString rdp_extra_flags = this->getSettingsValue("extraflag");
 
     SYSLOG(DEBUG) << "RDP-Server: " << server.toStdString();
 
-    this->rdp = new Rdp(user, pw, domain, server);
+    this->rdp = new Rdp(user, pw, domain, server, rdp_extra_flags);
     this->rdp->startRdp();
 
     // wait if login procedure successful

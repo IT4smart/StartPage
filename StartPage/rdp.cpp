@@ -6,12 +6,13 @@
 /*
  * constructor Rdp
  */
-Rdp::Rdp(QString user, QString password, QString domain, QString server) {
+Rdp::Rdp(QString user, QString password, QString domain, QString server, QString rdp_extraflag) {
     // Set login variables
     this->user = user;//.toStdString();
     this->password = password;//.toStdString();
     this->domain = domain;//.toStdString();
     this->server = server;//.toStdString();
+    this->extraflag = rdp_extraflag;
 
     QObject::connect(&process, SIGNAL(started()), this, SLOT(process_started()));
     QObject::connect(&process, SIGNAL(QProcess::ProcessError), this, SLOT(process_error(QProcess::ProcessError)));
@@ -34,7 +35,7 @@ Rdp::~Rdp() {
 void Rdp::startRdp() {
 
     QStringList arguments;
-    arguments << PAR_NOCERT << PAR_FULLSCREEN << PAR_USER + this->user << PAR_PW + this->password << PAR_DOMAIN + this->domain << PAR_SERVER + this->server << "/sound:sys:pulse /rfx /fonts";
+    arguments << PAR_NOCERT << PAR_FULLSCREEN << PAR_USER + this->user << PAR_PW + this->password << PAR_DOMAIN + this->domain << PAR_SERVER + this->server;
 
     SYSLOG(DEBUG) << "Start login for rdp session";
     process.start("xfreerdp", arguments);
