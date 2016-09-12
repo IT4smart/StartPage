@@ -288,7 +288,7 @@ void StartPage::loginRdp() {
     QString pw = ui->lePW->text();
     QString domain = ui->leDomain->text();
     QString server = this->getSettingsValue(RDP_URL).toString();
-    QString rdp_extra_flags = this->getSettingsValue("extraflag");
+    QString rdp_extra_flags = this->getSettingsValue("extraflag").toString();
 
     SYSLOG(DEBUG) << "RDP-Server: " << server.toStdString();
 
