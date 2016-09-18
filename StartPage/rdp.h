@@ -40,6 +40,9 @@ class Rdp : public QObject {
         void processErrorStream();
         void processFinished(int exitcode, QProcess::ExitStatus exitstatus);
 
+   signals:
+        void fireEnableLogin();
+
 };
 
 #endif // RDP_H

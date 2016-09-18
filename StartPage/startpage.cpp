@@ -66,6 +66,7 @@ StartPage::StartPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::StartPag
     this->isFirstChange = true;
 }
 
+
 /*
  * @brief StartPage::timerEvent
  * @param event
@@ -288,12 +289,14 @@ void StartPage::loginRdp() {
     QString pw = ui->lePW->text();
     QString domain = ui->leDomain->text();
     QString server = this->getSettingsValue(RDP_URL).toString();
-    QString rdp_extra_flags = this->getSettingsValue("extraflag").toString();
+    QString rdp_extra_flags = this->getSettingsValue(RDP_EXTRAFLAG).toString();
 
     SYSLOG(DEBUG) << "RDP-Server: " << server.toStdString();
 
     this->rdp = new Rdp(user, pw, domain, server, rdp_extra_flags);
+    connect(this->rdp, &Rdp::fireEnableLogin, this, &StartPage::enableLogin);
     this->rdp->startRdp();
+
 
     // wait if login procedure successful
     /*
@@ -319,6 +322,7 @@ void StartPage::loginRdp() {
     */
 
 
+    /*
     // make desktop responsive again --> for later
     ui->centralwidget->setEnabled(true); // enable buttons
     this->setLogin(true); // set login elements to visible
@@ -329,16 +333,18 @@ void StartPage::loginRdp() {
     // wait for 1 Second --> no double clicks possible --> DOES NOT WORK !!!
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     this->mouseClickCount = 0; // react to mouse clicks again --> DOES NOT WORK !!!
+    */
 
 
 }
 
 void StartPage::enableLogin() {
+    SYSLOG(DEBUG) << "Enable login ui";
     ui->centralwidget->setEnabled(true); // enable buttons
     this->setLogin(true); // set login elements to visible
-    ui->lblMessage->setText(""); // // show no message
-    ui->lblMessage->setVisible(false);
-    ui->centralwidget->repaint(); // repaint centralwidget (container)
+    this->ui->lblMessage->setText(""); // // show no message
+    this->ui->lblMessage->setVisible(false);
+    this->ui->centralwidget->repaint(); // repaint centralwidget (container)
 }
 
 

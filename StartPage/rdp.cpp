@@ -19,6 +19,7 @@ Rdp::Rdp(QString user, QString password, QString domain, QString server, QString
     QObject::connect(&process, SIGNAL(readyReadStandardError()), this, SLOT(processErrorStream()));
     QObject::connect(&process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(processFinished(int,QProcess::ExitStatus)));
 
+
     SYSLOG(DEBUG) << "Set all informationen for a rdp session";
 }
 
@@ -81,6 +82,7 @@ void Rdp::processErrorStream() {
 void Rdp::processFinished(int exitcode, QProcess::ExitStatus exitstatus) {
     SYSLOG(DEBUG) << "ExitCode: " << exitcode;
     SYSLOG(INFO) << "ExitStatus: " << exitstatus;
+    emit fireEnableLogin();
 }
 
 /**
