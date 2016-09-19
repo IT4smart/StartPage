@@ -32,6 +32,9 @@ const QString CITRIX_DOMAIN = "citrix/domain";
 const QString RDP_DOMAIN = "rdp/domain"; // key
 const QString RDP_URL = "rdp/server_url"; // key
 const QString RDP_EXTRAFLAG = "rdp/extraflag"; // key
+const QString RDP_AUTOLOGIN = "rdp/autologin";
+const QString RDP_USERNAME = "rdp/user";
+const QString RDP_PASSWORD = "rdp/password";
 // scripts
 const QString PRG_SHELL = "/bin/bash";
 const QString PRG_CONFIG_PAGE = "../Ressources/scripts/startConfigPage.sh";
@@ -68,7 +71,7 @@ class StartPage : public QMainWindow {
         void setLogin(bool enable); // true=enable, false=disable
         bool getNetworkStatus(); // get network status --> return: true=connected, false=offline
         void loginCitrix(); // start citrix login
-        void loginRdp(); // start rdp login
+        void loginRdp(bool autologin = false); // start rdp login
         void changeNetworkLogo(); // change network logo
 
         // VARS

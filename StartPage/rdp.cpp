@@ -36,7 +36,9 @@ Rdp::~Rdp() {
 void Rdp::startRdp() {
 
     QStringList arguments;
-    arguments << PAR_NOCERT << PAR_FULLSCREEN << PAR_USER + this->user << PAR_PW + this->password << PAR_DOMAIN + this->domain << PAR_SERVER + this->server;
+    arguments << PAR_NOCERT << PAR_FULLSCREEN << PAR_USER + this->user << PAR_PW + this->password << PAR_DOMAIN + this->domain << PAR_SERVER + this->server << this->extraflag;
+
+    SYSLOG(DEBUG) << "Arguments: " << arguments.join(", ").toStdString();
 
     SYSLOG(DEBUG) << "Start login for rdp session";
     process.start("xfreerdp", arguments);
@@ -69,6 +71,9 @@ void Rdp::processErrorStream() {
     } else if(error_msg.find("getaddrinfo: System error") != std::string::npos or error_msg.find("getaddrinfo: System error") != std::string::npos) {
         QMessageBox::information(0, "Verbindungsfehler", "Serverfehler, bitte kontaktieren Sie ihren Administrator");
         SYSLOG(ERROR) << "Error connecting to server!";
+    } else if(error_msg.find("unable to connect to") != std::string::npos) {
+        QMessageBox::information(0, "Verbindungsfehler!", "Der Server konnte nicht erreicht werden. Bitte kontaktieren Sie ihren Administrator.");
+        SYSLOG(ERROR) << "Unable to connect to server.";
     } else {
         SYSLOG(INFO) << "No errors during connection to server";
     }
