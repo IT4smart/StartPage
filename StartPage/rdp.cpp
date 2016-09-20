@@ -38,7 +38,7 @@ void Rdp::startRdp() {
     QStringList arguments;
     arguments << PAR_NOCERT << PAR_FULLSCREEN << PAR_USER + this->user << PAR_PW + this->password << PAR_DOMAIN + this->domain << PAR_SERVER + this->server << this->extraflag;
 
-    SYSLOG(DEBUG) << "Arguments: " << arguments.join(", ").toStdString();
+    SYSLOG(DEBUG) << "Arguments: " << arguments.join("; ").toStdString();
 
     SYSLOG(DEBUG) << "Start login for rdp session";
     process.start("xfreerdp", arguments);
