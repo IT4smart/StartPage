@@ -69,7 +69,16 @@ QString Storebrowse::getActualStore() {
 void Storebrowse::addStore() {
 //    qDebug() << "addStore";
     // run system command
-    QString command = PRG_STOREBROWSE + " -a '" + this->netscaler_url + "'";
+    QString command;
+
+    // check if netscaler is empty. So we have to decide that we use only storefront server
+    if (this->netscaler_url.trimmed().isEmpty()) {
+        command = PRG_STOREBROWSE + " -a '" + this->store_url + "'";
+        SYSLOG(DEBUG) << "Use storefront server to add it: " << this->store_url.toStdString();
+     } else {
+        command = PRG_STOREBROWSE + " -a '" + this->netscaler_url + "'";
+        SYSLOG(DEBUG) << "Use netscaler server to add it: " << this->netscaler_url.toStdString();
+     }
     QPair<QString,QString> ret_pair = StartPage::exec_cmd_process(command);
 //    qDebug() << "return:\n" << ret_pair.first << "\nerror:\n" << ret_pair.second;
 }
