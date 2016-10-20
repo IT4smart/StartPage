@@ -45,3 +45,9 @@ cp -ar Ressources files/opt/IT4S/startpage
 fix_arch_ctl "files/DEBIAN/control"
 dpkg_build files "${1}-startpage.deb"
 
+# get current version of this package
+version=$(awk '/^Version:/ { print $2 }' files/DEBIAN/control)
+package=$(awk '/^Package:/ { print $2 }' filed/DEBIAN/control)
+architecture=$(awk '/^Architecutre:/ { print $2 }' files/DEBIAN/control)
+
+mv "${1}-startpage.deb" "${package}_${version}_${architecture}.deb"
