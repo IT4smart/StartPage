@@ -31,6 +31,10 @@ const QString CITRIX_DOMAIN = "citrix/domain";
 // rdp keys
 const QString RDP_DOMAIN = "rdp/domain"; // key
 const QString RDP_URL = "rdp/server_url"; // key
+const QString RDP_EXTRAFLAG = "rdp/extraflag"; // key
+const QString RDP_AUTOLOGIN = "rdp/autologin";
+const QString RDP_USERNAME = "rdp/user";
+const QString RDP_PASSWORD = "rdp/password";
 // scripts
 const QString PRG_SHELL = "/bin/bash";
 const QString PRG_CONFIG_PAGE = "../Ressources/scripts/startConfigPage.sh";
@@ -54,7 +58,7 @@ class StartPage : public QMainWindow {
         ~StartPage(); // desctructor
         void init_screen(int w, int h); // initialize screen with elements and correct resolution
         static QPair<QString,QString> exec_cmd_process(QString command); // execute commands
-        void enableLogin();
+
 
         // VARS
         QNetworkConfigurationManager *nwManager; // NetworkManager from Qt to get status of networkinterfaces.
@@ -67,7 +71,7 @@ class StartPage : public QMainWindow {
         void setLogin(bool enable); // true=enable, false=disable
         bool getNetworkStatus(); // get network status --> return: true=connected, false=offline
         void loginCitrix(); // start citrix login
-        void loginRdp(); // start rdp login
+        void loginRdp(bool autologin = false); // start rdp login
         void changeNetworkLogo(); // change network logo
 
         // VARS
@@ -95,6 +99,7 @@ class StartPage : public QMainWindow {
         void on_tbtnNetStatus_clicked(); // show net status
         void on_btnDesktop_clicked(int index); // slot der geklickte desktops abfängt (for CITRIX only)
         void on_leUser_TextChanged(); // text was changed in line edit field
+        void enableLogin();
 
 };
 

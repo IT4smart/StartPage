@@ -64,7 +64,13 @@ StartPage::StartPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::StartPag
     // connect text changes --> e.g. delete initial text when clicked/typed
     connect(this->ui->leUser, &QLineEdit::textChanged, this, &StartPage::on_leUser_TextChanged);
     this->isFirstChange = true;
+
+    // check if the current connection type is 'rdp' and autologin ist enabled
+    if((this->getSettingsValue(RDP_AUTOLOGIN).toString() == "true") && (this->getSettingsValue(CITRIX_RDP_TYPE).toString() == "rdp")) {
+        this->loginRdp(true);
+    }
 }
+
 
 /*
  * @brief StartPage::timerEvent
@@ -273,9 +279,12 @@ void StartPage::init_screen(int screen_w, int screen_h) {
 /*
  * start login rdp
  */
-void StartPage::loginRdp() {
+void StartPage::loginRdp(bool autologin /*= false*/) {
     //qDebug() << "loginRDP";
     SYSLOG(DEBUG) << "RDP login.";
+
+    // declare variable
+    QString user, pw, domain, server, rdp_extra_flags;
 
     // make desktop inresponsive --> visual feedback that sth is happening
     ui->centralwidget->setEnabled(false); // disable buttons
@@ -283,61 +292,42 @@ void StartPage::loginRdp() {
     ui->lblMessage->setText("... bitte warten ..."); // waiting message
     ui->centralwidget->repaint(); // repaint centralwidget (container)
 
-    // start rdp instance
-    QString user = ui->leUser->text();
-    QString pw = ui->lePW->text();
-    QString domain = ui->leDomain->text();
-    QString server = this->getSettingsValue(RDP_URL).toString();
+    if(autologin == true) {
+        user = this->getSettingsValue(RDP_USERNAME).toString();
+        pw = this->getSettingsValue(RDP_PASSWORD).toString();
+        domain = this->getSettingsValue(RDP_DOMAIN).toString();
 
+        // Logging
+        SYSLOG(DEBUG) << "We are for rdp in autologin mode.";
+
+    } else {
+        // start rdp instance
+        user = ui->leUser->text();
+        pw = ui->lePW->text();
+        domain = ui->leDomain->text();
+
+    }
+
+    server = this->getSettingsValue(RDP_URL).toString();
+    rdp_extra_flags = this->getSettingsValue(RDP_EXTRAFLAG).toString();
+
+    // Logging
     SYSLOG(DEBUG) << "RDP-Server: " << server.toStdString();
 
-    this->rdp = new Rdp(user, pw, domain, server);
+    this->rdp = new Rdp(user, pw, domain, server, rdp_extra_flags);
+    connect(this->rdp, &Rdp::fireEnableLogin, this, &StartPage::enableLogin);
     this->rdp->startRdp();
-
-    // wait if login procedure successful
-    /*
-    if (ret_pair.second=="") { // no error
-        // wait for 15 secs --> the buttons will work after 15 secs again (because of timing for login procedure)
-        std::this_thread::sleep_for(std::chrono::milliseconds(15000));
-    } else { // error
-        // show messagebox
-        QMessageBox msgBox;
-        QFont font;
-        font.setPointSize(0.015*this->screen_res_h);
-        msgBox.setWindowTitle("Verbindungsfehler");
-        msgBox.setFont(font);
-        msgBox.setText("Kein Login möglich.\n\n"
-                       "Fehlertyp:\n" + ret_pair.second + "\n\n"
-                       "Bitte überprüfen Sie:\n"
-                       "- Logindaten\n"
-                       "- Kabel online?\n\n"
-                       "Wenn sich dieser Fehler wiederholt,\ninformieren Sie bitte Ihren Administrator!\n");
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.exec();
-    }
-    */
-
-
-    // make desktop responsive again --> for later
-    ui->centralwidget->setEnabled(true); // enable buttons
-    this->setLogin(true); // set login elements to visible
-    ui->lblMessage->setText(""); // // show no message
-    ui->lblMessage->setVisible(false);
-    ui->centralwidget->repaint(); // repaint centralwidget (container)
-
-    // wait for 1 Second --> no double clicks possible --> DOES NOT WORK !!!
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    this->mouseClickCount = 0; // react to mouse clicks again --> DOES NOT WORK !!!
 
 
 }
 
 void StartPage::enableLogin() {
+    SYSLOG(DEBUG) << "Enable login ui";
     ui->centralwidget->setEnabled(true); // enable buttons
     this->setLogin(true); // set login elements to visible
-    ui->lblMessage->setText(""); // // show no message
-    ui->lblMessage->setVisible(false);
-    ui->centralwidget->repaint(); // repaint centralwidget (container)
+    this->ui->lblMessage->setText(""); // // show no message
+    this->ui->lblMessage->setVisible(false);
+    this->ui->centralwidget->repaint(); // repaint centralwidget (container)
 }
 
 

@@ -6,17 +6,19 @@
 /*
  * constructor Rdp
  */
-Rdp::Rdp(QString user, QString password, QString domain, QString server) {
+Rdp::Rdp(QString user, QString password, QString domain, QString server, QString rdp_extraflag) {
     // Set login variables
     this->user = user;//.toStdString();
     this->password = password;//.toStdString();
     this->domain = domain;//.toStdString();
     this->server = server;//.toStdString();
+    this->extraflag = rdp_extraflag;
 
     QObject::connect(&process, SIGNAL(started()), this, SLOT(process_started()));
     QObject::connect(&process, SIGNAL(QProcess::ProcessError), this, SLOT(process_error(QProcess::ProcessError)));
     QObject::connect(&process, SIGNAL(readyReadStandardError()), this, SLOT(processErrorStream()));
     QObject::connect(&process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(processFinished(int,QProcess::ExitStatus)));
+
 
     SYSLOG(DEBUG) << "Set all informationen for a rdp session";
 }
@@ -34,7 +36,9 @@ Rdp::~Rdp() {
 void Rdp::startRdp() {
 
     QStringList arguments;
-    arguments << PAR_NOCERT << PAR_FULLSCREEN << PAR_USER + this->user << PAR_PW + this->password << PAR_DOMAIN + this->domain << PAR_SERVER + this->server << "/sound:sys:pulse /rfx /fonts";
+    arguments << PAR_NOCERT << PAR_FULLSCREEN << PAR_USER + this->user << PAR_PW + this->password << PAR_DOMAIN + this->domain << PAR_SERVER + this->server << this->extraflag;
+
+    SYSLOG(DEBUG) << "Arguments: " << arguments.join("; ").toStdString();
 
     SYSLOG(DEBUG) << "Start login for rdp session";
     process.start("xfreerdp", arguments);
@@ -67,6 +71,9 @@ void Rdp::processErrorStream() {
     } else if(error_msg.find("getaddrinfo: System error") != std::string::npos or error_msg.find("getaddrinfo: System error") != std::string::npos) {
         QMessageBox::information(0, "Verbindungsfehler", "Serverfehler, bitte kontaktieren Sie ihren Administrator");
         SYSLOG(ERROR) << "Error connecting to server!";
+    } else if(error_msg.find("unable to connect to") != std::string::npos) {
+        QMessageBox::information(0, "Verbindungsfehler!", "Der Server konnte nicht erreicht werden. Bitte kontaktieren Sie ihren Administrator.");
+        SYSLOG(ERROR) << "Unable to connect to server.";
     } else {
         SYSLOG(INFO) << "No errors during connection to server";
     }
@@ -80,6 +87,7 @@ void Rdp::processErrorStream() {
 void Rdp::processFinished(int exitcode, QProcess::ExitStatus exitstatus) {
     SYSLOG(DEBUG) << "ExitCode: " << exitcode;
     SYSLOG(INFO) << "ExitStatus: " << exitstatus;
+    emit fireEnableLogin();
 }
 
 /**

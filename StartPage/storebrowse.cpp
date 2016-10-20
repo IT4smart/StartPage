@@ -67,11 +67,27 @@ QString Storebrowse::getActualStore() {
  * @brief Storebrowse::addStore
  */
 void Storebrowse::addStore() {
-//    qDebug() << "addStore";
-    // run system command
-    QString command = PRG_STOREBROWSE + " -a '" + this->netscaler_url + "'";
+    QString command;
+
+    // check if netscaler is empty. So we have to decide that we use only storefront server
+    if (this->netscaler_url.trimmed().isEmpty()) {
+        command = PRG_STOREBROWSE + " -a '" + this->store_url + "'";
+        SYSLOG(DEBUG) << "Use storefront server to add it: " << this->store_url.toStdString();
+     } else {
+        command = PRG_STOREBROWSE + " -a '" + this->netscaler_url + "'";
+        SYSLOG(DEBUG) << "Use netscaler server to add it: " << this->netscaler_url.toStdString();
+     }
+
     QPair<QString,QString> ret_pair = StartPage::exec_cmd_process(command);
-//    qDebug() << "return:\n" << ret_pair.first << "\nerror:\n" << ret_pair.second;
+
+    // Logging
+    SYSLOG(DEBUG) << ret_pair.first.toStdString();
+    SYSLOG_IF(!ret_pair.second.isEmpty(), ERROR) << ret_pair.second.toStdString();
+
+    // check if we get an error so we don't have to fill 'store_url' with new data
+    if(!ret_pair.first.isEmpty()) {
+        this->store_url = ret_pair.first;
+    }
 }
 
 /*
@@ -81,7 +97,7 @@ QMap<QString,QString> Storebrowse::getDesktops() {
     QMap<QString, QString> ret_map; // initiate return map
 
     // run system command
-    QString command = PRG_STOREBROWSE+" -E '"+this->store_url+"'";
+    QString command = PRG_STOREBROWSE+" -E "+this->store_url;
 
     // logging
     SYSLOG(INFO) << "Request storefront server for desktops";
@@ -140,7 +156,7 @@ QMap<QString,QString> Storebrowse::getDesktops() {
  */
 QPair<QString,QString> Storebrowse::startDesktop(QString desktop_link) {
     // run system command
-    QString command = PRG_STOREBROWSE + " -L '" + desktop_link + "' '" + this->store_url + "'";
+    QString command = PRG_STOREBROWSE + " -L '" + desktop_link + "' " + this->store_url;
 
     // logging
     SYSLOG(INFO) << "Start Dekstop " << desktop_link.toStdString();
