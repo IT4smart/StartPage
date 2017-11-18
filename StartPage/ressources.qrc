@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>net_offline.png</file>
+        <file>net_online.png</file>
+        <file>desktop.png</file>
+    </qresource>
+</RCC>

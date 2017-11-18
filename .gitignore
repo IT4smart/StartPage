@@ -1,1 +1,13 @@
 #ignored files
+.*.swp
+build-*
+*.o
+*.qrc.depends
+StartPage.pro.*
+ui_*
+moc_*
+Makefile
+CMakeFile*
+CMakeCache*
+*_automoc*
+cmake_in*
