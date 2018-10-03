@@ -27,7 +27,7 @@ function dpkg_build()
 	echo "Installed-Size: $size" >> "$1/DEBIAN/control"
 	dpkg -b "$1" "$2"
 }
-# build 
+# build
 cd StartPage
 cmake .
 make "-j${NUM_CPUS}"
@@ -39,9 +39,9 @@ sed '/Depends/d' -i "${SRC_DIR}/files/DEBIAN/control"
 echo "Package: startpage" >> "${SRC_DIR}/files/DEBIAN/control"
 echo "Depends: qt5-default, freerdp-x11" >> "${SRC_DIR}/files/DEBIAN/control"
 
-mkdir -p files/opt/IT4S/startpage/StartPage
-cp -ar StartPage/StartPage files/opt/IT4S/startpage/StartPage
-cp -ar Ressources files/opt/IT4S/startpage
+mkdir -p files/opt/IT4smart/startpage/StartPage
+cp -ar StartPage/StartPage files/opt/IT4smart/startpage/StartPage
+cp -ar Ressources files/opt/IT4smart/startpage
 fix_arch_ctl "files/DEBIAN/control"
 dpkg_build files "${1}-startpage.deb"
 

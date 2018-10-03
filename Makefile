@@ -10,5 +10,5 @@ amd64:
 	sudo bash build.sh "amd64"
 clean:
 	sudo rm -f *.deb > /dev/null 2>&1
-	sudo rm -rf files/opt/IT4S/startpage > /dev/null 2>&1
+	sudo rm -rf files/opt/IT4smart/startpage > /dev/null 2>&1
 	sudo ./StartPage/clean_cmake.sh
