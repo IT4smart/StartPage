@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
     el::Loggers::reconfigureAllLoggers(conf);
     // Now all the loggers will use configuration from file
 
-    ELPP_INITIALIZE_SYSLOG("IT4S-StartPage", LOG_PID | LOG_CONS | LOG_PERROR, LOG_USER);
+    ELPP_INITIALIZE_SYSLOG("IT4smart-StartPage", LOG_PID | LOG_CONS | LOG_PERROR, LOG_USER);
 
     START_EASYLOGGINGPP(argc, argv);
 
