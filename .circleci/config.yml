@@ -1,0 +1,12 @@
+version: 2
+jobs:
+  build:
+    machine: true
+    working_directory: ~/repo
+    steps:
+    - run: git clone https://github.com/IT4smart/deb-packaging.git
+    - run:
+        name: Build debian package
+        command: |
+          cd deb-packaging/debian-jessie/startpage
+          ./changelog.sh > debian/changelog
