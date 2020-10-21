@@ -30,7 +30,7 @@ jobs:
         paths:
           - build/*
 
-workflow:
+workflows:
   version: 2
   snapshot:
     jobs:
