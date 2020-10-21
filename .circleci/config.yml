@@ -13,7 +13,42 @@ jobs:
           apt-get install -y bc qt5-default cmake dh-make git 
     - run:
         name: Create changelog
-        command: ./changelog.sh startpage stretch deb10 > debian/changelog
+        command: ./changelog.sh startpage buster deb10 > debian/changelog
+      
+    - run:
+        name: Create source archive
+        command: |
+          export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          export GIT_COMMIT=${CIRCLE_SHA1:0:7}
+          tar -czf /tmp/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}.orig.tar.gz .
+    - run:
+        name: Build package
+        command: dpkg-buildpackage -us -uc
+    - run:
+        name: Save build
+        command: |
+          mkdir -p ~/build
+          mv ~/*.deb ~/build/
+    - store_artifacts:
+        path: ~/build
+    - persist_to_workspace:
+        root: ~/
+        paths:
+          - build/*
+  build-commit-debian-stretch-amd64:
+    docker:
+      - image: debian:stretch-slim
+    working_directory: ~/repo
+    steps:
+    - checkout
+    - run: 
+        name: Install build dependencies
+        command: |
+          apt-get update -qq
+          apt-get install -y bc qt5-default cmake dh-make git 
+    - run:
+        name: Create changelog
+        command: ./changelog.sh startpage stretch deb9 > debian/changelog
       
     - run:
         name: Create source archive
@@ -41,3 +76,4 @@ workflows:
   snapshot:
     jobs:
       - build-commit-debian-buster-amd64
+      - build-commit-debian-stretch-amd64
