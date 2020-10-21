@@ -4,4 +4,4 @@
 
 # main packaging script based on dh7 syntax
 %:
-    dh $@ --buildsystem=cmake --sourcedirectory=StartPage --parallel
+	dh $@ --buildsystem=cmake --sourcedirectory=StartPage --parallel
