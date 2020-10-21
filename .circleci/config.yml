@@ -1,12 +1,37 @@
 version: 2
 jobs:
-  build:
+  build-commit-amd64:
     machine: true
     working_directory: ~/repo
     steps:
-    - run: git clone https://github.com/IT4smart/deb-packaging.git
+    - checkout
     - run:
-        name: Build debian package
+        name: Create changelog
+        command: ./changelog.sh startpage stretch deb10 > debian/changelog
+      
+    - run:
+        name: Create source archive
         command: |
-          cd deb-packaging/debian-jessie/startpage
-          ./changelog.sh > debian/changelog
+          export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          export GIT_COMMIT=${CIRCLE_SHA1:0:7}
+          tar -czf /tmp/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}.orig.tar.gz .
+    - run:
+        name: Build package
+        command: dpkg-buildpackage -us -uc
+    - run:
+        name: Save build
+        command: |
+          mkdir -p ~/build
+          mv ~/*.deb ~/build/
+    - store_artifacts:
+        path: ~/
+    - persist_to_workspace:
+        root: ~/
+        paths:
+          - build/*
+
+workflow:
+  version: 2
+  snapshot:
+    jobs:
+      - build-commit-amd64

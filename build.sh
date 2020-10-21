@@ -37,7 +37,7 @@ cd ..
 sed '/Package/d' -i "${SRC_DIR}/files/DEBIAN/control"
 sed '/Depends/d' -i "${SRC_DIR}/files/DEBIAN/control"
 echo "Package: startpage" >> "${SRC_DIR}/files/DEBIAN/control"
-echo "Depends: qt5-default, freerdp-x11" >> "${SRC_DIR}/files/DEBIAN/control"
+echo "Depends: qt5-default, freerdp2-x11" >> "${SRC_DIR}/files/DEBIAN/control"
 
 mkdir -p files/opt/IT4smart/startpage/StartPage
 cp -ar StartPage/StartPage files/opt/IT4smart/startpage/StartPage
