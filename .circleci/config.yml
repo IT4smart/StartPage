@@ -36,6 +36,7 @@ snapshot: &snapshot
           export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
           export GIT_COMMIT=${CIRCLE_SHA1:0:7}
           mkdir -p ~/build
+          ls -l ~/repo
           mv ~/repo/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}/*.deb ~/build/
     - store_artifacts:
         path: ~/build
