@@ -26,11 +26,15 @@ snapshot: &snapshot
     - run:
         name: Build package
         command: |
+          export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          export GIT_COMMIT=${CIRCLE_SHA1:0:7}
           cd ~/repo/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}
           dpkg-buildpackage -us -uc
     - run:
         name: Save build
         command: |
+          export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          export GIT_COMMIT=${CIRCLE_SHA1:0:7}
           mkdir -p ~/build
           mv ~/repo/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}/*.deb ~/build/
     - store_artifacts:
