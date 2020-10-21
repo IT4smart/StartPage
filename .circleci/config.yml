@@ -45,6 +45,14 @@ jobs:
     docker:
       - image: debian:stretch-slim
     <<: *snapshot
+  build-commit-debian-bullseye-amd64:
+    docker:
+      - image: debian:bullseye-slim
+    <<: *snapshot
+  build-commit-debian-buster-i386:
+    docker:
+      - image: i386/debian:buster-slim
+    <<: *snapshot
 
 workflows:
   version: 2
@@ -52,3 +60,5 @@ workflows:
     jobs:
       - build-commit-debian-buster-amd64
       - build-commit-debian-stretch-amd64
+      - build-commit-debian-bullseye-amd64
+      - build-commit-debian-buster-i386
