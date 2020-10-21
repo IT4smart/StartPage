@@ -24,7 +24,7 @@ jobs:
           mkdir -p ~/build
           mv ~/*.deb ~/build/
     - store_artifacts:
-        path: ~/
+        path: ~/build
     - persist_to_workspace:
         root: ~/
         paths:
