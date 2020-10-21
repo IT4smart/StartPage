@@ -10,7 +10,7 @@ jobs:
         name: Install build dependencies
         command: |
           apt-get update -qq
-          apt-get install -y bc qt5-default cmake dh-make
+          apt-get install -y bc qt5-default cmake dh-make git 
     - run:
         name: Create changelog
         command: ./changelog.sh startpage stretch deb10 > debian/changelog
