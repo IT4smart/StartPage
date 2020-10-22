@@ -29,7 +29,7 @@ snapshot-armhf: &snapshot-armhf
           export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
           export GIT_COMMIT=${CIRCLE_SHA1:0:7}
           cd ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
-          dpkg-buildpackage -us -uc
+          dpkg-buildpackage -us -uc --host-arch armhf
     - run:
         name: Save build
         command: |
@@ -119,10 +119,16 @@ jobs:
   build-commit-debian-stretch-armhf:
     docker:
       - image: it4smart/debian-stretch-cross:v1.0.0
+        auth: 
+          username: $DOCKERHUB_LOGIN
+          password: $DOCKERHUB_PASSWORD
     <<: *snapshot-armhf
   build-commit-debian-buster-armhf:
     docker:
       - image: it4smart/debian-buster-cross:v1.0.0
+        auth:
+          username: $DOCKERHUB_LOGIN
+          password: $DOCKERHUB_PASSWORD
     <<: *snapshot-armhf
 
 workflows:
