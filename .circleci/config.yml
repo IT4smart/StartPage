@@ -19,7 +19,7 @@ snapshot: &snapshot
         command: |
           export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
           export GIT_COMMIT=${CIRCLE_SHA1:0:7}
-          mkdir -p ~/repo/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}
+          mkdir -p ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
           tar -czf /tmp/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}.orig.tar.gz .
           tar -xzf /tmp/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}.orig.tar.gz -C ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
           ls -l
