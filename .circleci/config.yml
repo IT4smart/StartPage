@@ -21,16 +21,16 @@ snapshot: &snapshot
           export GIT_COMMIT=${CIRCLE_SHA1:0:7}
           mkdir -p ~/repo/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}
           tar -czf /tmp/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}.orig.tar.gz .
-          tar -xzf /tmp/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}.orig.tar.gz -C ~/repo/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}
+          tar -xzf /tmp/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}.orig.tar.gz -C ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
           ls -l
     - run:
         name: Build package
         command: |
           export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
           export GIT_COMMIT=${CIRCLE_SHA1:0:7}
-          cd ~/repo/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}
+          cd ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
           dpkg-buildpackage -us -uc
-          ls -l ~/repo/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}
+          ls -l ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
     - run:
         name: Save build
         command: |
