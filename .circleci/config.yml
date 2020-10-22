@@ -31,6 +31,7 @@ snapshot: &snapshot
           cd ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
           dpkg-buildpackage -us -uc
           ls -l ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
+          ls -lh ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}/obj-*
     - run:
         name: Save build
         command: |
