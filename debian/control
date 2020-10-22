@@ -4,6 +4,9 @@ Priority: optional
 Maintainer: IT4smart GmbH <support@it4smart.eu>
 Build-Depends: debhelper (>=9), qt5-default, cmake
 Standards-Version: 3.9.5
+Homepage: https://it4smart.eu
+Vcs-Git: https://github.com/IT4smart/StartPage.git
+Vcs-Browser: https://github.com/IT4smart/StartPage.git
 
 Package: startpage
 Architecture: any
