@@ -30,8 +30,6 @@ snapshot: &snapshot
           export GIT_COMMIT=${CIRCLE_SHA1:0:7}
           cd ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
           dpkg-buildpackage -us -uc
-          ls -l ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
-          ls -lh ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}/obj-*
     - run:
         name: Save build
         command: |
@@ -64,6 +62,22 @@ jobs:
     docker:
       - image: i386/debian:buster-slim
     <<: *snapshot
+  build-commit-debian-stretch-i386:
+    docker:
+      - image: i386/debian:stretch-slim
+    <<: *snapshot
+  build-commit-debian-bullseye-i386:
+    docker:
+      - image: i386/debian:bullseye-slim
+    <<: *snapshot
+  build-commit-debian-stretch-armhf:
+    docker:
+      - image: it4smart/debian-stretch-cross:v1.0.0
+    <<: *snapshot
+  build-commit-debian-buster-armhf:
+    docker:
+      - image: it4smart/debian-buster-cross:v1.0.0
+    <<: *snapshot
 
 workflows:
   version: 2
@@ -73,3 +87,7 @@ workflows:
       - build-commit-debian-stretch-amd64
       - build-commit-debian-bullseye-amd64
       - build-commit-debian-buster-i386
+      - build-commit-debian-stretch-i386
+      - build-commit-debian-bullseye-i386
+      - build-commit-debian-stretch-armhf
+      - build-commit-debian-buster-armhf
