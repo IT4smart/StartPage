@@ -1,3 +1,49 @@
+snapshot-armhf: &snapshot-armhf
+  working_directory: ~/repo
+  steps:
+    - checkout
+    - run: 
+        name: Install build dependencies
+        command: |
+          sudo apt-get update -qq
+          sudo apt-get install -y bc qt5-default cmake dh-make git lsb-release
+    - run:
+        name: Create changelog
+        command: |
+          CODENAME=$(lsb_release --codename --short)
+          RELEASE=$(lsb_release --release --short)
+          ./changelog.sh startpage ${CODENAME} deb${RELEASE} > debian/changelog
+      
+    - run:
+        name: Create source archive
+        command: |
+          export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          export GIT_COMMIT=${CIRCLE_SHA1:0:7}
+          mkdir -p ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
+          tar -czf /tmp/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}.orig.tar.gz .
+          tar -xzf /tmp/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}.orig.tar.gz -C ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
+          ls -l
+    - run:
+        name: Build package
+        command: |
+          export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          export GIT_COMMIT=${CIRCLE_SHA1:0:7}
+          cd ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
+          dpkg-buildpackage -us -uc
+    - run:
+        name: Save build
+        command: |
+          export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          export GIT_COMMIT=${CIRCLE_SHA1:0:7}
+          mkdir -p ~/build
+          mv ~/repo/*.deb ~/build/
+    - store_artifacts:
+        path: ~/build
+    - persist_to_workspace:
+        root: ~/
+        paths:
+          - build/*
+
 snapshot: &snapshot
   working_directory: ~/repo
   steps:
@@ -73,21 +119,45 @@ jobs:
   build-commit-debian-stretch-armhf:
     docker:
       - image: it4smart/debian-stretch-cross:v1.0.0
-    <<: *snapshot
+    <<: *snapshot-armhf
   build-commit-debian-buster-armhf:
     docker:
       - image: it4smart/debian-buster-cross:v1.0.0
-    <<: *snapshot
+    <<: *snapshot-armhf
 
 workflows:
   version: 2
   snapshot:
     jobs:
       - build-commit-debian-buster-amd64
+          filters:
+            tags:
+              ignore: /.*/
       - build-commit-debian-stretch-amd64
+          filters:
+            tags:
+              ignore: /.*/
       - build-commit-debian-bullseye-amd64
+          filters:
+            tags:
+              ignore: /.*/
       - build-commit-debian-buster-i386
+          filters:
+            tags:
+              ignore: /.*/
       - build-commit-debian-stretch-i386
+          filters:
+            tags:
+              ignore: /.*/
       - build-commit-debian-bullseye-i386
+          filters:
+            tags:
+              ignore: /.*/
       - build-commit-debian-stretch-armhf
+          filters:
+            tags:
+              ignore: /.*/
       - build-commit-debian-buster-armhf
+          filters:
+            tags:
+              ignore: /.*/
