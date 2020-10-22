@@ -7,7 +7,7 @@ snapshot-armhf: &snapshot-armhf
         command: |
           sudo dpkg --add-architecture armhf
           sudo apt-get update -qq
-          sudo apt-get install -y bc qt5-default:armhf cmake dh-make git lsb-release
+          sudo apt-get install -y bc qt5-default:armhf qtbase5-dev-tools:armhf cmake dh-make git lsb-release
     - run:
         name: Create changelog
         command: |
