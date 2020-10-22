@@ -129,35 +129,35 @@ workflows:
   version: 2
   snapshot:
     jobs:
-      - build-commit-debian-buster-amd64
+      - build-commit-debian-buster-amd64:
           filters:
             tags:
               ignore: /.*/
-      - build-commit-debian-stretch-amd64
+      - build-commit-debian-stretch-amd64:
           filters:
             tags:
               ignore: /.*/
-      - build-commit-debian-bullseye-amd64
+      - build-commit-debian-bullseye-amd64:
           filters:
             tags:
               ignore: /.*/
-      - build-commit-debian-buster-i386
+      - build-commit-debian-buster-i386:
           filters:
             tags:
               ignore: /.*/
-      - build-commit-debian-stretch-i386
+      - build-commit-debian-stretch-i386:
           filters:
             tags:
               ignore: /.*/
-      - build-commit-debian-bullseye-i386
+      - build-commit-debian-bullseye-i386:
           filters:
             tags:
               ignore: /.*/
-      - build-commit-debian-stretch-armhf
+      - build-commit-debian-stretch-armhf:
           filters:
             tags:
               ignore: /.*/
-      - build-commit-debian-buster-armhf
+      - build-commit-debian-buster-armhf:
           filters:
             tags:
               ignore: /.*/
