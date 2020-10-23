@@ -188,7 +188,7 @@ jobs:
 
 workflows:
   version: 2
-  release:
+  build-release:
     jobs:
       - build-release-debian-buster-amd64:
           filters:
@@ -202,7 +202,7 @@ workflows:
               ignore: /.*/
             tags:
               only: /v[0-9]+\.[0-9]+\.[0-9]+/
-  snapshot:
+  build-snapshot:
     jobs:
       - build-commit-debian-buster-amd64:
           filters:
