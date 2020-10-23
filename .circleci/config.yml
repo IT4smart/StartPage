@@ -188,6 +188,20 @@ jobs:
 
 workflows:
   version: 2
+  release:
+    jobs:
+      - build-release-debian-buster-amd64:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+\.[0-9]+\.[0-9]+/
+      - build-release-debian-buster-i386:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+\.[0-9]+\.[0-9]+/
   snapshot:
     jobs:
       - build-commit-debian-buster-amd64:
@@ -222,17 +236,3 @@ workflows:
 #          filters:
 #            tags:
 #              ignore: /.*/
-    release:
-      jobs:
-        - build-release-debian-buster-amd64:
-            filters:
-              branches:
-                ignore: /.*/
-              tags:
-                only: /v[0-9]+\.[0-9]+\.[0-9]+/
-        - build-release-debian-buster-i386:
-            filters:
-              branches:
-                ignore: /.*/
-              tags:
-                only: /v[0-9]+\.[0-9]+\.[0-9]+/
