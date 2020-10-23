@@ -113,24 +113,24 @@ jobs:
     docker:
       - image: i386/debian:stretch-slim
     <<: *snapshot
-#  build-commit-debian-bullseye-i386:
-#    docker:
-#      - image: i386/debian:bullseye-slim
-#    <<: *snapshot
-#  build-commit-debian-stretch-armhf:
-#    docker:
-#      - image: it4smart/debian-stretch-cross:v1.0.0
-#        auth: 
-#          username: $DOCKERHUB_LOGIN
-#          password: $DOCKERHUB_PASSWORD
-#    <<: *snapshot-armhf
-#  build-commit-debian-buster-armhf:
-#    docker:
-#      - image: it4smart/debian-buster-cross:v1.0.0
-#        auth:
-#          username: $DOCKERHUB_LOGIN
-#          password: $DOCKERHUB_PASSWORD
-#    <<: *snapshot-armhf
+  build-commit-debian-bullseye-i386:
+    docker:
+      - image: i386/debian:bullseye-slim
+    <<: *snapshot
+  build-commit-debian-stretch-armhf:
+    docker:
+      - image: it4smart/debian-stretch-cross:v1.0.0
+        auth: 
+          username: $DOCKERHUB_LOGIN
+          password: $DOCKERHUB_PASSWORD
+    <<: *snapshot-armhf
+  build-commit-debian-buster-armhf:
+    docker:
+      - image: it4smart/debian-buster-cross:v1.0.0
+        auth:
+          username: $DOCKERHUB_LOGIN
+          password: $DOCKERHUB_PASSWORD
+    <<: *snapshot-armhf
 
 workflows:
   version: 2
@@ -156,15 +156,15 @@ workflows:
           filters:
             tags:
               ignore: /.*/
-      - build-commit-debian-bullseye-i386:
-          filters:
-            tags:
-              ignore: /.*/
-      - build-commit-debian-stretch-armhf:
-          filters:
-            tags:
-              ignore: /.*/
-      - build-commit-debian-buster-armhf:
-          filters:
-            tags:
-              ignore: /.*/
+#      - build-commit-debian-bullseye-i386:
+#          filters:
+#            tags:
+#              ignore: /.*/
+#      - build-commit-debian-stretch-armhf:
+#          filters:
+#            tags:
+#              ignore: /.*/
+#      - build-commit-debian-buster-armhf:
+#          filters:
+#            tags:
+#              ignore: /.*/
