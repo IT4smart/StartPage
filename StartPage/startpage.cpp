@@ -1,7 +1,5 @@
-#include "startpage.h"
-#include "ui_startpage.h"
-#include "storebrowse.h"
-#include "easylogging++.h"
+#include <stdio.h>
+#include <math.h>
 #include <QDebug>
 #include <QSettings>
 #include <QTime>
@@ -19,7 +17,10 @@
 #include <thread>
 #include <QLineEdit>
 #include <QKeyEvent>
-
+#include "startpage.h"
+#include "ui_startpage.h"
+#include "storebrowse.h"
+#include "easylogging++.h"
 
 /*
  * Constructor

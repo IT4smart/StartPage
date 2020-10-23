@@ -1,12 +1,238 @@
+snapshot-armhf: &snapshot-armhf
+  working_directory: ~/repo
+  steps:
+    - checkout
+    - run: 
+        name: Install build dependencies
+        command: |
+          sudo dpkg --add-architecture armhf
+          sudo apt-get update -qq
+          sudo apt-get install -y bc qt5-default:armhf qtbase5-dev-tools:armhf cmake dh-make git lsb-release
+    - run:
+        name: Create changelog
+        command: |
+          CODENAME=$(lsb_release --codename --short)
+          RELEASE=$(lsb_release --release --short)
+          ./changelog.sh startpage ${CODENAME} deb${RELEASE} > debian/changelog
+      
+    - run:
+        name: Create source archive
+        command: |
+          export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          export GIT_COMMIT=${CIRCLE_SHA1:0:7}
+          mkdir -p ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
+          tar -czf /tmp/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}.orig.tar.gz .
+          tar -xzf /tmp/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}.orig.tar.gz -C ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
+          ls -l
+    - run:
+        name: Build package
+        command: |
+          export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          export GIT_COMMIT=${CIRCLE_SHA1:0:7}
+          cd ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
+          dpkg-buildpackage -us -uc --host-arch armhf
+    - run:
+        name: Save build
+        command: |
+          mkdir -p ~/build
+          mv ~/repo/*.deb ~/build/
+    - store_artifacts:
+        path: ~/build
+    - persist_to_workspace:
+        root: ~/
+        paths:
+          - build/*
+
+snapshot: &snapshot
+  working_directory: ~/repo
+  steps:
+    - checkout
+    - run: 
+        name: Install build dependencies
+        command: |
+          apt-get update -qq
+          apt-get install -y bc qt5-default cmake dh-make git lsb-release
+    - run:
+        name: Create changelog
+        command: |
+          CODENAME=$(lsb_release --codename --short)
+          RELEASE=$(lsb_release --release --short)
+          ./changelog.sh startpage ${CODENAME} deb${RELEASE} > debian/changelog
+      
+    - run:
+        name: Create source archive
+        command: |
+          export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          export GIT_COMMIT=${CIRCLE_SHA1:0:7}
+          mkdir -p ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
+          tar -czf /tmp/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}.orig.tar.gz .
+          tar -xzf /tmp/startpage_${GIT_TAG//v}+git-${GIT_COMMIT}.orig.tar.gz -C ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
+          ls -l
+    - run:
+        name: Build package
+        command: |
+          export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          export GIT_COMMIT=${CIRCLE_SHA1:0:7}
+          cd ~/repo/startpage-${GIT_TAG//v}+git-${GIT_COMMIT}
+          dpkg-buildpackage -us -uc
+    - run:
+        name: Save build
+        command: |
+          mkdir -p ~/build
+          mv ~/repo/*.deb ~/build/
+    - store_artifacts:
+        path: ~/build
+    - persist_to_workspace:
+        root: ~/
+        paths:
+          - build/*
+
+release: &release
+  working_directory: ~/repo
+  steps:
+    - checkout
+    - run: 
+        name: Install build dependencies
+        command: |
+          apt-get update -qq
+          apt-get install -y bc qt5-default cmake dh-make git lsb-release
+    - run:
+        name: Create changelog
+        command: |
+          CODENAME=$(lsb_release --codename --short)
+          RELEASE=$(lsb_release --release --short)
+          ./changelog.sh startpage ${CODENAME} deb${RELEASE} > debian/changelog
+      
+    - run:
+        name: Create source archive
+        command: |
+          export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          mkdir -p ~/repo/startpage-${GIT_TAG//v}
+          tar -czf /tmp/startpage_${GIT_TAG//v}.orig.tar.gz .
+          tar -xzf /tmp/startpage_${GIT_TAG//v}.orig.tar.gz -C ~/repo/startpage-${GIT_TAG//v}
+          ls -l
+    - run:
+        name: Build package
+        command: |
+          export GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          cd ~/repo/startpage-${GIT_TAG//v}
+          dpkg-buildpackage -us -uc
+    - run:
+        name: Save build
+        command: |
+          mkdir -p ~/build
+          mv ~/repo/*.deb ~/build/
+    - add_ssh_keys:
+        finderprints:
+          - "77:1e:e6:8b:6f:f5:1c:cc:c9:ca:92:02:1e:4b:c6:5f"
+    - run:
+        name: Upload package
+        command: |
+          CODENAME=$(lsb_release --codename --short)
+          scp -o StrictHostKeyChecking=no $(ls ~/build/*.deb) uploader@mirror.it4smart.eu:/var/repositories/debian/incoming/${CODENAME}/
+    - store_artifacts:
+        path: ~/build
+    - persist_to_workspace:
+        root: ~/
+        paths:
+          - build/*
+
 version: 2
 jobs:
-  build:
-    machine: true
-    working_directory: ~/repo
-    steps:
-    - run: git clone https://github.com/IT4smart/deb-packaging.git
-    - run:
-        name: Build debian package
-        command: |
-          cd deb-packaging/debian-jessie/startpage
-          ./changelog.sh > debian/changelog
+  build-release-debian-buster-amd64:
+    docker:
+      - image: debian:buster-slim
+    <<: *release
+  build-release-debian-buster-i386:
+    docker:
+      - image: i386/debian:buster-slim
+    <<: *release
+  build-commit-debian-buster-amd64:
+    docker:
+      - image: debian:buster-slim
+    <<: *snapshot
+  build-commit-debian-stretch-amd64:
+    docker:
+      - image: debian:stretch-slim
+    <<: *snapshot
+  build-commit-debian-bullseye-amd64:
+    docker:
+      - image: debian:bullseye-slim
+    <<: *snapshot
+  build-commit-debian-buster-i386:
+    docker:
+      - image: i386/debian:buster-slim
+    <<: *snapshot
+  build-commit-debian-stretch-i386:
+    docker:
+      - image: i386/debian:stretch-slim
+    <<: *snapshot
+  build-commit-debian-bullseye-i386:
+    docker:
+      - image: i386/debian:bullseye-slim
+    <<: *snapshot
+  build-commit-debian-stretch-armhf:
+    docker:
+      - image: it4smart/debian-stretch-cross:v1.0.0
+        auth: 
+          username: $DOCKERHUB_LOGIN
+          password: $DOCKERHUB_PASSWORD
+    <<: *snapshot-armhf
+  build-commit-debian-buster-armhf:
+    docker:
+      - image: it4smart/debian-buster-cross:v1.0.0
+        auth:
+          username: $DOCKERHUB_LOGIN
+          password: $DOCKERHUB_PASSWORD
+    <<: *snapshot-armhf
+
+workflows:
+  version: 2
+  build-release:
+    jobs:
+      - build-release-debian-buster-amd64:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+\.[0-9]+\.[0-9]+/
+      - build-release-debian-buster-i386:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+\.[0-9]+\.[0-9]+/
+  build-snapshot:
+    jobs:
+      - build-commit-debian-buster-amd64:
+          filters:
+            tags:
+              ignore: /.*/
+      - build-commit-debian-stretch-amd64:
+          filters:
+            tags:
+              ignore: /.*/
+      - build-commit-debian-bullseye-amd64:
+          filters:
+            tags:
+              ignore: /.*/
+      - build-commit-debian-buster-i386:
+          filters:
+            tags:
+              ignore: /.*/
+      - build-commit-debian-stretch-i386:
+          filters:
+            tags:
+              ignore: /.*/
+#      - build-commit-debian-bullseye-i386:
+#          filters:
+#            tags:
+#              ignore: /.*/
+#      - build-commit-debian-stretch-armhf:
+#          filters:
+#            tags:
+#              ignore: /.*/
+#      - build-commit-debian-buster-armhf:
+#          filters:
+#            tags:
+#              ignore: /.*/

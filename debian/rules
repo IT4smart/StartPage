@@ -1,0 +1,13 @@
+#!/usr/bin/make -f
+# You must remoce unused comment lines for the released package.
+#export DH_VERBOSE = 1
+
+BUILD_DIR := obj-$(DEB_HOST_GNU_TYPE)
+
+# main packaging script based on dh7 syntax
+%:
+	dh $@ --buildsystem=cmake --sourcedirectory=StartPage --parallel
+
+override_dh_auto_install:
+	mkdir -p debian/startpage/opt/IT4smart/startpage/StartPage
+	cp $(BUILD_DIR)/StartPage debian/startpage/opt/IT4smart/startpage/StartPage
